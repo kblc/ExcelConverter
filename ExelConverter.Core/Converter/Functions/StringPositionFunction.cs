@@ -41,9 +41,15 @@ namespace ExelConverter.Core.Converter.Functions
         {
             var str = GetStringValue(param);
 
-            var startPos = int.Parse((string)Parameters.Where(p=>p.Name=="Начало").Single().Value);
-            var len = int.Parse((string)Parameters.Where(p=>p.Name=="Длинна").Single().Value);
-            str = str.Substring(startPos, len);
+            var startPos = Math.Max(int.Parse((string)Parameters.Where(p=>p.Name=="Начало").Single().Value), 1) - 1;
+            var len = Math.Max(int.Parse((string)Parameters.Where(p => p.Name == "Длинна").Single().Value), (int)0);
+            
+            if (startPos < str.Length)
+            {
+                if (len > str.Length - startPos)
+                    str = str.Substring(startPos); else
+                    str = str.Substring(startPos, len);
+            }
 
             return str;
         }

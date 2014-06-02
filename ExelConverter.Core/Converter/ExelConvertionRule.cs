@@ -344,7 +344,6 @@ namespace ExelConverter.Core.Converter
                         {
                             throw new Exception(string.Format("exception at row line: '{0}', log part: '{1}';", i, logPart), ex);
                         }
-                    RemoveRepeatingId(result);
                 }
                 else
                     Log.Add(string.Format("sheet '{0}' has not header!", sheet.Name));
@@ -355,6 +354,7 @@ namespace ExelConverter.Core.Converter
             }
             finally
             {
+                RemoveRepeatingId(result);
                 Log.SessionEnd(logSession);
             }
             
@@ -382,18 +382,13 @@ namespace ExelConverter.Core.Converter
         //    return result;
         //}
 
-        private void RemoveRepeatingId(List<OutputRow> list)
+        public static void RemoveRepeatingId(List<OutputRow> list)
         {
             foreach (var row in list)
             {
-                var sameIds = list.Where(r => r.Code == row.Code).ToArray();
-                if (sameIds.Length > 1)
-                {
-                    for (var i = 1; i <= sameIds.Length; i++)
-                    {
-                        sameIds[i-1].Code += "_" + i;
-                    }
-                }
+                var sameIds = list.Where(r => r.Code == row.Code && row != r).ToArray();
+                for (var i = 0; i < sameIds.Length; i++)
+                    sameIds[i].Code = string.Format("{0}_{1}", sameIds[i].Code, i + 1);
             }
         }
 

@@ -18,6 +18,8 @@ using System.Windows;
 using ExcelConverter.Parser;
 using ExcelConverter.Parser.Controls;
 using ExelConverter.Core.DataAccess;
+using ExelConverter.Core.Converter;
+using ExelConverterLite.View;
 
 namespace ExelConverterLite.ViewModel
 {
@@ -99,14 +101,27 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
-        public ExportViewModel()
+        public ExportViewModel() { }
+
+        public void Initialize()
         {
             //RowsToExport = new ObservableCollection<OutputRow>(App.Locator.Import.SelectedOperator.MappingRule.Convert(App.Locator.Import.SelectedSheet));
             ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
 
-            Guid logSession = Log.SessionStart("ExportViewModel.ExportViewModel()");
+            Guid logSession = Log.SessionStart("ExportViewModel.Initialize()");
             try
             {
+                if (Export2CsvCommand == null)
+                    Export2CsvCommand = new RelayCommand(Export2Csv);
+                if (Export2DbCommand == null)
+                    Export2DbCommand = new RelayCommand(Export2Db);
+                if (UpdateErrorsCommand == null)
+                    UpdateErrorsCommand = new RelayCommand(UpdateErrors);
+                if (UpdateSelectedErrorCommand == null)
+                    UpdateSelectedErrorCommand = new RelayCommand(UpdateSelectedError);
+                if (UpdateSelectedWarningCommand == null)
+                    UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
+
                 Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.DocumentSheets.Count));
 
                 foreach (var item in App.Locator.Import.ExportRules)
@@ -132,6 +147,8 @@ namespace ExelConverterLite.ViewModel
                     }
                 }
 
+                ExelConvertionRule.RemoveRepeatingId(rowsToExport.ToList());
+
                 UrlCollection.Clear();
                 var UrlsPhoto = new UrlCollection();
                 var UrlsSchema = new UrlCollection();
@@ -149,55 +166,25 @@ namespace ExelConverterLite.ViewModel
                     UrlsAll.Add(new StringUrlWithResultWrapper(p));
 
                 if (UrlsPhoto.Count > 0)
-                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels[0], Collection = UrlsPhoto });
+                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(0), Collection = UrlsPhoto });
                 if (UrlsSchema.Count > 0)
-                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels[1], Collection = UrlsSchema });
+                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(1), Collection = UrlsSchema });
                 if (UrlsPhoto.Count > 0 && UrlsSchema.Count > 0 && UrlsAll.Count > 0)
                     UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
 
-
-                //foreach (var ds in App.Locator.Import.DocumentSheets)
-                //{
-                //    var mappingRule =
-                //        (
-                //            App.Locator.Import.SelectedOperator.MappingRules.Where(r => ds.Name.ToLower().Contains(r.Name.ToLower())).FirstOrDefault() 
-                //            ?? App.Locator.Import.SelectedOperator.MappingRules.Where(r => r.Name.ToLower() == "По умолчанию".ToLower() ).FirstOrDefault()
-                //        )
-                //        ?? App.Locator.Import.SelectedOperator.MappingRule;
-
-
-                //    if (ds.MainHeader == null)
-                //    {
-                //        Log.Add(string.Format("should update main header row..."));
-                //        if (mappingRule.FindMainHeaderByTags)
-                //            ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags.Select(h => h.Tag).ToArray());
-                //        else
-                //            ds.UpdateMainHeaderRow(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }));
-                //    }
-
-                //    var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds));
-                //    Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
-                //    rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
-
-                //    Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
-                //}
+                RowsToExport = rowsToExport;
+                UpdateErrors();   
+            }
+            catch(Exception ex)
+            {
+                Log.Add(logSession, ex.GetExceptionText());
+                throw ex;
             }
             finally
             {
                 Log.Add(string.Format("total row count to export: '{0}'", rowsToExport.Count));
-                RowsToExport = rowsToExport;
                 Log.SessionEnd(logSession);
             }
-
-            Errors = new ObservableCollection<Error>();
-            Warnings = new ObservableCollection<Error>();
-
-            Export2CsvCommand = new RelayCommand(Export2Csv);
-            Export2DbCommand = new RelayCommand(Export2Db);
-            UpdateErrorsCommand = new RelayCommand(UpdateErrors);
-            UpdateSelectedErrorCommand = new RelayCommand(UpdateSelectedError);
-            UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
-            UpdateErrors();   
         }
 
         private ObservableCollection<UrlCollectionAdditional> urlCollection = null;
@@ -219,10 +206,10 @@ namespace ExelConverterLite.ViewModel
 
         ~ExportViewModel()
         {
-            Parsers.Save();
+            //Parsers.Save();
         }
 
-        private ObservableCollection<OutputRow> _rowsToExport;
+        private ObservableCollection<OutputRow> _rowsToExport = new ObservableCollection<OutputRow>();
         public ObservableCollection<OutputRow> RowsToExport
         {
             get { return _rowsToExport; }
@@ -230,7 +217,10 @@ namespace ExelConverterLite.ViewModel
             {
                 if (_rowsToExport != value)
                 {
-                    _rowsToExport = value;
+                    RowsToExport.Clear();
+                    if (value != null)
+                        foreach (var i in value)
+                            RowsToExport.Add(i);
                     RaisePropertyChanged("RowsToExport");
                 }
             }
@@ -268,7 +258,7 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
-        private ObservableCollection<Error> _errors;
+        private ObservableCollection<Error> _errors = new ObservableCollection<Error>();
         public ObservableCollection<Error> Errors
         {
             get { return _errors; }
@@ -276,13 +266,16 @@ namespace ExelConverterLite.ViewModel
             {
                 if (_errors != value)
                 {
-                    _errors = value;
+                    Errors.Clear();
+                    if (value != null)
+                        foreach (var i in value)
+                            Errors.Add(i);
                     RaisePropertyChanged("Errors");
                 }
             }
         }
 
-        private ObservableCollection<Error> _warnings;
+        private ObservableCollection<Error> _warnings = new ObservableCollection<Error>();
         public ObservableCollection<Error> Warnings
         {
             get { return _warnings; }
@@ -290,7 +283,10 @@ namespace ExelConverterLite.ViewModel
             {
                 if (_warnings != value)
                 {
-                    _warnings = value;
+                    Warnings.Clear();
+                    if (value != null)
+                        foreach (var i in value)
+                            Warnings.Add(i);
                     RaisePropertyChanged("Warnings");
                 }
             }
@@ -714,6 +710,9 @@ namespace ExelConverterLite.ViewModel
             return result.ToArray();
         }
 
-        
+        internal void Closing()
+        {
+            Parsers.Save();
+        }
     }
 }

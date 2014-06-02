@@ -286,25 +286,40 @@ namespace ExelConverter.Core.DataAccess
 
         public Parser[] ParsersGet(Guid[] ids = null)
         {
-            //var dc = exelconverterEntities2.Default;
-            using (var dc = exelconverterEntities2.New())
+            bool wasException = false;
+            var result = new Parser[] { };
+            var logSession = Log.SessionStart("DataAccess.ParsersGet()", true);
+            try
             {
-                var result = dc
-                        .parsers
-                        .Where(p => ids == null || ids.Contains(p.id))
-                        .AsEnumerable()
-                        .Select(parser =>
-                        {
-                            Parser p = Parser.Deserialize(parser.xml, typeof(Parser)) as Parser;
-                            if (p != null)
-                                p.Id = parser.id;
-                            return p;
-                        })
-                        .Where(p => p != null)
-                        .ToArray<Parser>();
+                var pIds = ids == null ? new Guid[] { } : ids;
 
-                return result;
+                using (var dc = exelconverterEntities2.New())
+                {
+                    result = dc
+                            .parsers
+                            .Where(p => ids.Length == 0 || ids.Contains(p.id))
+                            .AsEnumerable()
+                            .Select(parser =>
+                            {
+                                Parser p = Parser.Deserialize(parser.xml, typeof(Parser)) as Parser;
+                                if (p != null)
+                                    p.Id = parser.id;
+                                return p;
+                            })
+                            .Where(p => p != null)
+                            .ToArray<Parser>();
+                }
             }
+            catch(Exception ex)
+            {
+                wasException = true;
+                Log.Add(logSession, ex.GetExceptionText());
+            }
+            finally
+            {
+                Log.SessionEnd(logSession, wasException);
+            }
+            return result;
         }
         public Guid[] ParsersRemove(Parser[] parsers)
         {

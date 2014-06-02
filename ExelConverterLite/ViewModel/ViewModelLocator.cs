@@ -114,12 +114,17 @@ namespace ExelConverterLite.ViewModel
         {
             get
             {
-                return _export ?? (_export = new ExportViewModel());
+                if (_export == null)
+                {
+                    _export = new ExportViewModel();
+                    //_export.Initialize();
+                }
+                return _export;
             }
-            set
-            {
-                _export = value;
-            }
+            //set
+            //{
+            //    _export = value;
+            //}
         }
 
         private ExportSetupViewModel _exportSetup;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Helpers;
 using ExelConverter.Core.Converter.CommonTypes;
 using ExelConverter.Core.ExelDataReader;
 
@@ -48,9 +48,10 @@ namespace ExelConverter.Core.Converter.Functions
 
                 foreach (var value in values)
                 {
-                    str = CheckValue(str, values);
-                    if (str != null)
+                    var str_res = CheckValue(str, values);
+                    if (str_res != null)
                     {
+                        str = str_res;
                         flag = true;
                         break;
                     }
@@ -72,7 +73,11 @@ namespace ExelConverter.Core.Converter.Functions
         {
             foreach (var mapping in values)
             {
-                if (value != null && value.ToLower().Trim().StartsWith(mapping.ToLower().Trim()))
+                if (value != null && 
+                    (
+                        value.ToLower().Trim().StartsWith(mapping.ToLower().Trim()))
+                        || value.Like(mapping)
+                    )
                 {
                     return mapping;
                 }

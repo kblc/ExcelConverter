@@ -122,8 +122,11 @@ namespace ExelConverterLite.View
             {
                 if (_exportView == null || _exportView.IsClosed) 
                 {
-                    App.Locator.Export = null;
+                    //App.Locator.Export = null;
+                    var export = App.Locator.Export;
+                    export.Initialize();
                     _exportView = new ExportView();
+                    _exportView.Closing += (s, e) => { export.Closing(); };
                 }
                 return _exportView;
             }

@@ -517,8 +517,16 @@ namespace ExcelConverter.Parser
     [Serializable]
     public class ParserCollection : INotifyPropertyChanged
     {
+        private const string LabelPhoto = "Фото";
+        private const string LabelSchema = "Схема";
+
         public ParserCollection()
         {
+            if (!labels.Contains(LabelPhoto))
+                labels.Add(LabelPhoto);
+            if (!labels.Contains(LabelSchema))
+                labels.Add(LabelSchema);
+            
             Labels.CollectionChanged += (s, e) => { RaisePropertyChanged("Labels"); };
             Parsers.CollectionChanged += (s, e) => 
             {
@@ -541,7 +549,7 @@ namespace ExcelConverter.Parser
             };
         }
 
-        private readonly ObservableCollection<string> labels = new ObservableCollection<string>(new string[] { "Фото", "Схема" });
+        private readonly ObservableCollection<string> labels = new ObservableCollection<string>(); //new string[] { LabelPhoto, LabelSchema }
         [field: NonSerializedAttribute()]
         public ObservableCollection<string> Labels
         {
