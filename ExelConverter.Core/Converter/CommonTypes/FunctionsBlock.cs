@@ -267,11 +267,29 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 bool subResult = false;
                 if (rule.AbsoluteCoincidence)
                 {
-                    subResult = rule.ExpectedValues.Any(s => s != null && (s.Value == cellResultContent || string.IsNullOrWhiteSpace(s.Value) == string.IsNullOrWhiteSpace(cellResultContent) == true));
+                    subResult = 
+                        rule
+                        .ExpectedValues
+                        .Any(s => 
+                                s != null 
+                                && 
+                                (
+                                    s.Value == cellResultContent 
+                                    || string.IsNullOrWhiteSpace(s.Value) == string.IsNullOrWhiteSpace(cellResultContent) == true
+                                )
+                            );
                 }
                 else
                 {
-                    subResult = rule.ExpectedValues.Any(s => s != null && s.Value != null && cellResultContent.ToLower().Contains(s.Value.ToLower()));
+                    subResult = 
+                        rule
+                        .ExpectedValues
+                        .Any(s => 
+                                s != null 
+                                && s.Value != null 
+                                && cellResultContent.ToLower().Contains(s.Value.ToLower()
+                        )
+                    );
                 }
                 if (IsAllStartRulesNeeded)
                     result &= subResult;
