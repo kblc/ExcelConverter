@@ -160,19 +160,19 @@ namespace ExelConverter.Core.DataWriter
                                                         var linksForCode = idsToGet.FirstOrDefault(itm => itm.Code == normalCode.Code);
                                                         if (linksForCode != null)
                                                         {
-                                                            if (linksForCode.LinkPhoto != null)
+                                                            if (!string.IsNullOrWhiteSpace(linksForCode.LinkPhoto))
                                                             {
                                                                 var c1 = sheet.Cells[i, lastIndex + 1];
                                                                 c1.Value = "фото";
                                                                 sheet.Hyperlinks.Add(c1.Name, 1, 1, linksForCode.LinkPhoto);
                                                             }
-                                                            if (linksForCode.LinkLocation != null)
+                                                            if (!string.IsNullOrWhiteSpace(linksForCode.LinkLocation))
                                                             {
                                                                 var c2 = sheet.Cells[i, lastIndex + 2];
                                                                 c2.Value = "схема";
                                                                 sheet.Hyperlinks.Add(c2.Name, 1, 1, linksForCode.LinkLocation);
                                                             }
-                                                            if (linksForCode.LinkMap != null)
+                                                            if (!string.IsNullOrWhiteSpace(linksForCode.LinkMap))
                                                             {
                                                                 var c3 = sheet.Cells[i, lastIndex + 3];
                                                                 c3.Value = "карта";
