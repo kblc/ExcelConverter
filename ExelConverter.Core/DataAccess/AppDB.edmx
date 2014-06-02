@@ -1,0 +1,2715 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="alphaModel.Store" Alias="Self" Provider="MySql.Data.MySqlClient" ProviderManifestToken="5.6" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="alphaModelStoreContainer">
+          <EntitySet Name="area" EntityType="alphaModel.Store.area" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="cart" EntityType="alphaModel.Store.cart" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="cities" EntityType="alphaModel.Store.cities" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="companies" EntityType="alphaModel.Store.companies" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="countries" EntityType="alphaModel.Store.countries" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="discounts_periods" EntityType="alphaModel.Store.discounts_periods" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="discounts_qty" EntityType="alphaModel.Store.discounts_qty" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="help_chapters" EntityType="alphaModel.Store.help_chapters" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="hots" EntityType="alphaModel.Store.hots" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="import_rectangle" EntityType="alphaModel.Store.import_rectangle" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="locations" EntityType="alphaModel.Store.locations" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="managers" EntityType="alphaModel.Store.managers" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="mockup" EntityType="alphaModel.Store.mockup" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="mockup_set" EntityType="alphaModel.Store.mockup_set" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="news" EntityType="alphaModel.Store.news" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="operator_orders" EntityType="alphaModel.Store.operator_orders" store:Type="Tables" store:Schema="alpha" store:Name="operator_orders">
+            <DefiningQuery>SELECT
+      `operator_orders`.`operator_id`, 
+      `operator_orders`.`order_id`, 
+      `operator_orders`.`status`
+      FROM `operator_orders` AS `operator_orders`</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="orders" EntityType="alphaModel.Store.orders" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="orders_confirms" EntityType="alphaModel.Store.orders_confirms" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="pages" EntityType="alphaModel.Store.pages" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="photo_report" EntityType="alphaModel.Store.photo_report" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="photo_report_resource" EntityType="alphaModel.Store.photo_report_resource" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="photo_report_resource_photo" EntityType="alphaModel.Store.photo_report_resource_photo" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="preferences" EntityType="alphaModel.Store.preferences" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="presentation_link" EntityType="alphaModel.Store.presentation_link" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="presentation_link_resource" EntityType="alphaModel.Store.presentation_link_resource" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="regions" EntityType="alphaModel.Store.regions" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="reserves" EntityType="alphaModel.Store.reserves" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resource_import_log" EntityType="alphaModel.Store.resource_import_log" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resource_lights" EntityType="alphaModel.Store.resource_lights" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resource_price_rules" EntityType="alphaModel.Store.resource_price_rules" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resource_sides" EntityType="alphaModel.Store.resource_sides" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resource_sizes" EntityType="alphaModel.Store.resource_sizes" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resource_types" EntityType="alphaModel.Store.resource_types" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resources" EntityType="alphaModel.Store.resources" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="resources_history" EntityType="alphaModel.Store.resources_history" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="seo_place" EntityType="alphaModel.Store.seo_place" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="static_pages" EntityType="alphaModel.Store.static_pages" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="subresources" EntityType="alphaModel.Store.subresources" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="subresources_history" EntityType="alphaModel.Store.subresources_history" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="sync" EntityType="alphaModel.Store.sync" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="synonym" EntityType="alphaModel.Store.synonym" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="synonym_word" EntityType="alphaModel.Store.synonym_word" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="tooltip" EntityType="alphaModel.Store.tooltip" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="tooltip_category" EntityType="alphaModel.Store.tooltip_category" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="users" EntityType="alphaModel.Store.users" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="users_clients" EntityType="alphaModel.Store.users_clients" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="users_history" EntityType="alphaModel.Store.users_history" store:Type="Tables" Schema="alpha" />
+          <EntitySet Name="users_ips" EntityType="alphaModel.Store.users_ips" store:Type="Tables" store:Schema="alpha" store:Name="users_ips">
+            <DefiningQuery>SELECT
+      `users_ips`.`user_id`, 
+      `users_ips`.`ip`, 
+      `users_ips`.`moment`
+      FROM `users_ips` AS `users_ips`</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="area_ibfk_1" Association="alphaModel.Store.area_ibfk_1">
+            <End Role="countries" EntitySet="countries" />
+            <End Role="area" EntitySet="area" />
+          </AssociationSet>
+          <AssociationSet Name="cities_ibfk_1" Association="alphaModel.Store.cities_ibfk_1">
+            <End Role="area" EntitySet="area" />
+            <End Role="cities" EntitySet="cities" />
+          </AssociationSet>
+          <AssociationSet Name="import_rectangle_ibfk_1" Association="alphaModel.Store.import_rectangle_ibfk_1">
+            <End Role="companies" EntitySet="companies" />
+            <End Role="import_rectangle" EntitySet="import_rectangle" />
+          </AssociationSet>
+          <AssociationSet Name="mockup_ibfk_1" Association="alphaModel.Store.mockup_ibfk_1">
+            <End Role="mockup_set" EntitySet="mockup_set" />
+            <End Role="mockup" EntitySet="mockup" />
+          </AssociationSet>
+          <AssociationSet Name="mockup_set_ibfk_1" Association="alphaModel.Store.mockup_set_ibfk_1">
+            <End Role="users" EntitySet="users" />
+            <End Role="mockup_set" EntitySet="mockup_set" />
+          </AssociationSet>
+          <AssociationSet Name="mockup_set_ibfk_2" Association="alphaModel.Store.mockup_set_ibfk_2">
+            <End Role="companies" EntitySet="companies" />
+            <End Role="mockup_set" EntitySet="mockup_set" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_ibfk_1" Association="alphaModel.Store.photo_report_ibfk_1">
+            <End Role="users" EntitySet="users" />
+            <End Role="photo_report" EntitySet="photo_report" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_resource_ibfk_1" Association="alphaModel.Store.photo_report_resource_ibfk_1">
+            <End Role="photo_report" EntitySet="photo_report" />
+            <End Role="photo_report_resource" EntitySet="photo_report_resource" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_resource_ibfk_2" Association="alphaModel.Store.photo_report_resource_ibfk_2">
+            <End Role="resources" EntitySet="resources" />
+            <End Role="photo_report_resource" EntitySet="photo_report_resource" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_resource_photo_ibfk_1" Association="alphaModel.Store.photo_report_resource_photo_ibfk_1">
+            <End Role="photo_report_resource" EntitySet="photo_report_resource" />
+            <End Role="photo_report_resource_photo" EntitySet="photo_report_resource_photo" />
+          </AssociationSet>
+          <AssociationSet Name="presentation_link_ibfk_1" Association="alphaModel.Store.presentation_link_ibfk_1">
+            <End Role="users" EntitySet="users" />
+            <End Role="presentation_link" EntitySet="presentation_link" />
+          </AssociationSet>
+          <AssociationSet Name="presentation_link_resource_ibfk_1" Association="alphaModel.Store.presentation_link_resource_ibfk_1">
+            <End Role="presentation_link" EntitySet="presentation_link" />
+            <End Role="presentation_link_resource" EntitySet="presentation_link_resource" />
+          </AssociationSet>
+          <AssociationSet Name="presentation_link_resource_ibfk_2" Association="alphaModel.Store.presentation_link_resource_ibfk_2">
+            <End Role="resources" EntitySet="resources" />
+            <End Role="presentation_link_resource" EntitySet="presentation_link_resource" />
+          </AssociationSet>
+          <AssociationSet Name="seo_place_ibfk_1" Association="alphaModel.Store.seo_place_ibfk_1">
+            <End Role="resource_types" EntitySet="resource_types" />
+            <End Role="seo_place" EntitySet="seo_place" />
+          </AssociationSet>
+          <AssociationSet Name="seo_place_ibfk_2" Association="alphaModel.Store.seo_place_ibfk_2">
+            <End Role="cities" EntitySet="cities" />
+            <End Role="seo_place" EntitySet="seo_place" />
+          </AssociationSet>
+          <AssociationSet Name="seo_place_ibfk_3" Association="alphaModel.Store.seo_place_ibfk_3">
+            <End Role="regions" EntitySet="regions" />
+            <End Role="seo_place" EntitySet="seo_place" />
+          </AssociationSet>
+          <AssociationSet Name="synonym_ibfk_1" Association="alphaModel.Store.synonym_ibfk_1">
+            <End Role="synonym_word" EntitySet="synonym_word" />
+            <End Role="synonym" EntitySet="synonym" />
+          </AssociationSet>
+          <AssociationSet Name="synonym_ibfk_2" Association="alphaModel.Store.synonym_ibfk_2">
+            <End Role="synonym_word" EntitySet="synonym_word" />
+            <End Role="synonym" EntitySet="synonym" />
+          </AssociationSet>
+          <AssociationSet Name="tooltip_ibfk_1" Association="alphaModel.Store.tooltip_ibfk_1">
+            <End Role="tooltip_category" EntitySet="tooltip_category" />
+            <End Role="tooltip" EntitySet="tooltip" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="area">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="usmallint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="countryId" Type="utinyint" Nullable="false" />
+          <Property Name="caption" Type="char" Nullable="false" MaxLength="100" />
+          <Property Name="sort" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="cart">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="resource_id" />
+          </Key>
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="resource_id" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="cities">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="country_id" Type="uint" Nullable="false" />
+          <Property Name="areaId" Type="usmallint" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="slug" Type="char" MaxLength="100" />
+          <Property Name="casePrepositional" Type="char" MaxLength="100" />
+          <Property Name="caseDative" Type="char" MaxLength="100" />
+          <Property Name="caseGenitive" Type="char" MaxLength="100" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+          <Property Name="latitude" Type="decimal" Nullable="false" Precision="20" Scale="10" />
+          <Property Name="coded" Type="tinyint" Nullable="false" />
+          <Property Name="longitude" Type="decimal" Nullable="false" Precision="20" Scale="10" />
+        </EntityType>
+        <EntityType Name="companies">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="type" Type="enum" Nullable="false" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="passwd" Type="varchar" MaxLength="255" />
+          <Property Name="address" Type="text" Nullable="false" />
+          <Property Name="city" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="region" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="country_id" Type="uint" Nullable="false" />
+          <Property Name="zip" Type="varchar" Nullable="false" MaxLength="10" />
+          <Property Name="phone" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="phone2" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="email" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="bank" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="bank_account" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="edrpou" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="address_law" Type="text" Nullable="false" />
+          <Property Name="prefix" Type="char" Nullable="false" MaxLength="20" />
+          <Property Name="reserve_hours" Type="uint" Nullable="false" />
+          <Property Name="users_limit" Type="uint" Nullable="false" />
+          <Property Name="autoconfirm" Type="bool" Nullable="false" />
+          <Property Name="contract" Type="text" Nullable="false" />
+          <Property Name="is_active" Type="bool" Nullable="false" />
+          <Property Name="showResourcesWhileInactive" Type="bool" Nullable="false" />
+          <Property Name="use_reserves" Type="tinyint" Nullable="false" />
+          <Property Name="deny_next_year" Type="tinyint" Nullable="false" />
+          <Property Name="sync_url" Type="varchar" MaxLength="255" />
+          <Property Name="sync_date" Type="datetime" />
+          <Property Name="sync_resources" Type="int" />
+          <Property Name="sync_new_resources" Type="int" />
+          <Property Name="sync_periods" Type="int" />
+          <Property Name="sync_files" Type="text" />
+          <Property Name="lose_date" Type="text" />
+          <Property Name="to_period" Type="date" />
+          <Property Name="tax" Type="tinyint" Nullable="false" />
+          <Property Name="deny_map" Type="bool" Nullable="false" />
+          <Property Name="code_free" Type="varchar" Nullable="false" MaxLength="50" />
+          <Property Name="code_reserved" Type="varchar" Nullable="false" MaxLength="50" />
+          <Property Name="code_reserve" Type="varchar" Nullable="false" MaxLength="50" />
+          <Property Name="new_codes" Type="bool" Nullable="false" />
+          <Property Name="ownMediaUrl" Type="char" Nullable="false" MaxLength="200" />
+          <Property Name="requisites" Type="text" Nullable="false" />
+          <Property Name="syncCheckLimit" Type="bool" Nullable="false" />
+        </EntityType>
+        <EntityType Name="countries">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="utinyint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6005: The data type 'ufloat' is currently not supported for the target .NET Framework version; the column 'discount' in table 'def.alpha.discounts_periods' was excluded.
+      -->
+        <EntityType Name="discounts_periods">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="periods" />
+          </Key>
+          <Property Name="company_id" Type="uint" Nullable="false" />
+          <Property Name="periods" Type="bool" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6005: The data type 'ufloat' is currently not supported for the target .NET Framework version; the column 'discount' in table 'def.alpha.discounts_qty' was excluded.
+      -->
+        <EntityType Name="discounts_qty">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="qty" />
+          </Key>
+          <Property Name="company_id" Type="uint" Nullable="false" />
+          <Property Name="qty" Type="bool" Nullable="false" />
+        </EntityType>
+        <EntityType Name="help_chapters">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="page_id" Type="int" Nullable="false" />
+          <Property Name="role" Type="varchar" MaxLength="255" />
+          <Property Name="content" Type="text" />
+        </EntityType>
+        <EntityType Name="hots">
+          <Key>
+            <PropertyRef Name="resource_id" />
+            <PropertyRef Name="period" />
+          </Key>
+          <Property Name="resource_id" Type="uint" Nullable="false" />
+          <Property Name="period" Type="date" Nullable="false" />
+          <Property Name="price" Type="decimal" Nullable="false" Scale="2" />
+        </EntityType>
+        <EntityType Name="import_rectangle">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="companyId" Type="uint" Nullable="false" />
+          <Property Name="type" Type="enum" Nullable="false" />
+          <Property Name="width" Type="usmallint" Nullable="false" />
+          <Property Name="height" Type="usmallint" Nullable="false" />
+          <Property Name="x1" Type="smallint" Nullable="false" />
+          <Property Name="y1" Type="smallint" Nullable="false" />
+          <Property Name="x2" Type="smallint" Nullable="false" />
+          <Property Name="y2" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="locations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="city_id" Type="uint" Nullable="false" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+          <Property Name="correspondence" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="managers">
+          <Key>
+            <PropertyRef Name="operator_id" />
+            <PropertyRef Name="company_id" />
+          </Key>
+          <Property Name="operator_id" Type="uint" Nullable="false" />
+          <Property Name="manager_id" Type="uint" Nullable="false" />
+          <Property Name="company_id" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="mockup">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="parentId" Type="uint" Nullable="false" />
+          <Property Name="fileName" Type="char" Nullable="false" MaxLength="37" />
+          <Property Name="origFileName" Type="char" Nullable="false" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="mockup_set">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="hash" Type="char" Nullable="false" MaxLength="32" />
+          <Property Name="emailClient" Type="char" MaxLength="100" />
+          <Property Name="emailManager" Type="char" MaxLength="100" />
+          <Property Name="userId" Type="uint" />
+          <Property Name="companyId" Type="uint" />
+          <Property Name="withPreview" Type="utinyint" Nullable="false" />
+          <Property Name="dateCreate" Type="timestamp" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="dateValid" Type="date" />
+        </EntityType>
+        <EntityType Name="news">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="posted" Type="datetime" Nullable="false" />
+          <Property Name="title" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="teaser" Type="varchar" MaxLength="255" />
+          <Property Name="content" Type="text" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'def.alpha.operator_orders' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="operator_orders">
+          <Key>
+            <PropertyRef Name="operator_id" />
+            <PropertyRef Name="order_id" />
+            <PropertyRef Name="status" />
+          </Key>
+          <Property Name="operator_id" Type="uint" Nullable="false" />
+          <Property Name="order_id" Type="uint" Nullable="false" />
+          <Property Name="status" Type="enum" Nullable="false" />
+        </EntityType>
+        <EntityType Name="orders">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="subuser_id" Type="uint" Nullable="false" />
+          <Property Name="added" Type="datetime" Nullable="false" />
+          <Property Name="changed" Type="datetime" Nullable="false" />
+          <Property Name="expires" Type="datetime" Nullable="false" />
+          <Property Name="status" Type="enum" Nullable="false" />
+          <Property Name="comments" Type="text" Nullable="false" />
+        </EntityType>
+        <EntityType Name="orders_confirms">
+          <Key>
+            <PropertyRef Name="order_id" />
+            <PropertyRef Name="resource_id" />
+          </Key>
+          <Property Name="order_id" Type="uint" Nullable="false" />
+          <Property Name="resource_id" Type="uint" Nullable="false" />
+          <Property Name="price_actual" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="subprice_actual" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="discount_actual" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="discount_qty_actual" Type="decimal" Nullable="false" Scale="2" />
+        </EntityType>
+        <EntityType Name="pages">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="controller" Type="varchar" MaxLength="255" />
+          <Property Name="action" Type="varchar" MaxLength="255" />
+          <Property Name="title" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="photo_report">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="userId" Type="uint" />
+          <Property Name="showLocations" Type="bool" Nullable="false" />
+          <Property Name="date" Type="timestamp" Nullable="false" StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="photo_report_resource">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="reportId" Type="uint" Nullable="false" />
+          <Property Name="resourceId" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="photo_report_resource_photo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="parentId" Type="uint" Nullable="false" />
+          <Property Name="photo" Type="char" Nullable="false" MaxLength="37" />
+          <Property Name="sort" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="preferences">
+          <Key>
+            <PropertyRef Name="key" />
+          </Key>
+          <Property Name="key" Type="char" Nullable="false" MaxLength="20" />
+          <Property Name="value" Type="varchar" Nullable="false" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="presentation_link">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="type" Type="enum" Nullable="false" />
+          <Property Name="userId" Type="uint" />
+          <Property Name="hash" Type="char" Nullable="false" MaxLength="32" />
+          <Property Name="downloadCount" Type="usmallint" Nullable="false" />
+          <Property Name="dateCreate" Type="timestamp" StoreGeneratedPattern="Identity" />
+          <Property Name="dateLastDownload" Type="timestamp" />
+          <Property Name="vars" Type="text" />
+        </EntityType>
+        <EntityType Name="presentation_link_resource">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="linkId" Type="uint" Nullable="false" />
+          <Property Name="resourceId" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="regions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="city_id" Type="uint" Nullable="false" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="slug" Type="char" MaxLength="100" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="reserves">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="ubigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="order_id" Type="int" Nullable="false" />
+          <Property Name="subuser_id" Type="uint" Nullable="false" />
+          <Property Name="resource_id" Type="uint" Nullable="false" />
+          <Property Name="period" Type="date" Nullable="false" />
+          <Property Name="status" Type="enum" Nullable="false" />
+          <Property Name="price_nominal" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="price_actual" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="subprice_nominal" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="subprice_actual" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="added" Type="datetime" Nullable="false" />
+          <Property Name="expires" Type="datetime" Nullable="false" />
+          <Property Name="is_notified" Type="bool" Nullable="false" />
+          <Property Name="is_active" Type="bool" Nullable="false" />
+          <Property Name="doer_id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_import_log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="int" Nullable="false" />
+          <Property Name="filename" Type="varchar" Nullable="false" MaxLength="50" />
+          <Property Name="errors" Type="text" Nullable="false" />
+          <Property Name="date" Type="datetime" />
+          <Property Name="status" Type="bool" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_lights">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_price_rules">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="int" Nullable="false" />
+          <Property Name="agency_id" Type="int" Nullable="false" />
+          <Property Name="price_from" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="price_to" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="percent" Type="decimal" Scale="2" />
+          <Property Name="bonus" Type="decimal" Scale="2" />
+        </EntityType>
+        <EntityType Name="resource_sides">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="pos" Type="uint" />
+        </EntityType>
+        <EntityType Name="resource_sizes">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="type_id" Type="uint" Nullable="false" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_types">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="slug" Type="char" MaxLength="100" />
+          <Property Name="pos" Type="uint" Nullable="false" />
+          <Property Name="view" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_north" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_north_east" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_east" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_east_south" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_south" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_west" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_north_west" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_south_west" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_bot" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_north_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_north_east_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_east_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_east_south_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_south_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_west_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_north_west_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="view_south_west_agency" Type="varchar" Nullable="false" MaxLength="300" />
+          <Property Name="iconBot" Type="char" MaxLength="37" />
+          <Property Name="iconOperator" Type="char" MaxLength="37" />
+          <Property Name="iconAgency" Type="char" MaxLength="37" />
+        </EntityType>
+        <EntityType Name="resources">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="char" Nullable="false" />
+          <Property Name="codeDoors" Type="uint" />
+          <Property Name="company_id" Type="uint" Nullable="false" />
+          <Property Name="type_id" Type="uint" Nullable="false" />
+          <Property Name="side_id" Type="uint" Nullable="false" />
+          <Property Name="size_id" Type="uint" Nullable="false" />
+          <Property Name="light" Type="bool" Nullable="false" />
+          <Property Name="restricted" Type="bool" Nullable="false" />
+          <Property Name="price" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="city_id" Type="uint" Nullable="false" />
+          <Property Name="region_id" Type="uint" />
+          <Property Name="location_id" Type="uint" />
+          <Property Name="address" Type="varchar" MaxLength="255" />
+          <Property Name="description" Type="text" />
+          <Property Name="added" Type="datetime" Nullable="false" />
+          <Property Name="is_active" Type="bool" Nullable="false" />
+          <Property Name="has_image" Type="tinyint" Nullable="false" />
+          <Property Name="latitude" Type="decimal" Nullable="false" Precision="20" Scale="10" />
+          <Property Name="longitude" Type="decimal" Nullable="false" Precision="20" Scale="10" />
+          <Property Name="marker_rotation" Type="smallint" Nullable="false" />
+          <Property Name="approved" Type="enum" Nullable="false" />
+          <Property Name="rotation_approved" Type="enum" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resources_history">
+          <Key>
+            <PropertyRef Name="resource_id" />
+            <PropertyRef Name="changed" />
+          </Key>
+          <Property Name="resource_id" Type="uint" Nullable="false" />
+          <Property Name="changed" Type="datetime" Nullable="false" />
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="price" Type="decimal" Nullable="false" Scale="2" />
+        </EntityType>
+        <EntityType Name="seo_place">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="typeId" Type="uint" Nullable="false" />
+          <Property Name="cityId" Type="uint" />
+          <Property Name="regionId" Type="uint" />
+          <Property Name="title" Type="text" Nullable="false" />
+          <Property Name="description" Type="text" Nullable="false" />
+          <Property Name="h1" Type="text" Nullable="false" />
+        </EntityType>
+        <EntityType Name="static_pages">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="alias" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="title" Type="varchar" MaxLength="255" />
+          <Property Name="content" Type="text" />
+        </EntityType>
+        <EntityType Name="subresources">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="resource_id" />
+          </Key>
+          <Property Name="company_id" Type="uint" Nullable="false" />
+          <Property Name="resource_id" Type="uint" Nullable="false" />
+          <Property Name="code" Type="char" Nullable="false" MaxLength="20" />
+          <Property Name="price" Type="decimal" Nullable="false" Scale="2" />
+          <Property Name="rate" Type="decimal" Nullable="false" Scale="2" />
+        </EntityType>
+        <EntityType Name="subresources_history">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="resource_id" />
+            <PropertyRef Name="changed" />
+          </Key>
+          <Property Name="company_id" Type="int" Nullable="false" />
+          <Property Name="resource_id" Type="int" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="changed" Type="datetime" Nullable="false" />
+          <Property Name="price" Type="decimal" Nullable="false" Scale="2" />
+        </EntityType>
+        <EntityType Name="sync">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="int" Nullable="false" />
+          <Property Name="resource_id" Type="int" Nullable="false" />
+          <Property Name="period" Type="date" Nullable="false" />
+          <Property Name="status" Type="varchar" MaxLength="255" />
+          <Property Name="added" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="synonym">
+          <Key>
+            <PropertyRef Name="mainWordId" />
+            <PropertyRef Name="synWordId" />
+          </Key>
+          <Property Name="mainWordId" Type="uint" Nullable="false" />
+          <Property Name="synWordId" Type="uint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="synonym_word">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="isMain" Type="bool" Nullable="false" />
+          <Property Name="word" Type="char" Nullable="false" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tooltip">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="usmallint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="categoryId" Type="usmallint" />
+          <Property Name="name" Type="char" Nullable="false" MaxLength="50" />
+          <Property Name="caption" Type="char" Nullable="false" MaxLength="100" />
+          <Property Name="text" Type="text" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tooltip_category">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="usmallint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="char" Nullable="false" MaxLength="50" />
+          <Property Name="caption" Type="char" Nullable="false" MaxLength="100" />
+          <Property Name="sort" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="uint" Nullable="false" />
+          <Property Name="manager_id" Type="uint" Nullable="false" />
+          <Property Name="login" Type="varchar" MaxLength="255" />
+          <Property Name="password" Type="char" Nullable="false" MaxLength="32" />
+          <Property Name="email" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="surname" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="patronymic" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="phone" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="address" Type="varchar" Nullable="false" MaxLength="255" />
+          <Property Name="icq" Type="varchar" Nullable="false" MaxLength="30" />
+          <Property Name="skype" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="type" Type="enum" Nullable="false" />
+          <Property Name="wannabe" Type="enum" Nullable="false" />
+          <Property Name="is_private" Type="bool" Nullable="false" />
+          <Property Name="is_active" Type="bool" Nullable="false" />
+          <Property Name="is_banned" Type="bool" Nullable="false" />
+          <Property Name="token" Type="char" Nullable="false" MaxLength="32" />
+          <Property Name="added" Type="datetime" Nullable="false" />
+          <Property Name="ip_check" Type="bool" Nullable="false" />
+          <Property Name="ip" Type="uint" Nullable="false" />
+          <Property Name="is_default" Type="tinyint" Nullable="false" />
+          <Property Name="last_user" Type="int" Nullable="false" />
+          <Property Name="is_price_visible" Type="tinyint" Nullable="false" />
+          <Property Name="translitPresentation" Type="bool" Nullable="false" />
+          <Property Name="useBefore" Type="enum" />
+        </EntityType>
+        <EntityType Name="users_clients">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="company" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="address" Type="text" Nullable="false" />
+          <Property Name="city" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="region" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="country_id" Type="uint" Nullable="false" />
+          <Property Name="zip" Type="varchar" Nullable="false" MaxLength="10" />
+          <Property Name="email" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="phone" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="phone2" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="bank" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="bank_account" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="edrpou" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="address_law" Type="text" Nullable="false" />
+          <Property Name="properties" Type="text" Nullable="false" />
+        </EntityType>
+        <EntityType Name="users_history">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="changed" />
+          </Key>
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="changed" Type="datetime" Nullable="false" />
+          <Property Name="surname" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="name" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="patronymic" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="email" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="phone" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="address" Type="text" Nullable="false" />
+          <Property Name="icq" Type="varchar" Nullable="false" MaxLength="30" />
+          <Property Name="skype" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="c_company" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="c_address" Type="text" Nullable="false" />
+          <Property Name="c_city" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="c_region" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="c_country_id" Type="uint" Nullable="false" />
+          <Property Name="c_zip" Type="varchar" Nullable="false" MaxLength="10" />
+          <Property Name="c_email" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="c_phone" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="c_phone2" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="c_bank" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="c_bank_account" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="c_edrpou" Type="varchar" Nullable="false" MaxLength="20" />
+          <Property Name="c_address_law" Type="text" Nullable="false" />
+          <Property Name="c_properties" Type="text" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'def.alpha.users_ips' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="users_ips">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="ip" />
+            <PropertyRef Name="moment" />
+          </Key>
+          <Property Name="user_id" Type="uint" Nullable="false" />
+          <Property Name="ip" Type="uint" Nullable="false" />
+          <Property Name="moment" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="area_ibfk_1">
+          <End Role="countries" Type="alphaModel.Store.countries" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="area" Type="alphaModel.Store.area" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="countries">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="area">
+              <PropertyRef Name="countryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="cities_ibfk_1">
+          <End Role="area" Type="alphaModel.Store.area" Multiplicity="0..1" />
+          <End Role="cities" Type="alphaModel.Store.cities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="area">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="cities">
+              <PropertyRef Name="areaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="import_rectangle_ibfk_1">
+          <End Role="companies" Type="alphaModel.Store.companies" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="import_rectangle" Type="alphaModel.Store.import_rectangle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="companies">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="import_rectangle">
+              <PropertyRef Name="companyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="mockup_ibfk_1">
+          <End Role="mockup_set" Type="alphaModel.Store.mockup_set" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="mockup" Type="alphaModel.Store.mockup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="mockup_set">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mockup">
+              <PropertyRef Name="parentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="mockup_set_ibfk_1">
+          <End Role="users" Type="alphaModel.Store.users" Multiplicity="0..1" />
+          <End Role="mockup_set" Type="alphaModel.Store.mockup_set" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mockup_set">
+              <PropertyRef Name="userId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="mockup_set_ibfk_2">
+          <End Role="companies" Type="alphaModel.Store.companies" Multiplicity="0..1" />
+          <End Role="mockup_set" Type="alphaModel.Store.mockup_set" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="companies">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mockup_set">
+              <PropertyRef Name="companyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_ibfk_1">
+          <End Role="users" Type="alphaModel.Store.users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report" Type="alphaModel.Store.photo_report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report">
+              <PropertyRef Name="userId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_resource_ibfk_1">
+          <End Role="photo_report" Type="alphaModel.Store.photo_report" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report_resource" Type="alphaModel.Store.photo_report_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="photo_report">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report_resource">
+              <PropertyRef Name="reportId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_resource_ibfk_2">
+          <End Role="resources" Type="alphaModel.Store.resources" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report_resource" Type="alphaModel.Store.photo_report_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="resources">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report_resource">
+              <PropertyRef Name="resourceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_resource_photo_ibfk_1">
+          <End Role="photo_report_resource" Type="alphaModel.Store.photo_report_resource" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report_resource_photo" Type="alphaModel.Store.photo_report_resource_photo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="photo_report_resource">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report_resource_photo">
+              <PropertyRef Name="parentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="presentation_link_ibfk_1">
+          <End Role="users" Type="alphaModel.Store.users" Multiplicity="0..1" />
+          <End Role="presentation_link" Type="alphaModel.Store.presentation_link" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="presentation_link">
+              <PropertyRef Name="userId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="presentation_link_resource_ibfk_1">
+          <End Role="presentation_link" Type="alphaModel.Store.presentation_link" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="presentation_link_resource" Type="alphaModel.Store.presentation_link_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="presentation_link">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="presentation_link_resource">
+              <PropertyRef Name="linkId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="presentation_link_resource_ibfk_2">
+          <End Role="resources" Type="alphaModel.Store.resources" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="presentation_link_resource" Type="alphaModel.Store.presentation_link_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="resources">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="presentation_link_resource">
+              <PropertyRef Name="resourceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seo_place_ibfk_1">
+          <End Role="resource_types" Type="alphaModel.Store.resource_types" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seo_place" Type="alphaModel.Store.seo_place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="resource_types">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="seo_place">
+              <PropertyRef Name="typeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seo_place_ibfk_2">
+          <End Role="cities" Type="alphaModel.Store.cities" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seo_place" Type="alphaModel.Store.seo_place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cities">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="seo_place">
+              <PropertyRef Name="cityId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seo_place_ibfk_3">
+          <End Role="regions" Type="alphaModel.Store.regions" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seo_place" Type="alphaModel.Store.seo_place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="regions">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="seo_place">
+              <PropertyRef Name="regionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="synonym_ibfk_1">
+          <End Role="synonym_word" Type="alphaModel.Store.synonym_word" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="synonym" Type="alphaModel.Store.synonym" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="synonym_word">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="synonym">
+              <PropertyRef Name="mainWordId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="synonym_ibfk_2">
+          <End Role="synonym_word" Type="alphaModel.Store.synonym_word" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="synonym" Type="alphaModel.Store.synonym" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="synonym_word">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="synonym">
+              <PropertyRef Name="synWordId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="tooltip_ibfk_1">
+          <End Role="tooltip_category" Type="alphaModel.Store.tooltip_category" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tooltip" Type="alphaModel.Store.tooltip" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tooltip_category">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tooltip">
+              <PropertyRef Name="categoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="alphaModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="alphaEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="area" EntityType="alphaModel.area" />
+          <EntitySet Name="cart" EntityType="alphaModel.cart" />
+          <EntitySet Name="cities" EntityType="alphaModel.cities" />
+          <EntitySet Name="companies" EntityType="alphaModel.companies" />
+          <EntitySet Name="countries" EntityType="alphaModel.countries" />
+          <EntitySet Name="discounts_periods" EntityType="alphaModel.discounts_periods" />
+          <EntitySet Name="discounts_qty" EntityType="alphaModel.discounts_qty" />
+          <EntitySet Name="help_chapters" EntityType="alphaModel.help_chapters" />
+          <EntitySet Name="hots" EntityType="alphaModel.hots" />
+          <EntitySet Name="import_rectangle" EntityType="alphaModel.import_rectangle" />
+          <EntitySet Name="locations" EntityType="alphaModel.locations" />
+          <EntitySet Name="managers" EntityType="alphaModel.managers" />
+          <EntitySet Name="mockup" EntityType="alphaModel.mockup" />
+          <EntitySet Name="mockup_set" EntityType="alphaModel.mockup_set" />
+          <EntitySet Name="news" EntityType="alphaModel.news" />
+          <EntitySet Name="operator_orders" EntityType="alphaModel.operator_orders" />
+          <EntitySet Name="orders" EntityType="alphaModel.orders" />
+          <EntitySet Name="orders_confirms" EntityType="alphaModel.orders_confirms" />
+          <EntitySet Name="pages" EntityType="alphaModel.pages" />
+          <EntitySet Name="photo_report" EntityType="alphaModel.photo_report" />
+          <EntitySet Name="photo_report_resource" EntityType="alphaModel.photo_report_resource" />
+          <EntitySet Name="photo_report_resource_photo" EntityType="alphaModel.photo_report_resource_photo" />
+          <EntitySet Name="preferences" EntityType="alphaModel.preferences" />
+          <EntitySet Name="presentation_link" EntityType="alphaModel.presentation_link" />
+          <EntitySet Name="presentation_link_resource" EntityType="alphaModel.presentation_link_resource" />
+          <EntitySet Name="regions" EntityType="alphaModel.regions" />
+          <EntitySet Name="reserves" EntityType="alphaModel.reserves" />
+          <EntitySet Name="resource_import_log" EntityType="alphaModel.resource_import_log" />
+          <EntitySet Name="resource_lights" EntityType="alphaModel.resource_lights" />
+          <EntitySet Name="resource_price_rules" EntityType="alphaModel.resource_price_rules" />
+          <EntitySet Name="resource_sides" EntityType="alphaModel.resource_sides" />
+          <EntitySet Name="resource_sizes" EntityType="alphaModel.resource_sizes" />
+          <EntitySet Name="resource_types" EntityType="alphaModel.resource_types" />
+          <EntitySet Name="resources" EntityType="alphaModel.resources" />
+          <EntitySet Name="resources_history" EntityType="alphaModel.resources_history" />
+          <EntitySet Name="seo_place" EntityType="alphaModel.seo_place" />
+          <EntitySet Name="static_pages" EntityType="alphaModel.static_pages" />
+          <EntitySet Name="subresources" EntityType="alphaModel.subresources" />
+          <EntitySet Name="subresources_history" EntityType="alphaModel.subresources_history" />
+          <EntitySet Name="sync" EntityType="alphaModel.sync" />
+          <EntitySet Name="synonym_word" EntityType="alphaModel.synonym_word" />
+          <EntitySet Name="tooltip" EntityType="alphaModel.tooltip" />
+          <EntitySet Name="tooltip_category" EntityType="alphaModel.tooltip_category" />
+          <EntitySet Name="users" EntityType="alphaModel.users" />
+          <EntitySet Name="users_clients" EntityType="alphaModel.users_clients" />
+          <EntitySet Name="users_history" EntityType="alphaModel.users_history" />
+          <EntitySet Name="users_ips" EntityType="alphaModel.users_ips" />
+          <AssociationSet Name="area_ibfk_1" Association="alphaModel.area_ibfk_1">
+            <End Role="countries" EntitySet="countries" />
+            <End Role="area" EntitySet="area" />
+          </AssociationSet>
+          <AssociationSet Name="cities_ibfk_1" Association="alphaModel.cities_ibfk_1">
+            <End Role="area" EntitySet="area" />
+            <End Role="cities" EntitySet="cities" />
+          </AssociationSet>
+          <AssociationSet Name="seo_place_ibfk_2" Association="alphaModel.seo_place_ibfk_2">
+            <End Role="cities" EntitySet="cities" />
+            <End Role="seo_place" EntitySet="seo_place" />
+          </AssociationSet>
+          <AssociationSet Name="import_rectangle_ibfk_1" Association="alphaModel.import_rectangle_ibfk_1">
+            <End Role="companies" EntitySet="companies" />
+            <End Role="import_rectangle" EntitySet="import_rectangle" />
+          </AssociationSet>
+          <AssociationSet Name="mockup_set_ibfk_2" Association="alphaModel.mockup_set_ibfk_2">
+            <End Role="companies" EntitySet="companies" />
+            <End Role="mockup_set" EntitySet="mockup_set" />
+          </AssociationSet>
+          <AssociationSet Name="mockup_ibfk_1" Association="alphaModel.mockup_ibfk_1">
+            <End Role="mockup_set" EntitySet="mockup_set" />
+            <End Role="mockup" EntitySet="mockup" />
+          </AssociationSet>
+          <AssociationSet Name="mockup_set_ibfk_1" Association="alphaModel.mockup_set_ibfk_1">
+            <End Role="users" EntitySet="users" />
+            <End Role="mockup_set" EntitySet="mockup_set" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_ibfk_1" Association="alphaModel.photo_report_ibfk_1">
+            <End Role="users" EntitySet="users" />
+            <End Role="photo_report" EntitySet="photo_report" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_resource_ibfk_1" Association="alphaModel.photo_report_resource_ibfk_1">
+            <End Role="photo_report" EntitySet="photo_report" />
+            <End Role="photo_report_resource" EntitySet="photo_report_resource" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_resource_ibfk_2" Association="alphaModel.photo_report_resource_ibfk_2">
+            <End Role="resources" EntitySet="resources" />
+            <End Role="photo_report_resource" EntitySet="photo_report_resource" />
+          </AssociationSet>
+          <AssociationSet Name="photo_report_resource_photo_ibfk_1" Association="alphaModel.photo_report_resource_photo_ibfk_1">
+            <End Role="photo_report_resource" EntitySet="photo_report_resource" />
+            <End Role="photo_report_resource_photo" EntitySet="photo_report_resource_photo" />
+          </AssociationSet>
+          <AssociationSet Name="presentation_link_ibfk_1" Association="alphaModel.presentation_link_ibfk_1">
+            <End Role="users" EntitySet="users" />
+            <End Role="presentation_link" EntitySet="presentation_link" />
+          </AssociationSet>
+          <AssociationSet Name="presentation_link_resource_ibfk_1" Association="alphaModel.presentation_link_resource_ibfk_1">
+            <End Role="presentation_link" EntitySet="presentation_link" />
+            <End Role="presentation_link_resource" EntitySet="presentation_link_resource" />
+          </AssociationSet>
+          <AssociationSet Name="presentation_link_resource_ibfk_2" Association="alphaModel.presentation_link_resource_ibfk_2">
+            <End Role="resources" EntitySet="resources" />
+            <End Role="presentation_link_resource" EntitySet="presentation_link_resource" />
+          </AssociationSet>
+          <AssociationSet Name="seo_place_ibfk_3" Association="alphaModel.seo_place_ibfk_3">
+            <End Role="regions" EntitySet="regions" />
+            <End Role="seo_place" EntitySet="seo_place" />
+          </AssociationSet>
+          <AssociationSet Name="seo_place_ibfk_1" Association="alphaModel.seo_place_ibfk_1">
+            <End Role="resource_types" EntitySet="resource_types" />
+            <End Role="seo_place" EntitySet="seo_place" />
+          </AssociationSet>
+          <AssociationSet Name="tooltip_ibfk_1" Association="alphaModel.tooltip_ibfk_1">
+            <End Role="tooltip_category" EntitySet="tooltip_category" />
+            <End Role="tooltip" EntitySet="tooltip" />
+          </AssociationSet>
+          <AssociationSet Name="synonym" Association="alphaModel.synonym">
+            <End Role="synonym_word" EntitySet="synonym_word" />
+            <End Role="synonym_word1" EntitySet="synonym_word" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="area">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="countryId" Type="Byte" Nullable="false" />
+          <Property Name="caption" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="sort" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="countries" Relationship="alphaModel.area_ibfk_1" FromRole="area" ToRole="countries" />
+          <NavigationProperty Name="cities" Relationship="alphaModel.cities_ibfk_1" FromRole="area" ToRole="cities" />
+        </EntityType>
+        <EntityType Name="cart">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="resource_id" />
+          </Key>
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="resource_id" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="cities">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="country_id" Type="Int64" Nullable="false" />
+          <Property Name="areaId" Type="Int32" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="slug" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="casePrepositional" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="caseDative" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="caseGenitive" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+          <Property Name="latitude" Type="Decimal" Nullable="false" />
+          <Property Name="coded" Type="SByte" Nullable="false" />
+          <Property Name="longitude" Type="Decimal" Nullable="false" />
+          <NavigationProperty Name="area" Relationship="alphaModel.cities_ibfk_1" FromRole="cities" ToRole="area" />
+          <NavigationProperty Name="seo_place" Relationship="alphaModel.seo_place_ibfk_2" FromRole="cities" ToRole="seo_place" />
+        </EntityType>
+        <EntityType Name="companies">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="type" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="passwd" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="address" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="city" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="region" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="country_id" Type="Int64" Nullable="false" />
+          <Property Name="zip" Type="String" Nullable="false" MaxLength="10" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="phone" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="phone2" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="bank" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="bank_account" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="edrpou" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="address_law" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="prefix" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="reserve_hours" Type="Int64" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="users_limit" Type="Int64" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="autoconfirm" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="contract" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="is_active" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="showResourcesWhileInactive" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="use_reserves" Type="SByte" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="deny_next_year" Type="SByte" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="sync_url" Type="String" MaxLength="255" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="sync_date" Type="DateTime" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="sync_resources" Type="Int32" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="sync_new_resources" Type="Int32" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="sync_periods" Type="Int32" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="sync_files" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="lose_date" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="to_period" Type="DateTime" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="tax" Type="SByte" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="deny_map" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="code_free" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="code_reserved" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="code_reserve" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="new_codes" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="ownMediaUrl" Type="String" Nullable="false" MaxLength="200" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="requisites" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="syncCheckLimit" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <NavigationProperty Name="import_rectangle" Relationship="alphaModel.import_rectangle_ibfk_1" FromRole="companies" ToRole="import_rectangle" />
+          <NavigationProperty Name="mockup_set" Relationship="alphaModel.mockup_set_ibfk_2" FromRole="companies" ToRole="mockup_set" />
+        </EntityType>
+        <EntityType Name="countries">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="area" Relationship="alphaModel.area_ibfk_1" FromRole="countries" ToRole="area" />
+        </EntityType>
+        <EntityType Name="discounts_periods">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="periods" />
+          </Key>
+          <Property Name="company_id" Type="Int64" Nullable="false" />
+          <Property Name="periods" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="discounts_qty">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="qty" />
+          </Key>
+          <Property Name="company_id" Type="Int64" Nullable="false" />
+          <Property Name="qty" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="help_chapters">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="page_id" Type="Int32" Nullable="false" />
+          <Property Name="role" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="content" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="hots">
+          <Key>
+            <PropertyRef Name="resource_id" />
+            <PropertyRef Name="period" />
+          </Key>
+          <Property Name="resource_id" Type="Int64" Nullable="false" />
+          <Property Name="period" Type="DateTime" Nullable="false" />
+          <Property Name="price" Type="Decimal" Nullable="false" />
+        </EntityType>
+        <EntityType Name="import_rectangle">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="companyId" Type="Int64" Nullable="false" />
+          <Property Name="type" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="width" Type="Int32" Nullable="false" />
+          <Property Name="height" Type="Int32" Nullable="false" />
+          <Property Name="x1" Type="Int16" Nullable="false" />
+          <Property Name="y1" Type="Int16" Nullable="false" />
+          <Property Name="x2" Type="Int16" Nullable="false" />
+          <Property Name="y2" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="companies" Relationship="alphaModel.import_rectangle_ibfk_1" FromRole="import_rectangle" ToRole="companies" />
+        </EntityType>
+        <EntityType Name="locations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="city_id" Type="Int64" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+          <Property Name="correspondence" Type="String" MaxLength="250" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="managers">
+          <Key>
+            <PropertyRef Name="operator_id" />
+            <PropertyRef Name="company_id" />
+          </Key>
+          <Property Name="operator_id" Type="Int64" Nullable="false" />
+          <Property Name="manager_id" Type="Int64" Nullable="false" />
+          <Property Name="company_id" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="mockup">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="parentId" Type="Int64" Nullable="false" />
+          <Property Name="fileName" Type="String" Nullable="false" MaxLength="37" Unicode="false" FixedLength="false" />
+          <Property Name="origFileName" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="mockup_set" Relationship="alphaModel.mockup_ibfk_1" FromRole="mockup" ToRole="mockup_set" />
+        </EntityType>
+        <EntityType Name="mockup_set">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="hash" Type="String" Nullable="false" MaxLength="32" Unicode="false" FixedLength="false" />
+          <Property Name="emailClient" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="emailManager" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="userId" Type="Int64" />
+          <Property Name="companyId" Type="Int64" />
+          <Property Name="withPreview" Type="Byte" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="dateValid" Type="DateTime" />
+          <NavigationProperty Name="companies" Relationship="alphaModel.mockup_set_ibfk_2" FromRole="mockup_set" ToRole="companies" />
+          <NavigationProperty Name="mockup" Relationship="alphaModel.mockup_ibfk_1" FromRole="mockup_set" ToRole="mockup" />
+          <NavigationProperty Name="users" Relationship="alphaModel.mockup_set_ibfk_1" FromRole="mockup_set" ToRole="users" />
+        </EntityType>
+        <EntityType Name="news">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="posted" Type="DateTime" Nullable="false" />
+          <Property Name="title" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="teaser" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="content" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="operator_orders">
+          <Key>
+            <PropertyRef Name="operator_id" />
+            <PropertyRef Name="order_id" />
+            <PropertyRef Name="status" />
+          </Key>
+          <Property Name="operator_id" Type="Int64" Nullable="false" />
+          <Property Name="order_id" Type="Int64" Nullable="false" />
+          <Property Name="status" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="orders">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="subuser_id" Type="Int64" Nullable="false" />
+          <Property Name="added" Type="DateTime" Nullable="false" />
+          <Property Name="changed" Type="DateTime" Nullable="false" />
+          <Property Name="expires" Type="DateTime" Nullable="false" />
+          <Property Name="status" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="comments" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="orders_confirms">
+          <Key>
+            <PropertyRef Name="order_id" />
+            <PropertyRef Name="resource_id" />
+          </Key>
+          <Property Name="order_id" Type="Int64" Nullable="false" />
+          <Property Name="resource_id" Type="Int64" Nullable="false" />
+          <Property Name="price_actual" Type="Decimal" Nullable="false" />
+          <Property Name="subprice_actual" Type="Decimal" Nullable="false" />
+          <Property Name="discount_actual" Type="Decimal" Nullable="false" />
+          <Property Name="discount_qty_actual" Type="Decimal" Nullable="false" />
+        </EntityType>
+        <EntityType Name="pages">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="controller" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="action" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="title" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="photo_report">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userId" Type="Int64" />
+          <Property Name="showLocations" Type="Boolean" Nullable="false" />
+          <Property Name="date" Type="DateTime" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="users" Relationship="alphaModel.photo_report_ibfk_1" FromRole="photo_report" ToRole="users" />
+          <NavigationProperty Name="photo_report_resource" Relationship="alphaModel.photo_report_resource_ibfk_1" FromRole="photo_report" ToRole="photo_report_resource" />
+        </EntityType>
+        <EntityType Name="photo_report_resource">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="reportId" Type="Int64" Nullable="false" />
+          <Property Name="resourceId" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="photo_report" Relationship="alphaModel.photo_report_resource_ibfk_1" FromRole="photo_report_resource" ToRole="photo_report" />
+          <NavigationProperty Name="resources" Relationship="alphaModel.photo_report_resource_ibfk_2" FromRole="photo_report_resource" ToRole="resources" />
+          <NavigationProperty Name="photo_report_resource_photo" Relationship="alphaModel.photo_report_resource_photo_ibfk_1" FromRole="photo_report_resource" ToRole="photo_report_resource_photo" />
+        </EntityType>
+        <EntityType Name="photo_report_resource_photo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="parentId" Type="Int64" Nullable="false" />
+          <Property Name="photo" Type="String" Nullable="false" MaxLength="37" Unicode="false" FixedLength="false" />
+          <Property Name="sort" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="photo_report_resource" Relationship="alphaModel.photo_report_resource_photo_ibfk_1" FromRole="photo_report_resource_photo" ToRole="photo_report_resource" />
+        </EntityType>
+        <EntityType Name="preferences">
+          <Key>
+            <PropertyRef Name="key" />
+          </Key>
+          <Property Name="key" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="value" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="presentation_link">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="type" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="userId" Type="Int64" />
+          <Property Name="hash" Type="String" Nullable="false" MaxLength="32" Unicode="false" FixedLength="false" />
+          <Property Name="downloadCount" Type="Int32" Nullable="false" />
+          <Property Name="dateCreate" Type="DateTime" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="dateLastDownload" Type="DateTime" />
+          <Property Name="vars" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="users" Relationship="alphaModel.presentation_link_ibfk_1" FromRole="presentation_link" ToRole="users" />
+          <NavigationProperty Name="presentation_link_resource" Relationship="alphaModel.presentation_link_resource_ibfk_1" FromRole="presentation_link" ToRole="presentation_link_resource" />
+        </EntityType>
+        <EntityType Name="presentation_link_resource">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="linkId" Type="Int64" Nullable="false" />
+          <Property Name="resourceId" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="presentation_link" Relationship="alphaModel.presentation_link_resource_ibfk_1" FromRole="presentation_link_resource" ToRole="presentation_link" />
+          <NavigationProperty Name="resources" Relationship="alphaModel.presentation_link_resource_ibfk_2" FromRole="presentation_link_resource" ToRole="resources" />
+        </EntityType>
+        <EntityType Name="regions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="city_id" Type="Int64" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="slug" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="seo_place" Relationship="alphaModel.seo_place_ibfk_3" FromRole="regions" ToRole="seo_place" />
+        </EntityType>
+        <EntityType Name="reserves">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Decimal" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="order_id" Type="Int32" Nullable="false" />
+          <Property Name="subuser_id" Type="Int64" Nullable="false" />
+          <Property Name="resource_id" Type="Int64" Nullable="false" />
+          <Property Name="period" Type="DateTime" Nullable="false" />
+          <Property Name="status" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="price_nominal" Type="Decimal" Nullable="false" />
+          <Property Name="price_actual" Type="Decimal" Nullable="false" />
+          <Property Name="subprice_nominal" Type="Decimal" Nullable="false" />
+          <Property Name="subprice_actual" Type="Decimal" Nullable="false" />
+          <Property Name="added" Type="DateTime" Nullable="false" />
+          <Property Name="expires" Type="DateTime" Nullable="false" />
+          <Property Name="is_notified" Type="Boolean" Nullable="false" />
+          <Property Name="is_active" Type="Boolean" Nullable="false" />
+          <Property Name="doer_id" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_import_log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="Int32" Nullable="false" />
+          <Property Name="filename" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="errors" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="date" Type="DateTime" />
+          <Property Name="status" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_lights">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_price_rules">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="Int32" Nullable="false" />
+          <Property Name="agency_id" Type="Int32" Nullable="false" />
+          <Property Name="price_from" Type="Decimal" Nullable="false" />
+          <Property Name="price_to" Type="Decimal" Nullable="false" />
+          <Property Name="percent" Type="Decimal" />
+          <Property Name="bonus" Type="Decimal" />
+        </EntityType>
+        <EntityType Name="resource_sides">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" />
+        </EntityType>
+        <EntityType Name="resource_sizes">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="type_id" Type="Int64" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="resource_types">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="slug" Type="String" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="pos" Type="Int64" Nullable="false" />
+          <Property Name="view" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_north" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_north_east" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_east" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_east_south" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_south" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_west" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_north_west" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_south_west" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_bot" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_north_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_north_east_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_east_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_east_south_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_south_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_west_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_north_west_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="view_south_west_agency" Type="String" Nullable="false" MaxLength="300" Unicode="false" FixedLength="false" />
+          <Property Name="iconBot" Type="String" MaxLength="37" Unicode="false" FixedLength="false" />
+          <Property Name="iconOperator" Type="String" MaxLength="37" Unicode="false" FixedLength="false" />
+          <Property Name="iconAgency" Type="String" MaxLength="37" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="seo_place" Relationship="alphaModel.seo_place_ibfk_1" FromRole="resource_types" ToRole="seo_place" />
+        </EntityType>
+        <EntityType Name="resources">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="code" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="codeDoors" Type="Int64" />
+          <Property Name="company_id" Type="Int64" Nullable="false" />
+          <Property Name="type_id" Type="Int64" Nullable="false" />
+          <Property Name="side_id" Type="Int64" Nullable="false" />
+          <Property Name="size_id" Type="Int64" Nullable="false" />
+          <Property Name="light" Type="Boolean" Nullable="false" />
+          <Property Name="restricted" Type="Boolean" Nullable="false" />
+          <Property Name="price" Type="Decimal" Nullable="false" />
+          <Property Name="city_id" Type="Int64" Nullable="false" />
+          <Property Name="region_id" Type="Int64" />
+          <Property Name="location_id" Type="Int64" />
+          <Property Name="address" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="description" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="added" Type="DateTime" Nullable="false" />
+          <Property Name="is_active" Type="Boolean" Nullable="false" />
+          <Property Name="has_image" Type="SByte" Nullable="false" />
+          <Property Name="latitude" Type="Decimal" Nullable="false" />
+          <Property Name="longitude" Type="Decimal" Nullable="false" />
+          <Property Name="marker_rotation" Type="Int16" Nullable="false" />
+          <Property Name="approved" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="rotation_approved" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="photo_report_resource" Relationship="alphaModel.photo_report_resource_ibfk_2" FromRole="resources" ToRole="photo_report_resource" />
+          <NavigationProperty Name="presentation_link_resource" Relationship="alphaModel.presentation_link_resource_ibfk_2" FromRole="resources" ToRole="presentation_link_resource" />
+        </EntityType>
+        <EntityType Name="resources_history">
+          <Key>
+            <PropertyRef Name="resource_id" />
+            <PropertyRef Name="changed" />
+          </Key>
+          <Property Name="resource_id" Type="Int64" Nullable="false" />
+          <Property Name="changed" Type="DateTime" Nullable="false" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="price" Type="Decimal" Nullable="false" />
+        </EntityType>
+        <EntityType Name="seo_place">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="typeId" Type="Int64" Nullable="false" />
+          <Property Name="cityId" Type="Int64" />
+          <Property Name="regionId" Type="Int64" />
+          <Property Name="title" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="description" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="h1" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="cities" Relationship="alphaModel.seo_place_ibfk_2" FromRole="seo_place" ToRole="cities" />
+          <NavigationProperty Name="regions" Relationship="alphaModel.seo_place_ibfk_3" FromRole="seo_place" ToRole="regions" />
+          <NavigationProperty Name="resource_types" Relationship="alphaModel.seo_place_ibfk_1" FromRole="seo_place" ToRole="resource_types" />
+        </EntityType>
+        <EntityType Name="static_pages">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="alias" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="title" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="content" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="subresources">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="resource_id" />
+          </Key>
+          <Property Name="company_id" Type="Int64" Nullable="false" />
+          <Property Name="resource_id" Type="Int64" Nullable="false" />
+          <Property Name="code" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="price" Type="Decimal" Nullable="false" />
+          <Property Name="rate" Type="Decimal" Nullable="false" />
+        </EntityType>
+        <EntityType Name="subresources_history">
+          <Key>
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="resource_id" />
+            <PropertyRef Name="changed" />
+          </Key>
+          <Property Name="company_id" Type="Int32" Nullable="false" />
+          <Property Name="resource_id" Type="Int32" Nullable="false" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="changed" Type="DateTime" Nullable="false" />
+          <Property Name="price" Type="Decimal" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sync">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="Int32" Nullable="false" />
+          <Property Name="resource_id" Type="Int32" Nullable="false" />
+          <Property Name="period" Type="DateTime" Nullable="false" />
+          <Property Name="status" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="added" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="synonym_word">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="isMain" Type="Boolean" Nullable="false" />
+          <Property Name="word" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="synonym_word1" Relationship="alphaModel.synonym" FromRole="synonym_word" ToRole="synonym_word1" />
+          <NavigationProperty Name="synonym_word2" Relationship="alphaModel.synonym" FromRole="synonym_word1" ToRole="synonym_word" />
+        </EntityType>
+        <EntityType Name="tooltip">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="categoryId" Type="Int32" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="caption" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="text" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="tooltip_category" Relationship="alphaModel.tooltip_ibfk_1" FromRole="tooltip" ToRole="tooltip_category" />
+        </EntityType>
+        <EntityType Name="tooltip_category">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="caption" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="sort" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="tooltip" Relationship="alphaModel.tooltip_ibfk_1" FromRole="tooltip_category" ToRole="tooltip" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="company_id" Type="Int64" Nullable="false" />
+          <Property Name="manager_id" Type="Int64" Nullable="false" a:SetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" />
+          <Property Name="login" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="32" Unicode="false" FixedLength="false" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="surname" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="patronymic" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="phone" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="address" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />
+          <Property Name="icq" Type="String" Nullable="false" MaxLength="30" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="skype" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="type" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" />
+          <Property Name="wannabe" Type="String" Nullable="false" MaxLength="65532" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="is_private" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="is_active" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="is_banned" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="token" Type="String" Nullable="false" MaxLength="32" Unicode="false" FixedLength="false" a:SetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:GetterAccess="Private" />
+          <Property Name="added" Type="DateTime" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="ip_check" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="ip" Type="Int64" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="is_default" Type="SByte" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="last_user" Type="Int32" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="is_price_visible" Type="SByte" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="translitPresentation" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="useBefore" Type="String" MaxLength="65532" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <NavigationProperty Name="mockup_set" Relationship="alphaModel.mockup_set_ibfk_1" FromRole="users" ToRole="mockup_set" />
+          <NavigationProperty Name="photo_report" Relationship="alphaModel.photo_report_ibfk_1" FromRole="users" ToRole="photo_report" />
+          <NavigationProperty Name="presentation_link" Relationship="alphaModel.presentation_link_ibfk_1" FromRole="users" ToRole="presentation_link" />
+        </EntityType>
+        <EntityType Name="users_clients">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="company" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="address" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="city" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="region" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="country_id" Type="Int64" Nullable="false" />
+          <Property Name="zip" Type="String" Nullable="false" MaxLength="10" Unicode="false" FixedLength="false" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="phone" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="phone2" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="bank" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="bank_account" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="edrpou" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="address_law" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="properties" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="users_history">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="changed" />
+          </Key>
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="changed" Type="DateTime" Nullable="false" />
+          <Property Name="surname" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="patronymic" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="phone" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="address" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="icq" Type="String" Nullable="false" MaxLength="30" Unicode="false" FixedLength="false" />
+          <Property Name="skype" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="c_company" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="c_address" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="c_city" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="c_region" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="c_country_id" Type="Int64" Nullable="false" />
+          <Property Name="c_zip" Type="String" Nullable="false" MaxLength="10" Unicode="false" FixedLength="false" />
+          <Property Name="c_email" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="c_phone" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="c_phone2" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="c_bank" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="c_bank_account" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="c_edrpou" Type="String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+          <Property Name="c_address_law" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+          <Property Name="c_properties" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="users_ips">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="ip" />
+            <PropertyRef Name="moment" />
+          </Key>
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="ip" Type="Int64" Nullable="false" />
+          <Property Name="moment" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <Association Name="area_ibfk_1">
+          <End Role="countries" Type="alphaModel.countries" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="area" Type="alphaModel.area" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="countries">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="area">
+              <PropertyRef Name="countryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="cities_ibfk_1">
+          <End Role="area" Type="alphaModel.area" Multiplicity="0..1" />
+          <End Role="cities" Type="alphaModel.cities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="area">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="cities">
+              <PropertyRef Name="areaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seo_place_ibfk_2">
+          <End Role="cities" Type="alphaModel.cities" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seo_place" Type="alphaModel.seo_place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cities">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="seo_place">
+              <PropertyRef Name="cityId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="import_rectangle_ibfk_1">
+          <End Role="companies" Type="alphaModel.companies" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="import_rectangle" Type="alphaModel.import_rectangle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="companies">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="import_rectangle">
+              <PropertyRef Name="companyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="mockup_set_ibfk_2">
+          <End Role="companies" Type="alphaModel.companies" Multiplicity="0..1" />
+          <End Role="mockup_set" Type="alphaModel.mockup_set" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="companies">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mockup_set">
+              <PropertyRef Name="companyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="mockup_ibfk_1">
+          <End Role="mockup_set" Type="alphaModel.mockup_set" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="mockup" Type="alphaModel.mockup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="mockup_set">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mockup">
+              <PropertyRef Name="parentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="mockup_set_ibfk_1">
+          <End Role="users" Type="alphaModel.users" Multiplicity="0..1" />
+          <End Role="mockup_set" Type="alphaModel.mockup_set" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mockup_set">
+              <PropertyRef Name="userId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_ibfk_1">
+          <End Role="users" Type="alphaModel.users" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report" Type="alphaModel.photo_report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report">
+              <PropertyRef Name="userId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_resource_ibfk_1">
+          <End Role="photo_report" Type="alphaModel.photo_report" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report_resource" Type="alphaModel.photo_report_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="photo_report">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report_resource">
+              <PropertyRef Name="reportId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_resource_ibfk_2">
+          <End Role="resources" Type="alphaModel.resources" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report_resource" Type="alphaModel.photo_report_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="resources">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report_resource">
+              <PropertyRef Name="resourceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="photo_report_resource_photo_ibfk_1">
+          <End Role="photo_report_resource" Type="alphaModel.photo_report_resource" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="photo_report_resource_photo" Type="alphaModel.photo_report_resource_photo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="photo_report_resource">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="photo_report_resource_photo">
+              <PropertyRef Name="parentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="presentation_link_ibfk_1">
+          <End Role="users" Type="alphaModel.users" Multiplicity="0..1" />
+          <End Role="presentation_link" Type="alphaModel.presentation_link" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="presentation_link">
+              <PropertyRef Name="userId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="presentation_link_resource_ibfk_1">
+          <End Role="presentation_link" Type="alphaModel.presentation_link" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="presentation_link_resource" Type="alphaModel.presentation_link_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="presentation_link">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="presentation_link_resource">
+              <PropertyRef Name="linkId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="presentation_link_resource_ibfk_2">
+          <End Role="resources" Type="alphaModel.resources" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="presentation_link_resource" Type="alphaModel.presentation_link_resource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="resources">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="presentation_link_resource">
+              <PropertyRef Name="resourceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seo_place_ibfk_3">
+          <End Role="regions" Type="alphaModel.regions" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seo_place" Type="alphaModel.seo_place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="regions">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="seo_place">
+              <PropertyRef Name="regionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seo_place_ibfk_1">
+          <End Role="resource_types" Type="alphaModel.resource_types" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seo_place" Type="alphaModel.seo_place" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="resource_types">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="seo_place">
+              <PropertyRef Name="typeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="tooltip_ibfk_1">
+          <End Role="tooltip_category" Type="alphaModel.tooltip_category" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="tooltip" Type="alphaModel.tooltip" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tooltip_category">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tooltip">
+              <PropertyRef Name="categoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="synonym">
+          <End Role="synonym_word" Type="alphaModel.synonym_word" Multiplicity="*" />
+          <End Role="synonym_word1" Type="alphaModel.synonym_word" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="alphaModelStoreContainer" CdmEntityContainer="alphaEntities">
+          <EntitySetMapping Name="area">
+            <EntityTypeMapping TypeName="alphaModel.area">
+              <MappingFragment StoreEntitySet="area">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="countryId" ColumnName="countryId" />
+                <ScalarProperty Name="caption" ColumnName="caption" />
+                <ScalarProperty Name="sort" ColumnName="sort" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cart">
+            <EntityTypeMapping TypeName="alphaModel.cart">
+              <MappingFragment StoreEntitySet="cart">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cities">
+            <EntityTypeMapping TypeName="alphaModel.cities">
+              <MappingFragment StoreEntitySet="cities">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="country_id" ColumnName="country_id" />
+                <ScalarProperty Name="areaId" ColumnName="areaId" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="slug" ColumnName="slug" />
+                <ScalarProperty Name="casePrepositional" ColumnName="casePrepositional" />
+                <ScalarProperty Name="caseDative" ColumnName="caseDative" />
+                <ScalarProperty Name="caseGenitive" ColumnName="caseGenitive" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+                <ScalarProperty Name="latitude" ColumnName="latitude" />
+                <ScalarProperty Name="coded" ColumnName="coded" />
+                <ScalarProperty Name="longitude" ColumnName="longitude" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="companies">
+            <EntityTypeMapping TypeName="alphaModel.companies">
+              <MappingFragment StoreEntitySet="companies">
+                <ScalarProperty Name="deny_next_year" ColumnName="deny_next_year" />
+                <ScalarProperty Name="syncCheckLimit" ColumnName="syncCheckLimit" />
+                <ScalarProperty Name="requisites" ColumnName="requisites" />
+                <ScalarProperty Name="ownMediaUrl" ColumnName="ownMediaUrl" />
+                <ScalarProperty Name="new_codes" ColumnName="new_codes" />
+                <ScalarProperty Name="code_reserve" ColumnName="code_reserve" />
+                <ScalarProperty Name="code_reserved" ColumnName="code_reserved" />
+                <ScalarProperty Name="code_free" ColumnName="code_free" />
+                <ScalarProperty Name="deny_map" ColumnName="deny_map" />
+                <ScalarProperty Name="tax" ColumnName="tax" />
+                <ScalarProperty Name="to_period" ColumnName="to_period" />
+                <ScalarProperty Name="lose_date" ColumnName="lose_date" />
+                <ScalarProperty Name="sync_files" ColumnName="sync_files" />
+                <ScalarProperty Name="sync_periods" ColumnName="sync_periods" />
+                <ScalarProperty Name="sync_new_resources" ColumnName="sync_new_resources" />
+                <ScalarProperty Name="sync_resources" ColumnName="sync_resources" />
+                <ScalarProperty Name="sync_date" ColumnName="sync_date" />
+                <ScalarProperty Name="sync_url" ColumnName="sync_url" />
+                <ScalarProperty Name="use_reserves" ColumnName="use_reserves" />
+                <ScalarProperty Name="showResourcesWhileInactive" ColumnName="showResourcesWhileInactive" />
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="contract" ColumnName="contract" />
+                <ScalarProperty Name="autoconfirm" ColumnName="autoconfirm" />
+                <ScalarProperty Name="users_limit" ColumnName="users_limit" />
+                <ScalarProperty Name="reserve_hours" ColumnName="reserve_hours" />
+                <ScalarProperty Name="prefix" ColumnName="prefix" />
+                <ScalarProperty Name="address_law" ColumnName="address_law" />
+                <ScalarProperty Name="edrpou" ColumnName="edrpou" />
+                <ScalarProperty Name="bank_account" ColumnName="bank_account" />
+                <ScalarProperty Name="bank" ColumnName="bank" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone2" ColumnName="phone2" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="zip" ColumnName="zip" />
+                <ScalarProperty Name="passwd" ColumnName="passwd" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="city" ColumnName="city" />
+                <ScalarProperty Name="region" ColumnName="region" />
+                <ScalarProperty Name="country_id" ColumnName="country_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="countries">
+            <EntityTypeMapping TypeName="alphaModel.countries">
+              <MappingFragment StoreEntitySet="countries">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="discounts_periods">
+            <EntityTypeMapping TypeName="alphaModel.discounts_periods">
+              <MappingFragment StoreEntitySet="discounts_periods">
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="periods" ColumnName="periods" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="discounts_qty">
+            <EntityTypeMapping TypeName="alphaModel.discounts_qty">
+              <MappingFragment StoreEntitySet="discounts_qty">
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="qty" ColumnName="qty" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="help_chapters">
+            <EntityTypeMapping TypeName="alphaModel.help_chapters">
+              <MappingFragment StoreEntitySet="help_chapters">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="page_id" ColumnName="page_id" />
+                <ScalarProperty Name="role" ColumnName="role" />
+                <ScalarProperty Name="content" ColumnName="content" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="hots">
+            <EntityTypeMapping TypeName="alphaModel.hots">
+              <MappingFragment StoreEntitySet="hots">
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="period" ColumnName="period" />
+                <ScalarProperty Name="price" ColumnName="price" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="import_rectangle">
+            <EntityTypeMapping TypeName="alphaModel.import_rectangle">
+              <MappingFragment StoreEntitySet="import_rectangle">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="companyId" ColumnName="companyId" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="width" ColumnName="width" />
+                <ScalarProperty Name="height" ColumnName="height" />
+                <ScalarProperty Name="x1" ColumnName="x1" />
+                <ScalarProperty Name="y1" ColumnName="y1" />
+                <ScalarProperty Name="x2" ColumnName="x2" />
+                <ScalarProperty Name="y2" ColumnName="y2" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="locations">
+            <EntityTypeMapping TypeName="alphaModel.locations">
+              <MappingFragment StoreEntitySet="locations">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="city_id" ColumnName="city_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+                <ScalarProperty Name="correspondence" ColumnName="correspondence" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="managers">
+            <EntityTypeMapping TypeName="alphaModel.managers">
+              <MappingFragment StoreEntitySet="managers">
+                <ScalarProperty Name="operator_id" ColumnName="operator_id" />
+                <ScalarProperty Name="manager_id" ColumnName="manager_id" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="mockup">
+            <EntityTypeMapping TypeName="alphaModel.mockup">
+              <MappingFragment StoreEntitySet="mockup">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="parentId" ColumnName="parentId" />
+                <ScalarProperty Name="fileName" ColumnName="fileName" />
+                <ScalarProperty Name="origFileName" ColumnName="origFileName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="mockup_set">
+            <EntityTypeMapping TypeName="alphaModel.mockup_set">
+              <MappingFragment StoreEntitySet="mockup_set">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="hash" ColumnName="hash" />
+                <ScalarProperty Name="emailClient" ColumnName="emailClient" />
+                <ScalarProperty Name="emailManager" ColumnName="emailManager" />
+                <ScalarProperty Name="userId" ColumnName="userId" />
+                <ScalarProperty Name="companyId" ColumnName="companyId" />
+                <ScalarProperty Name="withPreview" ColumnName="withPreview" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="dateValid" ColumnName="dateValid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="news">
+            <EntityTypeMapping TypeName="alphaModel.news">
+              <MappingFragment StoreEntitySet="news">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="posted" ColumnName="posted" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="teaser" ColumnName="teaser" />
+                <ScalarProperty Name="content" ColumnName="content" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="operator_orders">
+            <EntityTypeMapping TypeName="alphaModel.operator_orders">
+              <MappingFragment StoreEntitySet="operator_orders">
+                <ScalarProperty Name="operator_id" ColumnName="operator_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="orders">
+            <EntityTypeMapping TypeName="alphaModel.orders">
+              <MappingFragment StoreEntitySet="orders">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="subuser_id" ColumnName="subuser_id" />
+                <ScalarProperty Name="added" ColumnName="added" />
+                <ScalarProperty Name="changed" ColumnName="changed" />
+                <ScalarProperty Name="expires" ColumnName="expires" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="comments" ColumnName="comments" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="orders_confirms">
+            <EntityTypeMapping TypeName="alphaModel.orders_confirms">
+              <MappingFragment StoreEntitySet="orders_confirms">
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="price_actual" ColumnName="price_actual" />
+                <ScalarProperty Name="subprice_actual" ColumnName="subprice_actual" />
+                <ScalarProperty Name="discount_actual" ColumnName="discount_actual" />
+                <ScalarProperty Name="discount_qty_actual" ColumnName="discount_qty_actual" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="pages">
+            <EntityTypeMapping TypeName="alphaModel.pages">
+              <MappingFragment StoreEntitySet="pages">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="controller" ColumnName="controller" />
+                <ScalarProperty Name="action" ColumnName="action" />
+                <ScalarProperty Name="title" ColumnName="title" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="photo_report">
+            <EntityTypeMapping TypeName="alphaModel.photo_report">
+              <MappingFragment StoreEntitySet="photo_report">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="userId" ColumnName="userId" />
+                <ScalarProperty Name="showLocations" ColumnName="showLocations" />
+                <ScalarProperty Name="date" ColumnName="date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="photo_report_resource">
+            <EntityTypeMapping TypeName="alphaModel.photo_report_resource">
+              <MappingFragment StoreEntitySet="photo_report_resource">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="reportId" ColumnName="reportId" />
+                <ScalarProperty Name="resourceId" ColumnName="resourceId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="photo_report_resource_photo">
+            <EntityTypeMapping TypeName="alphaModel.photo_report_resource_photo">
+              <MappingFragment StoreEntitySet="photo_report_resource_photo">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="parentId" ColumnName="parentId" />
+                <ScalarProperty Name="photo" ColumnName="photo" />
+                <ScalarProperty Name="sort" ColumnName="sort" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="preferences">
+            <EntityTypeMapping TypeName="alphaModel.preferences">
+              <MappingFragment StoreEntitySet="preferences">
+                <ScalarProperty Name="key" ColumnName="key" />
+                <ScalarProperty Name="value" ColumnName="value" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="presentation_link">
+            <EntityTypeMapping TypeName="alphaModel.presentation_link">
+              <MappingFragment StoreEntitySet="presentation_link">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="userId" ColumnName="userId" />
+                <ScalarProperty Name="hash" ColumnName="hash" />
+                <ScalarProperty Name="downloadCount" ColumnName="downloadCount" />
+                <ScalarProperty Name="dateCreate" ColumnName="dateCreate" />
+                <ScalarProperty Name="dateLastDownload" ColumnName="dateLastDownload" />
+                <ScalarProperty Name="vars" ColumnName="vars" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="presentation_link_resource">
+            <EntityTypeMapping TypeName="alphaModel.presentation_link_resource">
+              <MappingFragment StoreEntitySet="presentation_link_resource">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="linkId" ColumnName="linkId" />
+                <ScalarProperty Name="resourceId" ColumnName="resourceId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="regions">
+            <EntityTypeMapping TypeName="alphaModel.regions">
+              <MappingFragment StoreEntitySet="regions">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="city_id" ColumnName="city_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="slug" ColumnName="slug" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="reserves">
+            <EntityTypeMapping TypeName="alphaModel.reserves">
+              <MappingFragment StoreEntitySet="reserves">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="subuser_id" ColumnName="subuser_id" />
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="period" ColumnName="period" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="price_nominal" ColumnName="price_nominal" />
+                <ScalarProperty Name="price_actual" ColumnName="price_actual" />
+                <ScalarProperty Name="subprice_nominal" ColumnName="subprice_nominal" />
+                <ScalarProperty Name="subprice_actual" ColumnName="subprice_actual" />
+                <ScalarProperty Name="added" ColumnName="added" />
+                <ScalarProperty Name="expires" ColumnName="expires" />
+                <ScalarProperty Name="is_notified" ColumnName="is_notified" />
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="doer_id" ColumnName="doer_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resource_import_log">
+            <EntityTypeMapping TypeName="alphaModel.resource_import_log">
+              <MappingFragment StoreEntitySet="resource_import_log">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="filename" ColumnName="filename" />
+                <ScalarProperty Name="errors" ColumnName="errors" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resource_lights">
+            <EntityTypeMapping TypeName="alphaModel.resource_lights">
+              <MappingFragment StoreEntitySet="resource_lights">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resource_price_rules">
+            <EntityTypeMapping TypeName="alphaModel.resource_price_rules">
+              <MappingFragment StoreEntitySet="resource_price_rules">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="agency_id" ColumnName="agency_id" />
+                <ScalarProperty Name="price_from" ColumnName="price_from" />
+                <ScalarProperty Name="price_to" ColumnName="price_to" />
+                <ScalarProperty Name="percent" ColumnName="percent" />
+                <ScalarProperty Name="bonus" ColumnName="bonus" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resource_sides">
+            <EntityTypeMapping TypeName="alphaModel.resource_sides">
+              <MappingFragment StoreEntitySet="resource_sides">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resource_sizes">
+            <EntityTypeMapping TypeName="alphaModel.resource_sizes">
+              <MappingFragment StoreEntitySet="resource_sizes">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="type_id" ColumnName="type_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resource_types">
+            <EntityTypeMapping TypeName="alphaModel.resource_types">
+              <MappingFragment StoreEntitySet="resource_types">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="slug" ColumnName="slug" />
+                <ScalarProperty Name="pos" ColumnName="pos" />
+                <ScalarProperty Name="view" ColumnName="view" />
+                <ScalarProperty Name="view_north" ColumnName="view_north" />
+                <ScalarProperty Name="view_north_east" ColumnName="view_north_east" />
+                <ScalarProperty Name="view_east" ColumnName="view_east" />
+                <ScalarProperty Name="view_east_south" ColumnName="view_east_south" />
+                <ScalarProperty Name="view_south" ColumnName="view_south" />
+                <ScalarProperty Name="view_west" ColumnName="view_west" />
+                <ScalarProperty Name="view_north_west" ColumnName="view_north_west" />
+                <ScalarProperty Name="view_south_west" ColumnName="view_south_west" />
+                <ScalarProperty Name="view_bot" ColumnName="view_bot" />
+                <ScalarProperty Name="view_agency" ColumnName="view_agency" />
+                <ScalarProperty Name="view_north_agency" ColumnName="view_north_agency" />
+                <ScalarProperty Name="view_north_east_agency" ColumnName="view_north_east_agency" />
+                <ScalarProperty Name="view_east_agency" ColumnName="view_east_agency" />
+                <ScalarProperty Name="view_east_south_agency" ColumnName="view_east_south_agency" />
+                <ScalarProperty Name="view_south_agency" ColumnName="view_south_agency" />
+                <ScalarProperty Name="view_west_agency" ColumnName="view_west_agency" />
+                <ScalarProperty Name="view_north_west_agency" ColumnName="view_north_west_agency" />
+                <ScalarProperty Name="view_south_west_agency" ColumnName="view_south_west_agency" />
+                <ScalarProperty Name="iconBot" ColumnName="iconBot" />
+                <ScalarProperty Name="iconOperator" ColumnName="iconOperator" />
+                <ScalarProperty Name="iconAgency" ColumnName="iconAgency" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resources">
+            <EntityTypeMapping TypeName="alphaModel.resources">
+              <MappingFragment StoreEntitySet="resources">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="codeDoors" ColumnName="codeDoors" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="type_id" ColumnName="type_id" />
+                <ScalarProperty Name="side_id" ColumnName="side_id" />
+                <ScalarProperty Name="size_id" ColumnName="size_id" />
+                <ScalarProperty Name="light" ColumnName="light" />
+                <ScalarProperty Name="restricted" ColumnName="restricted" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="city_id" ColumnName="city_id" />
+                <ScalarProperty Name="region_id" ColumnName="region_id" />
+                <ScalarProperty Name="location_id" ColumnName="location_id" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="added" ColumnName="added" />
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="has_image" ColumnName="has_image" />
+                <ScalarProperty Name="latitude" ColumnName="latitude" />
+                <ScalarProperty Name="longitude" ColumnName="longitude" />
+                <ScalarProperty Name="marker_rotation" ColumnName="marker_rotation" />
+                <ScalarProperty Name="approved" ColumnName="approved" />
+                <ScalarProperty Name="rotation_approved" ColumnName="rotation_approved" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="resources_history">
+            <EntityTypeMapping TypeName="alphaModel.resources_history">
+              <MappingFragment StoreEntitySet="resources_history">
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="changed" ColumnName="changed" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="price" ColumnName="price" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="seo_place">
+            <EntityTypeMapping TypeName="alphaModel.seo_place">
+              <MappingFragment StoreEntitySet="seo_place">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="typeId" ColumnName="typeId" />
+                <ScalarProperty Name="cityId" ColumnName="cityId" />
+                <ScalarProperty Name="regionId" ColumnName="regionId" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="h1" ColumnName="h1" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="static_pages">
+            <EntityTypeMapping TypeName="alphaModel.static_pages">
+              <MappingFragment StoreEntitySet="static_pages">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="content" ColumnName="content" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="subresources">
+            <EntityTypeMapping TypeName="alphaModel.subresources">
+              <MappingFragment StoreEntitySet="subresources">
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="rate" ColumnName="rate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="subresources_history">
+            <EntityTypeMapping TypeName="alphaModel.subresources_history">
+              <MappingFragment StoreEntitySet="subresources_history">
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="changed" ColumnName="changed" />
+                <ScalarProperty Name="price" ColumnName="price" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sync">
+            <EntityTypeMapping TypeName="alphaModel.sync">
+              <MappingFragment StoreEntitySet="sync">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="resource_id" ColumnName="resource_id" />
+                <ScalarProperty Name="period" ColumnName="period" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="added" ColumnName="added" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="synonym_word">
+            <EntityTypeMapping TypeName="alphaModel.synonym_word">
+              <MappingFragment StoreEntitySet="synonym_word">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="isMain" ColumnName="isMain" />
+                <ScalarProperty Name="word" ColumnName="word" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tooltip">
+            <EntityTypeMapping TypeName="alphaModel.tooltip">
+              <MappingFragment StoreEntitySet="tooltip">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="categoryId" ColumnName="categoryId" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="caption" ColumnName="caption" />
+                <ScalarProperty Name="text" ColumnName="text" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tooltip_category">
+            <EntityTypeMapping TypeName="alphaModel.tooltip_category">
+              <MappingFragment StoreEntitySet="tooltip_category">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="caption" ColumnName="caption" />
+                <ScalarProperty Name="sort" ColumnName="sort" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="alphaModel.users">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="useBefore" ColumnName="useBefore" />
+                <ScalarProperty Name="translitPresentation" ColumnName="translitPresentation" />
+                <ScalarProperty Name="is_price_visible" ColumnName="is_price_visible" />
+                <ScalarProperty Name="last_user" ColumnName="last_user" />
+                <ScalarProperty Name="is_default" ColumnName="is_default" />
+                <ScalarProperty Name="ip" ColumnName="ip" />
+                <ScalarProperty Name="ip_check" ColumnName="ip_check" />
+                <ScalarProperty Name="added" ColumnName="added" />
+                <ScalarProperty Name="token" ColumnName="token" />
+                <ScalarProperty Name="is_banned" ColumnName="is_banned" />
+                <ScalarProperty Name="is_active" ColumnName="is_active" />
+                <ScalarProperty Name="is_private" ColumnName="is_private" />
+                <ScalarProperty Name="wannabe" ColumnName="wannabe" />
+                <ScalarProperty Name="skype" ColumnName="skype" />
+                <ScalarProperty Name="icq" ColumnName="icq" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="manager_id" ColumnName="manager_id" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="login" ColumnName="login" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="surname" ColumnName="surname" />
+                <ScalarProperty Name="patronymic" ColumnName="patronymic" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="type" ColumnName="type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users_clients">
+            <EntityTypeMapping TypeName="alphaModel.users_clients">
+              <MappingFragment StoreEntitySet="users_clients">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="company" ColumnName="company" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="city" ColumnName="city" />
+                <ScalarProperty Name="region" ColumnName="region" />
+                <ScalarProperty Name="country_id" ColumnName="country_id" />
+                <ScalarProperty Name="zip" ColumnName="zip" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="phone2" ColumnName="phone2" />
+                <ScalarProperty Name="bank" ColumnName="bank" />
+                <ScalarProperty Name="bank_account" ColumnName="bank_account" />
+                <ScalarProperty Name="edrpou" ColumnName="edrpou" />
+                <ScalarProperty Name="address_law" ColumnName="address_law" />
+                <ScalarProperty Name="properties" ColumnName="properties" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users_history">
+            <EntityTypeMapping TypeName="alphaModel.users_history">
+              <MappingFragment StoreEntitySet="users_history">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="changed" ColumnName="changed" />
+                <ScalarProperty Name="surname" ColumnName="surname" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="patronymic" ColumnName="patronymic" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="icq" ColumnName="icq" />
+                <ScalarProperty Name="skype" ColumnName="skype" />
+                <ScalarProperty Name="c_company" ColumnName="c_company" />
+                <ScalarProperty Name="c_address" ColumnName="c_address" />
+                <ScalarProperty Name="c_city" ColumnName="c_city" />
+                <ScalarProperty Name="c_region" ColumnName="c_region" />
+                <ScalarProperty Name="c_country_id" ColumnName="c_country_id" />
+                <ScalarProperty Name="c_zip" ColumnName="c_zip" />
+                <ScalarProperty Name="c_email" ColumnName="c_email" />
+                <ScalarProperty Name="c_phone" ColumnName="c_phone" />
+                <ScalarProperty Name="c_phone2" ColumnName="c_phone2" />
+                <ScalarProperty Name="c_bank" ColumnName="c_bank" />
+                <ScalarProperty Name="c_bank_account" ColumnName="c_bank_account" />
+                <ScalarProperty Name="c_edrpou" ColumnName="c_edrpou" />
+                <ScalarProperty Name="c_address_law" ColumnName="c_address_law" />
+                <ScalarProperty Name="c_properties" ColumnName="c_properties" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users_ips">
+            <EntityTypeMapping TypeName="alphaModel.users_ips">
+              <MappingFragment StoreEntitySet="users_ips">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="ip" ColumnName="ip" />
+                <ScalarProperty Name="moment" ColumnName="moment" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="synonym" TypeName="alphaModel.synonym" StoreEntitySet="synonym">
+            <EndProperty Name="synonym_word">
+              <ScalarProperty Name="id" ColumnName="mainWordId" />
+            </EndProperty>
+            <EndProperty Name="synonym_word1">
+              <ScalarProperty Name="id" ColumnName="synWordId" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

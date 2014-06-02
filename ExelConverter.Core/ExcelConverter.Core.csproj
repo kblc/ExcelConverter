@@ -1,0 +1,430 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FD5887B1-3B28-4470-B9DB-19C5C0ACDFD4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ExelConverter.Core</RootNamespace>
+    <AssemblyName>ExelConverter.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aspose.Cells, Version=7.4.3.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Aspose.Cells.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
+    <Reference Include="MySql.Data.Entity, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Converter\CommonTypes\FunctionsBlock.cs" />
+    <Compile Include="Converter\CommonTypes\FunctionsBlocksContainer.cs" />
+    <Compile Include="Converter\CommonTypes\ImageData.cs" />
+    <Compile Include="Converter\CommonTypes\ImageParsingData.cs" />
+    <Compile Include="Converter\CommonTypes\Mapping.cs" />
+    <Compile Include="Converter\CommonTypes\FieldConvertionData.cs" />
+    <Compile Include="Converter\CommonTypes\MappingsContainer.cs" />
+    <Compile Include="Converter\CommonTypes\Parameter.cs" />
+    <Compile Include="Converter\CommonTypes\FunctionBlockStartRule.cs" />
+    <Compile Include="Converter\CommonTypes\SheetHeader.cs" />
+    <Compile Include="Converter\CommonTypes\SheetHeadersContainer.cs" />
+    <Compile Include="Converter\Functions\AddTextFunction.cs" />
+    <Compile Include="Converter\Functions\CombimeColumnsFunction.cs" />
+    <Compile Include="Converter\Functions\CutRightAndLeftCharsFunction.cs" />
+    <Compile Include="Converter\Functions\DefaultValueFunction.cs" />
+    <Compile Include="Converter\Functions\DirectValueFunction.cs" />
+    <Compile Include="Converter\Functions\FindNumFunction.cs" />
+    <Compile Include="Converter\Functions\FindPriceFunction.cs" />
+    <Compile Include="Converter\Functions\FindStringFunction.cs" />
+    <Compile Include="Converter\Functions\FunctionBase.cs" />
+    <Compile Include="Converter\Functions\GetColorFunction.cs" />
+    <Compile Include="Converter\Functions\GetHyperlinkFunction.cs" />
+    <Compile Include="Converter\Functions\GetLeftCharFunction.cs" />
+    <Compile Include="Converter\Functions\GetRightCharFunction.cs" />
+    <Compile Include="Converter\Functions\SizeFunction.cs" />
+    <Compile Include="Converter\Functions\SplitFunction.cs" />
+    <Compile Include="Converter\Functions\StringPositionFunction.cs" />
+    <Compile Include="Converter\ExelConvertionRule.cs" />
+    <Compile Include="Converter\Functions\StringReverseFunction.cs" />
+    <Compile Include="Converter\Functions\ReplaceStringFunction.cs" />
+    <Compile Include="DataAccess\DB.Additional.cs" />
+    <Compile Include="DataAccess\AppDB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppDB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\AppDB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\AppDB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppDB.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\area.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\cart.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\cities.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\companies.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\ConverterDB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConverterDB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\ConverterDB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConverterDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\ConverterDB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConverterDB.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\convertion_rules.cs">
+      <DependentUpon>ConverterDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\countries.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\DataAccess.cs" />
+    <Compile Include="DataAccess\discounts_periods.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\discounts_qty.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\DynamicJsonConverter.cs" />
+    <Compile Include="DataAccess\help_chapters.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\hots.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\HttpDataAccess.cs" />
+    <Compile Include="DataAccess\IDataAccess.cs" />
+    <Compile Include="DataAccess\import_rectangle.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\locations.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\locks.cs">
+      <DependentUpon>ConverterDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\managers.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\mockup.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\mockup_set.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\news.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\operator_orders.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\orders.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\orders_confirms.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\pages.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\parsers.cs">
+      <DependentUpon>ConverterDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\photo_report.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\photo_report_resource.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\photo_report_resource_photo.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\preferences.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\presentation_link.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\presentation_link_resource.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\regions.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\reserves.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resources.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resources_history.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resource_import_log.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resource_lights.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resource_price_rules.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resource_sides.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resource_sizes.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\resource_types.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\seo_place.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\static_pages.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\subresources.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\subresources_history.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\sync.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\synonym_word.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\tooltip.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\tooltip_category.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\users.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\users_clients.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\users_history.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\users_ips.cs">
+      <DependentUpon>AppDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataObjects\City.cs" />
+    <Compile Include="DataObjects\FillArea.cs" />
+    <Compile Include="DataObjects\Operator.cs" />
+    <Compile Include="DataObjects\Region.cs" />
+    <Compile Include="DataObjects\Role.cs" />
+    <Compile Include="DataObjects\Size.cs" />
+    <Compile Include="DataObjects\Type.cs" />
+    <Compile Include="DataObjects\User.cs" />
+    <Compile Include="DataWriter\CsvDataWriter.cs" />
+    <Compile Include="DataWriter\DataBaseDataWriter.cs" />
+    <Compile Include="DataWriter\Error.cs" />
+    <Compile Include="DataWriter\ExportedCsv.cs" />
+    <Compile Include="DataWriter\InternalDataWriter.cs" />
+    <Compile Include="DataWriter\ReExport.cs" />
+    <Compile Include="ExelDataReader\AsyncDocumentLoader.cs" />
+    <Compile Include="ExelDataReader\ExelCell.cs" />
+    <Compile Include="ExelDataReader\ExelDocument.cs" />
+    <Compile Include="ExelDataReader\ExelRow.cs" />
+    <Compile Include="DataWriter\OutputRow.cs" />
+    <Compile Include="ExelDataReader\ExelSheet.cs" />
+    <Compile Include="ImagesParser\ImagesParser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SettingsObject.cs" />
+    <Compile Include="Settings\SettingsProvider.cs" />
+    <Compile Include="Validation\IsNumberValidationRule.cs" />
+    <Compile Include="Validation\IValidationRule.cs" />
+    <Compile Include="Validation\StringIsNotNullOrEmptyValidationRule.cs" />
+    <Compile Include="Validation\ValidationResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+    <EntityDeploy Include="DataAccess\AppDB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>AppDB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="DataAccess\AppDB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>AppDB.edmx</DependentUpon>
+      <LastGenOutput>AppDB.Context.cs</LastGenOutput>
+    </None>
+    <None Include="DataAccess\AppDB.edmx.diagram">
+      <DependentUpon>AppDB.edmx</DependentUpon>
+    </None>
+    <None Include="DataAccess\AppDB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>AppDB.edmx</DependentUpon>
+      <LastGenOutput>AppDB.cs</LastGenOutput>
+    </None>
+    <EntityDeploy Include="DataAccess\ConverterDB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ConverterDB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="DataAccess\ConverterDB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ConverterDB.edmx</DependentUpon>
+      <LastGenOutput>ConverterDB.Context.cs</LastGenOutput>
+    </None>
+    <None Include="DataAccess\ConverterDB.edmx.diagram">
+      <DependentUpon>ConverterDB.edmx</DependentUpon>
+    </None>
+    <None Include="DataAccess\ConverterDB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ConverterDB.edmx</DependentUpon>
+      <LastGenOutput>ConverterDB.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.SQL.Server.Compact.4.0">
+      <Visible>False</Visible>
+      <ProductName>SQL Server Compact 4.0 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExcelConverter.Parser\ExcelConverter.Parser.csproj">
+      <Project>{3f4df3ad-d1e9-4234-a74c-c89fcdd42f83}</Project>
+      <Name>ExcelConverter.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{c46731b0-690f-4747-9bb7-b08ae61e24eb}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del "$(TargetDir)*.pdb"
+del "$(TargetDir)CefSharp.xml"
+del "$(TargetDir)HtmlAgilityPack.xml"
+rd "$(TargetDir)cache" /s /q
+del "$(TargetDir)*vshost*"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

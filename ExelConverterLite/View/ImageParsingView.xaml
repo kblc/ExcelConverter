@@ -1,0 +1,50 @@
+﻿<Window x:Class="ExelConverterLite.View.ImageParsingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="500" Width="700" 
+        xmlns:uc="clr-namespace:ExelConverterLite.UserControls"
+        DataContext="{Binding Source={StaticResource Locator}, Path=Import.SelectedOperator.MappingRule}"
+        Title="Обработка изображений" MinHeight="500" MinWidth="600" FontSize="13" FontFamily="Calibri"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+    <TabControl>
+        <TabItem Header="Фото" AllowDrop="True" Drop="PhotoDrop" >
+            <Grid>
+                <TabControl Margin="0,3,0,0" ItemsSource="{Binding PhotoParsingData}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Size}"/>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ContentControl Height="{Binding Height}" Width="{Binding Width}" Content="{Binding DrawingArea}"/>
+                                </ScrollViewer>
+                            </Grid>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Карта" AllowDrop="True" Drop="MapDrop" >
+            <Grid>
+                <TabControl Margin="0,3,0,0" ItemsSource="{Binding MapParsingData}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Size}"/>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <ContentControl Height="{Binding Height}" Width="{Binding Width}" Content="{Binding DrawingArea}"/>
+                                </ScrollViewer>
+                            </Grid>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</Window>

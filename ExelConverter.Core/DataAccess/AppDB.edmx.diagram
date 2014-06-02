@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="eae80af528b54d5998a552fd662f5674" Name="Diagram1" ZoomLevel="64">
+        <EntityTypeShape EntityType="alphaModel.area" Width="1.5" PointX="10" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.cart" Width="1.5" PointX="7.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.cities" Width="1.5" PointX="12.25" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.companies" Width="1.5" PointX="0.75" PointY="14.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.countries" Width="1.5" PointX="7.75" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.discounts_periods" Width="1.5" PointX="14.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.discounts_qty" Width="1.5" PointX="14.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.help_chapters" Width="1.5" PointX="14.75" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.hots" Width="1.5" PointX="14.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.import_rectangle" Width="1.5" PointX="3" PointY="22.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.locations" Width="1.5" PointX="10.75" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.managers" Width="1.5" PointX="16.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.mockup" Width="1.5" PointX="5.25" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.mockup_set" Width="1.5" PointX="3" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.news" Width="1.5" PointX="16.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.operator_orders" Width="1.5" PointX="16.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.orders" Width="1.5" PointX="16.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.orders_confirms" Width="1.5" PointX="16.75" PointY="13.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.pages" Width="1.5" PointX="16.75" PointY="16.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.photo_report" Width="1.5" PointX="3" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.photo_report_resource" Width="1.5" PointX="5.25" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.photo_report_resource_photo" Width="1.5" PointX="7.5" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.preferences" Width="1.5" PointX="5.75" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.presentation_link" Width="1.5" PointX="3" PointY="10.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.presentation_link_resource" Width="1.5" PointX="5.25" PointY="10.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.regions" Width="1.5" PointX="12.25" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.reserves" Width="1.5" PointX="7.75" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resource_import_log" Width="1.5" PointX="12.75" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resource_lights" Width="1.5" PointX="18.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resource_price_rules" Width="1.5" PointX="18.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resource_sides" Width="1.5" PointX="18.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resource_sizes" Width="1.5" PointX="9.75" PointY="18.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resource_types" Width="1.5" PointX="12.25" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resources" Width="1.5" PointX="3" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.resources_history" Width="1.5" PointX="18.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.seo_place" Width="1.5" PointX="14.5" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.static_pages" Width="1.5" PointX="18.75" PointY="13.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.subresources" Width="1.5" PointX="18.75" PointY="16.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.subresources_history" Width="1.5" PointX="14.75" PointY="19.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.sync" Width="1.5" PointX="16.75" PointY="19.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.synonym_word" Width="1.5" PointX="7.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.tooltip" Width="1.5" PointX="8" PointY="13.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.tooltip_category" Width="1.5" PointX="5.75" PointY="14" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.users" Width="1.5" PointX="0.75" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.users_clients" Width="1.5" PointX="18.75" PointY="19.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.users_history" Width="1.5" PointX="20.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="alphaModel.users_ips" Width="1.5" PointX="20.75" PointY="7.75" IsExpanded="true" />
+        <AssociationConnector Association="alphaModel.area_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.cities_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.seo_place_ibfk_2" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.import_rectangle_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.mockup_set_ibfk_2" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.mockup_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.mockup_set_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.photo_report_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.photo_report_resource_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.photo_report_resource_ibfk_2" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.photo_report_resource_photo_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.presentation_link_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.presentation_link_resource_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.presentation_link_resource_ibfk_2" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.seo_place_ibfk_3" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.seo_place_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.tooltip_ibfk_1" ManuallyRouted="false" />
+        <AssociationConnector Association="alphaModel.synonym" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

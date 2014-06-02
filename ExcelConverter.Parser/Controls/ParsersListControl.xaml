@@ -1,0 +1,107 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:p="clr-namespace:ExcelConverter.Parser"
+             xmlns:local="clr-namespace:ExcelConverter.Parser.Controls" 
+             x:Class="ExcelConverter.Parser.Controls.ParsersListControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="600"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <Grid>
+        <Grid.Resources>
+            <p:IsEqualsConverter x:Key="IsEqualsConverter"/>
+            <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
+            <p:ParseFindRuleConditionList x:Key="ParseFindRuleConditionList"/>
+            <p:BoolToBoldConverter x:Key="BoolToBoldConverter"/>
+            
+            <CollectionViewSource x:Key="SortedParseItems" Source="{Binding Path=Parsers.Parsers}">
+                <CollectionViewSource.SortDescriptions>
+                    <scm:SortDescription PropertyName="UrlForOrder"/>
+                </CollectionViewSource.SortDescriptions>
+            </CollectionViewSource>
+        </Grid.Resources>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="ParsersListGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Margin" Value="0,4,4,4"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button 
+					Content="Новый..."
+					Command="{Binding ParserNewCommand}" 
+                    />
+                <!--<Button 
+					Content="Изменить..."
+					Command="{Binding ParserChangeCommand}" 
+					CommandParameter="{Binding SelectedItem, ElementName=ParsersListBox}"
+					IsEnabled="{Binding SelectedItems.Count, ConverterParameter=1, Converter={StaticResource IsEqualsConverter}, ElementName=ParsersListBox}"/>-->
+                <Button 
+					Content="Удалить" 
+					Command="{Binding ParserDeleteCommand}" 
+					CommandParameter="{Binding SelectedItems, ElementName=ParsersListBox}"
+					IsEnabled="{Binding SelectedItems.Count, ElementName=ParsersListBox}"/>
+            </StackPanel>
+
+            <ListBox 
+				ItemsSource="{Binding Source={StaticResource SortedParseItems}}" 
+				ScrollViewer.VerticalScrollBarVisibility="Visible"
+				Grid.Row="1"
+				SelectionMode="Extended"
+				x:Name="ParsersListBox">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <!--<StackPanel Orientation="Horizontal">-->
+                        <Label Content="{Binding Url}" Padding="0" FontWeight="{Binding Path=IsChanged, Converter={StaticResource BoolToBoldConverter}}"/>
+                        <!--</StackPanel>-->
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        
+        <GridSplitter Grid.Column="1" Background="DarkGray" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+        <local:ParsersEditParserControl 
+            Grid.Column="2" 
+            Parser="{Binding Path=SelectedItem, ElementName=ParsersListBox, Mode=TwoWay}"
+            IsEnabled="{Binding Path=SelectedItems.Count, ElementName=ParsersListBox, Converter={StaticResource IsEqualsConverter}, ConverterParameter=1}"
+            IsAddModeChange="ParsersEditParserControl_AddModeChange"
+            />
+
+        <Expander 
+            Grid.Row="1"
+            Grid.ColumnSpan="3"
+            Header="Тестирование" 
+            IsExpanded="False"
+            Background="DarkOrange">
+            <local:ParsersTestParserControl 
+                Margin="4"
+                Padding="4"
+                Background="DarkGray"
+                IsSingleParser="True" 
+                MaxHeight="300" 
+                Parsers="{Binding Path=Parsers, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" 
+                Parser="{Binding Path=SelectedItem, ElementName=ParsersListBox}"/>
+        </Expander>
+    </Grid>
+</UserControl>

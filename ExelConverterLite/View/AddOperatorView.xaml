@@ -1,0 +1,29 @@
+﻿<Window x:Class="ExelConverterLite.View.AddOperatorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Добавить оператора" Height="120" Width="250" 
+        WindowStartupLocation="CenterOwner"
+        DataContext="{Binding AddOperator, Source={StaticResource Locator}}"
+        ShowInTaskbar="False" ResizeMode="NoResize" FontSize="13" Icon="/icon.ico" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="90" />
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Название" Margin="5"
+                       VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <TextBox Grid.Column="1" Text="{Binding OperatorName}" Margin="5"
+                     VerticalAlignment="Center" />
+
+
+        <Button Content="Добавить" Grid.Row="1" VerticalAlignment="Center" Margin="5" 
+                    HorizontalAlignment="Left" Command="{Binding AddOperatorCommand}" />
+        <Button Content="Отмена" VerticalAlignment="Center" HorizontalAlignment="Right" IsCancel="True"
+                Grid.Row="1" Grid.Column="1" Margin="5" />
+    </Grid>
+</Window>

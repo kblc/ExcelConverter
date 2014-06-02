@@ -1,0 +1,63 @@
+﻿<Window x:Class="ExelConverterLite.View.OperatorSettingsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="400" Width="300"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        DataContext="{Binding OperatorSettings, Source={StaticResource Locator}}"
+        Title="Настройки оператора"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="#DDDDDD" >
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <cmd:EventToCommand Command="{Binding ClosingCommand}" PassEventArgsToCommand="False"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Skins/ControlTemplates/AddDeleteButtons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Опреатор" Margin="2" VerticalAlignment="Center" />
+            <TextBox Margin="2" VerticalAlignment="Center" IsEnabled="False" Grid.Column="1"
+                         Text="{Binding Path=OperatorName, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+        
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Правила :" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2"/>
+            <Button Content="Добавить" Command="{Binding AddRuleCommand}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2" Width="60" Grid.Column="1" />
+        </Grid>
+        
+        <DataGrid ItemsSource="{Binding Path=Operator.MappingRules}" 
+                  AutoGenerateColumns="False" 
+                  Grid.Row="2" CanUserResizeColumns="False" 
+                  HeadersVisibility="None" CanUserResizeRows="False" 
+                  CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Правило" Binding="{Binding Name}" Width="270" />
+            </DataGrid.Columns>
+        </DataGrid>       
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="2" >
+            <Button Content="Готово" Width="50" Command="{Binding SaveChangesCommand}" 
+                VerticalAlignment="Center" IsCancel="True" HorizontalAlignment="Left" Margin="2" />
+            <Button Content="Отмена" VerticalAlignment="Center" Command="{Binding CancelCommand}" IsCancel="True" 
+                    HorizontalAlignment="Left" Width="50" Margin="2" />
+        </StackPanel>
+    </Grid>
+</Window>

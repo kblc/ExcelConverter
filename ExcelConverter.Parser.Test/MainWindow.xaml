@@ -1,0 +1,23 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:ExcelConverter.Parser.Controls;assembly=ExcelConverter.Parser"
+        x:Class="ExcelConverter.Parser.Test.MainWindow"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="MainWindow" 
+        Height="350" 
+        Width="525">
+    <Grid>
+        <Controls:ParsersControl 
+            Parsers="{Binding Path=Parsers, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+            ShowEditTab="True"
+            ShowImportTab="True"
+            AllowOpenSaveParsers="True"
+            AllowImportFileImport="True"
+            AllowImportFileExport="True"
+            AllowImportAll="True"
+            AllowImportPhoto="True"
+            ImportThreadCount="3"
+            />
+    </Grid>
+</Window>

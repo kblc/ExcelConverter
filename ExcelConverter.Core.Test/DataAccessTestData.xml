@@ -1,0 +1,20 @@
+﻿<Rows>
+  <TestConnectionToDBRow>
+    <Login>ad</Login>
+    <Password>ad</Password>
+    <Server>http://alpha.outdoor-online.com.ua/</Server>
+    <ShouldPass>true</ShouldPass>
+  </TestConnectionToDBRow>
+  <TestConnectionToDBRow>
+    <Login>adb</Login>
+    <Password>adb</Password>
+    <Server>http://beta.outdoor-online.com.ua/</Server>
+    <ShouldPass>true</ShouldPass>
+  </TestConnectionToDBRow>
+  <TestConnectionToDBRow>
+    <Login>adw</Login>
+    <Password>adw</Password>
+    <Server>http://www.outdoor-online.com.ua/</Server>
+    <ShouldPass>true</ShouldPass>
+  </TestConnectionToDBRow>
+</Rows>

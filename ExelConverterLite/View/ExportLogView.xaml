@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="ExelConverterLite.View.ExportLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             DataContext="{Binding ExportLog, Source={StaticResource Locator}}">
+    <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding ExportLog}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="40" Margin="2,5,2,5" >
+                        <Rectangle RadiusX="5" RadiusY="5" Stroke="Black" Fill="#EEEEEE" StrokeThickness="1"/>
+                        <Grid Margin="1" >
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
+                                <TextBlock FontSize="15" Foreground="DarkBlue" Text="{Binding FileName}" Margin="5,2,2,2" />
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <TextBlock FontSize="15" Text="{Binding ExportDate}" VerticalAlignment="Center" Margin="2"/>
+                                <Button Content="Показать" Margin="2" VerticalAlignment="Center"
+                                        Command="{Binding Path=ExportLog.ShowExportedCsvCommand, Source={StaticResource Locator}}"
+                                        CommandParameter="{Binding Id}"/>
+                                <Button Content="Удалить" Margin="2" VerticalAlignment="Center" 
+                                        Command="{Binding Path=ExportLog.DeleteEntryCommand, Source={StaticResource Locator}}"
+                                        CommandParameter="{Binding Id}"/>
+                            </StackPanel>
+                            
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>

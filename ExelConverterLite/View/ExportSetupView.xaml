@@ -1,0 +1,53 @@
+﻿<Window x:Class="ExelConverterLite.View.ExportSetupView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="400" Width="300"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:viewModel="clr-namespace:ExelConverterLite.ViewModel"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        DataContext="{Binding ExportSetup, Source={StaticResource Locator}}"
+        Title="Настройки правил экспорта"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="#DDDDDD" >
+    <Window.Resources>
+        <ResourceDictionary>
+            <viewModel:AviableRulesCollection x:Key="AviableRulesCollection"/>
+            <viewModel:AviableSheetsCollection x:Key="AviableSheetsCollection"/>
+            
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Skins/ControlTemplates/AddDeleteButtons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+
+        <DataGrid ItemsSource="{Binding Path=ExportRules}" 
+                  AutoGenerateColumns="False" 
+                  Grid.Row="0" CanUserResizeColumns="True" 
+                  HeadersVisibility="Column" CanUserResizeRows="False" 
+                  CanUserAddRows="True"
+                  CanUserDeleteRows="True">
+            <DataGrid.Columns>
+                <DataGridComboBoxColumn Header="Вкладка" SelectedItemBinding="{Binding Sheet}" DisplayMemberPath="{Binding Sheet.Name}" ItemsSource="{StaticResource AviableSheetsCollection}"/>
+                <DataGridComboBoxColumn Header="Правило" SelectedItemBinding="{Binding Rule}" DisplayMemberPath="{Binding Rule.Name}" ItemsSource="{StaticResource AviableRulesCollection}"/>
+            </DataGrid.Columns>
+        </DataGrid>       
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="2" >
+            <Button 
+                Content="Готово" 
+                Width="50" 
+                Command="{Binding SaveCommand}" 
+                VerticalAlignment="Center" IsDefault="True"
+                HorizontalAlignment="Left" Margin="2" />
+            <Button 
+                Content="Отмена" 
+                VerticalAlignment="Center" 
+                Command="{Binding CancelCommand}" IsCancel="True" 
+                HorizontalAlignment="Left" Width="50" Margin="2" />
+        </StackPanel>
+    </Grid>
+</Window>

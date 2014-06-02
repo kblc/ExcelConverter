@@ -1,0 +1,132 @@
+﻿<UserControl x:Class="ExcelConverter.Parser.Controls.ParsersEditParserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:p="clr-namespace:ExcelConverter.Parser"
+             xmlns:local="clr-namespace:ExcelConverter.Parser.Controls"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="670">
+    <Grid>
+        <Grid.Resources>
+            <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
+            <p:ParseFindRuleConditionList x:Key="ParseFindRuleConditionList"/>
+            <p:ParseRuleConnectionTypeList x:Key="ParseRuleConnectionTypeList"/>
+            <p:IsNotVisibleConverter x:Key="IsNotVisibleConverter"/>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0"
+              IsEnabled="{Binding ElementName=ParsersGenerateRuleControl, Path=Visibility, Converter={StaticResource IsNotVisibleConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="URL: " Padding="0" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Text="{Binding Path=Parser.Url}" Margin="0,4" HorizontalAlignment="Stretch"/>
+                <Label Content="Потоки: " Padding="0" VerticalAlignment="Center" Grid.Row="1"/>
+                <TextBox Grid.Column="1" Text="{Binding Path=Parser.ThreadCount}" Margin="0,4" Grid.Row="1" HorizontalAlignment="Stretch"/>
+            </Grid>
+
+            <Grid Margin="0,0,0,4" Grid.Row="1" >
+                <Label Content="Правила:" Padding="0" VerticalAlignment="Center"/>
+                <Button 
+                        x:Name="AddRuleButton"
+					    HorizontalAlignment="Right" 
+					    Content="Добавить..."
+					    Command="{Binding ShowParsersGenerateRuleControlCommand}"
+                        IsEnabled="{Binding ElementName=ParsersGenerateRuleControl, Path=Visibility, Converter={StaticResource IsNotVisibleConverter}}"/>
+            </Grid>
+
+            <DataGrid 
+				    Grid.Row="2"
+				    ItemsSource="{Binding Path=Parser.Rules}"
+				    AutoGenerateColumns="False"
+				    CanUserAddRows="True"
+				    CanUserDeleteRows="True"
+				    CanUserResizeColumns="True"
+                    IsEnabled="{Binding ElementName=ParsersGenerateRuleControl, Path=Visibility, Converter={StaticResource IsNotVisibleConverter}}"
+                    x:Name="RulesDataGrid"
+                    >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Label}" Header="Метка"/>
+                    <!--<DataGridComboBoxColumn
+                        SelectedItemBinding="{Binding Label}"
+                        ItemsSource="{Binding Source=Parser.Labels}" 
+                        Header="Метка"/>-->
+                    <DataGridTextColumn Binding="{Binding Parameter}" Header="Параметр"/>
+                    <DataGridComboBoxColumn 
+                        SelectedItemBinding="{Binding Condition}" 
+                        ItemsSource="{StaticResource ParseFindRuleConditionList}" 
+                        Header="Условие"/>
+                    <DataGridComboBoxColumn 
+                        SelectedItemBinding="{Binding Connection}" 
+                        ItemsSource="{StaticResource ParseRuleConnectionTypeList}" 
+                        Header="Тип соединения"/>
+                    <DataGridTextColumn Binding="{Binding MinImageWidth}" Width="140">
+                        <DataGridTextColumn.Header>
+                            <Label Padding="0" HorizontalAlignment="Stretch">
+                                <Label.Content>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="Минимальная длинна изображения (px)" TextAlignment="Center"/>
+                                </Label.Content>
+                            </Label>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding MinImageHeight}" Width="140">
+                        <DataGridTextColumn.Header>
+                            <Label Padding="0" HorizontalAlignment="Stretch">
+                                <Label.Content>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="Минимальная высота изображения (px)" TextAlignment="Center"/>
+                                </Label.Content>
+                            </Label>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridCheckBoxColumn Binding="{Binding CheckImageSize}" Width="150">
+                        <DataGridCheckBoxColumn.Header>
+                            <Label Padding="0">
+                                <Label.Content>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="Проверить размер изображения перед импортом" TextAlignment="Center"/>
+                                </Label.Content>
+                            </Label>
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" 
+                      VerticalAlignment="Top" 
+                      HorizontalAlignment="Stretch" 
+                      Background="DarkGray"
+                      Height="5"
+                      Visibility="{Binding ElementName=ParsersGenerateRuleControl, Path=Visibility}"
+                      />
+
+        <local:ParsersGenerateRuleControl Grid.Row="2" 
+            Margin="0,5,0,0"
+            MinHeight="250"
+            x:Name="ParsersGenerateRuleControl"
+            Parser="{Binding Path=Parser, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+            Cancel="ParsersGenerateRuleControl_Hide"
+            Done="ParsersGenerateRuleControl_Hide"
+            Visibility="Collapsed"
+            />
+    </Grid>
+</UserControl>

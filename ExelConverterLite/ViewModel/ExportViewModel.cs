@@ -1,0 +1,719 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+
+using ExelConverter.Core.ExelDataReader;
+using ExelConverter.Core.DataWriter;
+using ExelConverter.Core.Settings;
+using System.Windows.Controls;
+using System.IO;
+using Helpers;
+using System.Threading.Tasks;
+using System.Windows;
+using ExcelConverter.Parser;
+using ExcelConverter.Parser.Controls;
+using ExelConverter.Core.DataAccess;
+
+namespace ExelConverterLite.ViewModel
+{
+    [Serializable]
+    [System.Xml.Serialization.XmlRoot("ParserCollection")]
+    public class MyDBParserCollection : DBParserCollection 
+    {
+        protected IDataAccess DataAccess = new DataAccess();
+
+        protected override void DBParserLoad()
+        {
+            Parsers.Clear();
+            Parser[] parsersLoaded = DataAccess.ParsersGet();
+            foreach (var p in parsersLoaded)
+                Parsers.Add(p);
+        }
+        protected override void DBParserSave()
+        {
+            Parser[] parsersToUpdate = Parsers.Where(p => p.IsChanged && !p.IsDeleted).ToArray();
+            Parser[] parsersToDelete = Parsers.Where(p => p.IsDeleted).ToArray();
+            Parser[] parsersToInsert = Parsers.Where(p => p.Id == Guid.Empty && !p.IsDeleted).ToArray();
+
+            DataAccess.ParsersInsert(parsersToInsert);
+            DataAccess.ParsersUpdate(parsersToUpdate);
+            DataAccess.ParsersRemove(parsersToDelete);
+        }
+        protected override void DBParserAdd(Parser p)
+        {
+            if (StoreDirect)
+            {
+                p.Id = Guid.NewGuid();
+                DataAccess.ParsersInsert(new Parser[] { p });
+                p.IsChanged = false;
+            }
+        }
+        protected override void DBParserRemove(Parser p)
+        {
+            p.IsDeleted = true;
+            if (StoreDirect)
+            {
+                DataAccess.ParsersRemove(new Parser[] { p });
+                p.Id = Guid.Empty;
+                p.IsChanged = false;
+            }
+        }
+        protected override void DBParserUpdate(Parser p)
+        {
+            if (StoreDirect)
+            {
+                DataAccess.ParsersUpdate(new Parser[] { p });
+                p.IsChanged = false;
+            }
+        }
+    }
+
+    public class UrlCollectionAdditional
+    {
+        public UrlCollection Collection { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class ExportViewModel : ViewModelBase
+    {
+        private static MyDBParserCollection _DBParsers = null;
+        private static MyDBParserCollection DBParsers
+        {
+            get
+            {
+                if (_DBParsers == null)
+                {
+                    if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject())) 
+                    {
+                        _DBParsers = new MyDBParserCollection() { StoreLocal = true, StoreDirect = false };
+                    } else
+                        _DBParsers = new MyDBParserCollection() { StoreLocal = false, StoreDirect = true };
+                    _DBParsers.Load();
+                }
+                return _DBParsers;
+            }
+        }
+
+        public ExportViewModel()
+        {
+            //RowsToExport = new ObservableCollection<OutputRow>(App.Locator.Import.SelectedOperator.MappingRule.Convert(App.Locator.Import.SelectedSheet));
+            ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
+
+            Guid logSession = Log.SessionStart("ExportViewModel.ExportViewModel()");
+            try
+            {
+                Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.DocumentSheets.Count));
+
+                foreach (var item in App.Locator.Import.ExportRules)
+                {
+                    var mappingRule = item.Rule;
+                    var ds = item.Sheet;
+                    if (mappingRule != null)
+                    {
+                        if (ds.MainHeader == null)
+                        {
+                            Log.Add(string.Format("should update main header row..."));
+                            if (mappingRule.FindMainHeaderByTags)
+                                ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags.Select(h => h.Tag).ToArray());
+                            else
+                                ds.UpdateMainHeaderRow(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }));
+                        }
+
+                        var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds));
+                        Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
+                        rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
+
+                        Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
+                    }
+                }
+
+                UrlCollection.Clear();
+                var UrlsPhoto = new UrlCollection();
+                var UrlsSchema = new UrlCollection();
+                var UrlsAll = new UrlCollection();
+
+                var photos = rowsToExport.Select(r => r.Photo_img).Where(r => Helper.IsWellFormedUriString(r, UriKind.Absolute)).Distinct();
+                var schemas = rowsToExport.Select(r => r.Location_img).Where(r => Helper.IsWellFormedUriString(r, UriKind.Absolute)).Distinct();
+                var all = photos.Union(schemas).Distinct();
+
+                foreach (var p in photos)
+                    UrlsPhoto.Add(new StringUrlWithResultWrapper(p));
+                foreach (var p in schemas)
+                    UrlsSchema.Add(new StringUrlWithResultWrapper(p));
+                foreach (var p in all)
+                    UrlsAll.Add(new StringUrlWithResultWrapper(p));
+
+                if (UrlsPhoto.Count > 0)
+                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels[0], Collection = UrlsPhoto });
+                if (UrlsSchema.Count > 0)
+                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels[1], Collection = UrlsSchema });
+                if (UrlsPhoto.Count > 0 && UrlsSchema.Count > 0 && UrlsAll.Count > 0)
+                    UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
+
+
+                //foreach (var ds in App.Locator.Import.DocumentSheets)
+                //{
+                //    var mappingRule =
+                //        (
+                //            App.Locator.Import.SelectedOperator.MappingRules.Where(r => ds.Name.ToLower().Contains(r.Name.ToLower())).FirstOrDefault() 
+                //            ?? App.Locator.Import.SelectedOperator.MappingRules.Where(r => r.Name.ToLower() == "По умолчанию".ToLower() ).FirstOrDefault()
+                //        )
+                //        ?? App.Locator.Import.SelectedOperator.MappingRule;
+
+
+                //    if (ds.MainHeader == null)
+                //    {
+                //        Log.Add(string.Format("should update main header row..."));
+                //        if (mappingRule.FindMainHeaderByTags)
+                //            ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags.Select(h => h.Tag).ToArray());
+                //        else
+                //            ds.UpdateMainHeaderRow(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }));
+                //    }
+
+                //    var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds));
+                //    Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
+                //    rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
+
+                //    Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
+                //}
+            }
+            finally
+            {
+                Log.Add(string.Format("total row count to export: '{0}'", rowsToExport.Count));
+                RowsToExport = rowsToExport;
+                Log.SessionEnd(logSession);
+            }
+
+            Errors = new ObservableCollection<Error>();
+            Warnings = new ObservableCollection<Error>();
+
+            Export2CsvCommand = new RelayCommand(Export2Csv);
+            Export2DbCommand = new RelayCommand(Export2Db);
+            UpdateErrorsCommand = new RelayCommand(UpdateErrors);
+            UpdateSelectedErrorCommand = new RelayCommand(UpdateSelectedError);
+            UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
+            UpdateErrors();   
+        }
+
+        private ObservableCollection<UrlCollectionAdditional> urlCollection = null;
+        public ObservableCollection<UrlCollectionAdditional> UrlCollection
+        {
+            get
+            {
+                return urlCollection ?? (urlCollection = new ObservableCollection<UrlCollectionAdditional>());
+            }
+        }
+
+        public MyDBParserCollection Parsers
+        {
+            get
+            {
+                return DBParsers;
+            }
+        }
+
+        ~ExportViewModel()
+        {
+            Parsers.Save();
+        }
+
+        private ObservableCollection<OutputRow> _rowsToExport;
+        public ObservableCollection<OutputRow> RowsToExport
+        {
+            get { return _rowsToExport; }
+            set
+            {
+                if (_rowsToExport != value)
+                {
+                    _rowsToExport = value;
+                    RaisePropertyChanged("RowsToExport");
+                }
+            }
+        }
+
+        private Error _selectedError;
+        public Error SelectedError
+        {
+            get { return _selectedError; }
+            set
+            {
+                if (_selectedError != value)
+                {
+                    _selectedError = value;
+                    RaisePropertyChanged("SelectedError");
+                }
+                if (SelectedError != null)
+                {
+                    View.ViewLocator.ExportView.ScrollToRow(SelectedError.RowNumber);
+                }
+            }
+        }
+
+        private Error _selectedWarning;
+        public Error SelectedWarning
+        {
+            get { return _selectedWarning; }
+            set
+            {
+                if (_selectedWarning != value)
+                {
+                    _selectedWarning = value;
+                    RaisePropertyChanged("SelectedWarning");
+                }
+            }
+        }
+
+        private ObservableCollection<Error> _errors;
+        public ObservableCollection<Error> Errors
+        {
+            get { return _errors; }
+            set
+            {
+                if (_errors != value)
+                {
+                    _errors = value;
+                    RaisePropertyChanged("Errors");
+                }
+            }
+        }
+
+        private ObservableCollection<Error> _warnings;
+        public ObservableCollection<Error> Warnings
+        {
+            get { return _warnings; }
+            set
+            {
+                if (_warnings != value)
+                {
+                    _warnings = value;
+                    RaisePropertyChanged("Warnings");
+                }
+            }
+        }
+
+        private RelayCommand<object> exportToQueueCommand = null;
+        public RelayCommand<object> ExportToQueueCommand
+        {
+            get
+            {
+                return exportToQueueCommand ?? (exportToQueueCommand = new RelayCommand<object>(ExportToQueue));
+            }
+        }
+
+        private void ExportToQueue(object param)
+        {
+            ExelConverter.Core.DataAccess.HttpDataAccessQueueParameters prm = param as ExelConverter.Core.DataAccess.HttpDataAccessQueueParameters;
+            if (prm != null)
+            {
+                prm.OperatorID = App.Locator.Import.SelectedOperator.Id;
+                prm.FilePath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.document.Name + ".csv";
+                Export2Csv();
+                try
+                {
+                    ExelConverter.Core.DataAccess.HttpDataClient.Default.UploadFileToQueue(prm);
+                }
+                catch(Exception ex)
+                {
+                    Log.Add(string.Format("ExportViewModel.ExportToQueue() :: exception: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
+                    MessageBox.Show(string.Format("Произошла ошибка при отправке файла для постановки в очередь:{0}{1}", Environment.NewLine, ex.Message), "Ошибка при отправке файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private RelayCommand<UrlCollection> applyParsingCommand = null;
+        public RelayCommand<UrlCollection> ApplyParsingCommand 
+        {
+            get
+            {
+                return applyParsingCommand ?? (applyParsingCommand = new RelayCommand<UrlCollection>((collection) =>
+                    {
+                        if (collection != null)
+                        {
+                            foreach(var row in RowsToExport)
+                            {
+                                string photo_img = string.IsNullOrWhiteSpace(row.Photo_img) ? row.Location_img : row.Photo_img;
+                                string location_img = string.IsNullOrWhiteSpace(row.Location_img) ? row.Photo_img : row.Location_img; ;
+
+                                row.Photo_img = ReplaceUrlFromData(photo_img, DBParsers.Labels[0], collection);
+                                row.Location_img = ReplaceUrlFromData(location_img, DBParsers.Labels[1], collection);
+                            }
+                        }
+                    }));
+            }
+        }
+
+        private string ReplaceUrlFromData(string url, string label, UrlCollection collection)
+        {
+            string result = url;
+            var colRes = collection.FirstOrDefault(i => i.Value == url);
+            if (colRes != null)
+            {
+                result = string.Empty;
+                if (colRes.Result != null && colRes.Result.Data != null && colRes.Result.Data.ContainsKey(label))
+                    result = colRes.Result.Data[label];
+            }
+            return result;
+        }
+
+        public RelayCommand Export2CsvCommand { get; private set; }
+        private void Export2Csv()
+        {
+            try
+            {
+                var fileName = App.Locator.Import.document.Name + ".csv";
+                var fullPath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.document.Name + ".csv";
+
+                using (var strm = new FileStream(fullPath, FileMode.OpenOrCreate)) { }
+                using (var writer = new StreamWriter(new FileStream(fullPath, FileMode.Truncate), Encoding.Default))
+                {
+                    List<string> props = new List<string>(OutputRow.ColumnOrder.OrderBy( i => i.Key).Select( i=> i.Value));
+
+                    List<int> excludeColumns = new List<int>();
+                    for (int i = 0; i < props.Count; i++)
+                        excludeColumns.Add(i);
+
+                    Parallel.ForEach(RowsToExport, entry =>
+                    {
+                        var items = entry.ToItemsList(props);
+                        object lockParallel = new Object();
+                        Parallel.For(0, items.Count, i =>
+                            {
+                                try
+                                {
+                                    if (!string.IsNullOrWhiteSpace(items[i]))
+                                        lock (lockParallel)
+                                        {
+                                            excludeColumns.Remove(i);
+                                        }
+                                }
+                                catch { }
+                            }
+                        );
+                    }
+                    );
+
+                    foreach (var excludeIndex in excludeColumns.OrderByDescending(i => i))
+                        props.RemoveAt(excludeIndex);
+
+                    string propLine = string.Empty;
+                    for (int i = 0; i < props.Count; i++)
+                            propLine += (propLine.Length > 0 ? ";" : string.Empty) + string.Format("\"{0}\"", props[i]);
+
+                    writer.WriteLine(propLine);
+                    foreach (var entry in RowsToExport)
+                        writer.WriteLine(entry.ToCsvString(props.ToArray()));
+                }
+
+                var exportedCsv = new ExportedCsv
+                {
+                    ExportDate = DateTime.Now,
+                    FileName = fileName,
+                    Path = fullPath,
+                    Id = Guid.NewGuid()
+                };
+                App.Locator.ExportLog.AddExportedCsv(exportedCsv);
+
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show(@"Произошла ошибка, проверьте еще раз правило, 
+корректность загрузки сетки, правильность пути к 
+папке с файлами и попробуйте снова...", "Ошибка",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            }
+        }
+
+        public RelayCommand Export2DbCommand { get; private set; }
+        private void Export2Db()
+        {
+
+        }
+
+        public RelayCommand UpdateSelectedErrorCommand { get; private set; }
+        private void UpdateSelectedError()
+        {
+            if (SelectedError != null)
+            {
+                View.ViewLocator.ExportView.ScrollToRow(SelectedError.RowNumber);
+            }
+        }
+
+        public RelayCommand UpdateSelectedWarningCommand { get; private set; }
+        private void UpdateSelectedWarning()
+        {
+            if (SelectedWarning != null)
+            {
+                View.ViewLocator.ExportView.ScrollToRow(SelectedWarning.RowNumber);
+            }
+        }
+
+        public RelayCommand UpdateErrorsCommand { get; private set; }
+        private void UpdateErrors()
+        {
+            Errors.Clear();
+            foreach (var row in RowsToExport)
+            {
+                var errors = CheckRowErrors(row);
+                if (errors.Length != 0)
+                {
+                    foreach (var err in errors)
+                    {
+                        Errors.Add(err);
+                    }
+                }
+            }
+        }
+
+        private Error[] CheckRowErrors(OutputRow row)
+        {
+            var result = new List<Error>();
+
+            var totalErrors = new List<Error[]>
+            {
+                CheckCity(row),
+                CheckRegion(row),
+                CheckType(row),
+                CheckSize(row),
+                CheckLight(row),
+                CheckSide(row),
+                CheckCodeDoors(row)
+            };
+            foreach (var errArray in totalErrors)
+            {
+                foreach (var err in errArray)
+                {
+                    result.Add(err);
+                }
+            }
+            
+            return result.ToArray();
+        }
+
+        private Error[] CheckCodeDoors(OutputRow row)
+        {
+            var result = new List<Error>();
+            //if (string.IsNullOrWhiteSpace(row.CodeDoors))
+            //{
+            //    var error = new Error
+            //    {
+            //        RowNumber = RowsToExport.IndexOf(row),
+            //        Description = "Колонка <Код DOORS> содержит пустое значение."
+            //    };
+            //    result.Add(error);
+            //}
+            //else
+            //{
+                int res;
+                if (!string.IsNullOrWhiteSpace(row.CodeDoors) && !int.TryParse(row.CodeDoors, out res))
+                {
+                    var error = new Error
+                    {
+                        RowNumber = RowsToExport.IndexOf(row),
+                        Description = "Значение \"" + row.CodeDoors + "\" в колонке <Код DOORS> неверное. Должны содержаться только арабские цифры."
+                    };
+                    result.Add(error);
+                }
+            //}
+            return result.ToArray();
+        }
+
+        private Error[] CheckCity(OutputRow row)
+        {
+            var result = new List<Error>();
+            if (string.IsNullOrEmpty(row.City)||string.IsNullOrWhiteSpace(row.City))
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Колонка <Город> содержит пустое значение"
+                };
+                result.Add(error);
+            }
+            else if (!SettingsProvider.AllowedCities.Any(c => c.Name == row.City) && row.City != string.Empty)
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Значение \"" + row.City + "\" в колонке <Город> не является стандартным"
+                };
+                result.Add(error);
+            }
+            return result.ToArray();
+        }
+
+        private Error[] CheckRegion(OutputRow row)
+        {
+            var result = new List<Error>();
+            if (!SettingsProvider.AllowedRegions.Any(r => r.Name == row.Region) && row.City != string.Empty && row.Region!=string.Empty)
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Значение \"" + row.Region + "\" в колонке <Район> не является стандартным"
+                };
+                result.Add(error);
+            }
+            else if (row.Region != string.Empty)
+            {
+                var city = SettingsProvider.AllowedCities.Where(c => c.Name == row.City).FirstOrDefault();
+                if (city != null && !SettingsProvider.AllowedRegions.Where(r => r.FkCityId == city.Id || r.FkCityId == null).ToArray().Any(r => r.Name == row.Region))
+                {
+                    var error = new Error
+                    {
+                        RowNumber = RowsToExport.IndexOf(row),
+                        Description = "Район \"" + row.Region + "\" не принадлежит городу \" " + row.City + "\""
+                    };
+                    result.Add(error);
+                }
+            }
+            return result.ToArray();
+        }
+
+        private Error[] CheckType(OutputRow row)
+        {
+            var result = new List<Error>();
+            if (string.IsNullOrEmpty(row.Type) || string.IsNullOrWhiteSpace(row.Type))
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Колонка <Тип> содержит пустое значение"
+                };
+                result.Add(error);
+            }
+            else if (!SettingsProvider.AllowedTypes.Any(t => t.Name == row.Type) && row.Type != string.Empty)
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Значение в колонке <Тип> не является стандартным"
+                };
+                result.Add(error);
+            }
+            return result.ToArray();
+        }
+
+        private Error[] CheckSize(OutputRow row)
+        {
+            var result = new List<Error>();
+            if (!SettingsProvider.AllowedSizes.Any(s => s.Name == row.Size) && row.Size != string.Empty)
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Значение \"" + row.Size + "\" в колонке <Размер> не является стандартным"
+                };
+                result.Add(error);
+            }
+            else if (string.IsNullOrWhiteSpace(row.Size) || string.IsNullOrEmpty(row.Size))
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Колонка <Размер> содержит пустое значение"
+                };
+                result.Add(error);
+            }
+            else
+            {
+                var type = SettingsProvider.AllowedTypes.Where(c => c.Name == row.Type).FirstOrDefault();
+                if (type != null && !SettingsProvider.AllowedSizes.Where(r => r.FkTypeId == type.Id).ToArray().Any(s => s.Name == row.Size))
+                {
+                    var error = new Error
+                    {
+                        RowNumber = RowsToExport.IndexOf(row),
+                        Description = "Размер \"" + row.Size + "\" не принадлежит типу \" " + row.Type + "\""
+                    };
+                    result.Add(error);
+                }
+            }
+            return result.ToArray();
+        }
+
+        private Error[] CheckLight(OutputRow row)
+        {
+            var result = new List<Error>();
+
+            if (!SettingsProvider.AllowedLights.Contains(row.Light) && row.Light != string.Empty)
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Значение в колонке <Свет> не является стандартным"
+                };
+                result.Add(error);
+            }
+            else if (string.IsNullOrEmpty(row.Light) || string.IsNullOrWhiteSpace(row.Light))
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Колонка <Свет> содержит пустое значение"
+                };
+                result.Add(error);
+            }
+
+            return result.ToArray();
+        }
+
+        private Error[] CheckSide(OutputRow row)
+        {
+            var result = new List<Error>();
+
+            if (!SettingsProvider.AllowedSides.Contains(row.Side) && row.Side != string.Empty)
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Значение в колонке <Сторона> не является стандартным"
+                };
+                result.Add(error);
+            }
+            else if (string.IsNullOrEmpty(row.Side) || string.IsNullOrWhiteSpace(row.Side))
+            {
+                var error = new Error
+                {
+                    RowNumber = RowsToExport.IndexOf(row),
+                    Description = "Колонка <Сторона> содержит пустое значение"
+                };
+                result.Add(error);
+            }
+            
+            return result.ToArray();
+        }
+
+        private Error[] CheckRowWarnings(OutputRow row)
+        {
+            var result = new List<Error>();
+            var props = row.GetType().GetProperties();
+            foreach (var prop in props)
+            {
+                if (((string)prop.GetValue(row, null)) == string.Empty)
+                {
+                    result.Add(new Error
+                    {
+                        Description = "Колонка <"+prop.Name+"> содержит пустое значение",
+                        RowNumber = RowsToExport.IndexOf(row)
+                    });
+                }
+                else if (string.IsNullOrEmpty(row.Light) || string.IsNullOrWhiteSpace(row.Light))
+                {
+                    var error = new Error
+                    {
+                        RowNumber = RowsToExport.IndexOf(row),
+                        Description = "Колонка <Свет> содержит пустое значение"
+                    };
+                    result.Add(error);
+                }
+            }
+            return result.ToArray();
+        }
+
+        
+    }
+}

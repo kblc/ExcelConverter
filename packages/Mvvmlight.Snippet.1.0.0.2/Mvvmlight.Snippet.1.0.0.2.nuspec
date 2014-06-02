@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Mvvmlight.Snippet</id>
+    <version>1.0.0.2</version>
+    <title>Mvvmlight.Snippet</title>
+    <authors>Felix Fang</authors>
+    <owners>Felix Fang</owners>
+    <projectUrl>http://blog.csdn.net/fangxinggood</projectUrl>
+    <iconUrl>https://www.codeplex.com/favicon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Mvvmlight Code Snippet</description>
+    <releaseNotes />
+    <copyright>Copyright FelixFang 2012</copyright>
+    <language />
+  </metadata>
+</package>

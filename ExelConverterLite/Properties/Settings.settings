@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ExelConverterLite.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="LogFilename" Type="System.String" Scope="User">
+      <Value Profile="(Default)">log.txt</Value>
+    </Setting>
+    <Setting Name="Import_DeleteEmptyRows" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="HttpServersName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Альфа:http://alpha.outdoor-online.com.ua/;Бета:http://beta.outdoor-online.com.ua/;Продакшен:http://www.outdoor-online.com.ua/</Value>
+    </Setting>
+    <Setting Name="LastConnected" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Альфа</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

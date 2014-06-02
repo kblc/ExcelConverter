@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="ExcelConverter.Parser.Controls.ParsersTestParserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:p="clr-namespace:ExcelConverter.Parser"
+             xmlns:local="clr-namespace:ExcelConverter.Parser.Controls"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.Resources>
+            <!--<p:IsEqualsConverter x:Key="IsEqualsConverter"/>-->
+            <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="URL для парсинга:" Grid.Row="0" Padding="0"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="UrlToParseTextBox"/>
+            <Button 
+							Content="Тестировать" 
+							Grid.Column="1" 
+							Margin="4,0,0,0"
+							Command="{Binding ParserTestUrl}"
+							CommandParameter="{Binding Text, ElementName=UrlToParseTextBox}"
+							IsEnabled="{Binding IsEnableTesting}"/>
+        </Grid>
+        <CheckBox 
+            Grid.Row="2" 
+            Content="Проверить только выбранный парсер" 
+            IsChecked="{Binding Path=IsSingleParser}"
+            Visibility="{Binding Path=IsSingleParserCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <WrapPanel Grid.Row="3" Orientation="Horizontal" Margin="0,4,0,0">
+            <Label Content="Результат: " Padding="0"/>
+            <Label Padding="0">
+                <TextBlock Text="{Binding TestResult}" TextWrapping="WrapWithOverflow"/>
+            </Label>
+        </WrapPanel>
+        <ListBox Grid.Row="4" MinHeight="60" ItemsSource="{Binding ParseResults, Mode=OneWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <!--<Grid.ContextMenu>
+                            <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="{Binding Value, Mode=OneWay}" Command="{Binding CutCommand}" />
+                                <MenuItem Header="Copy" Command="{Binding CopyCommand}" />
+                                <MenuItem Header="Paste" Command="{Binding PasteCommand}" />
+                            </ContextMenu>
+                        </Grid.ContextMenu>-->
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Метка: "/>
+                            <Label Content="{Binding Key, Mode=OneWay}"/>
+                        </StackPanel>
+                        <TextBox Text="{Binding Value, Mode=OneWay}" Grid.Row="1" IsReadOnly="True"/>
+                        <Expander Header="Картинка" Grid.Row="2">
+                            <Image 
+											MaxWidth="200" 
+											MaxHeight="200" 
+											Source="{Binding Value, Converter={StaticResource ImageFromUrlConverter}}"/>
+                        </Expander>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
