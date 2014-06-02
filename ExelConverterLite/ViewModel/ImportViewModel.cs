@@ -216,7 +216,7 @@ namespace ExelConverterLite.ViewModel
 
         private void OperatorChanged()
         {
-            exportRules = null;
+            ExportRules = null;
             if (SelectedOperator != null)
             {
                 SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(SelectedOperator));
@@ -362,6 +362,9 @@ namespace ExelConverterLite.ViewModel
 
                 SaveImageParsingData(storedRules);
 
+                if (exportRules != null)
+                    SaveExportRules(exportRules.ToArray());
+
                 if (needRefresh)
                 {
                     SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(App.Locator.Import.SelectedOperator));
@@ -485,6 +488,11 @@ namespace ExelConverterLite.ViewModel
                     if (!res[i])
                         _appSettingsDataAccess.AddFillRectangle(areaList[i]);
             }
+        }
+
+        private void SaveExportRules(SheetRulePair[] exportRules)
+        {
+            _appSettingsDataAccess.SetExportedRulesForOperator(SelectedOperator, exportRules);
         }
 
         private string performSearchString = string.Empty;
@@ -685,7 +693,7 @@ namespace ExelConverterLite.ViewModel
         private void EditOperator()
         {
             View.ViewLocator.OperatorSettingsView.ShowDialog(App.Current.MainWindow);
-            exportRules = null;
+            ExportRules = null;
         }
 
         public RelayCommand<string> UpdateMappingsTableCommand { get; private set; }
@@ -749,22 +757,30 @@ namespace ExelConverterLite.ViewModel
                 if (exportRules != null)
                     return exportRules;
 
-                exportRules = new ObservableCollection<SheetRulePair>();
+                var savedRules = _appSettingsDataAccess.GetExportRulesIdByOperator(SelectedOperator, DocumentSheets.AsQueryable());
+
+                exportRules = new ObservableCollection<SheetRulePair>(savedRules);
                 foreach (var sheet in DocumentSheets)
-                    exportRules.Add( 
-                        new SheetRulePair() 
-                        {
-                            Sheet = sheet,
-                            Rule = SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == sheet.Name.ToLower()) 
-                                   ?? SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == ExelConvertionRule.DefaultName.ToLower())
-                        }
+                {
+                    if (!exportRules
+                        .Where(s => s.Sheet != null)
+                        .Select(s => s.Sheet).Contains(sheet))
+                        exportRules.Add( 
+                            new SheetRulePair() 
+                            {
+                                Sheet = sheet,
+                                Rule = SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == sheet.Name.ToLower()) 
+                                       ?? SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == ExelConvertionRule.DefaultName.ToLower())
+                            }
                    );
+                }
 
                 return exportRules;
             }
             set
             {
                 exportRules = value;
+                RaisePropertyChanged("ExportRules");
             }
         }
 
@@ -783,7 +799,7 @@ namespace ExelConverterLite.ViewModel
                 }
                 else
                 {
-                    exportRules = null;
+                    ExportRules = null;
                     View.ViewLocator.ExportView.ShowDialog(App.Current.MainWindow);
                 }
             }
@@ -1192,7 +1208,7 @@ namespace ExelConverterLite.ViewModel
             get { return _documentSheets; }
             set
             {
-                exportRules = null;
+                ExportRules = null;
                 if (_documentSheets != value)
                 {
                     _documentSheets = value;

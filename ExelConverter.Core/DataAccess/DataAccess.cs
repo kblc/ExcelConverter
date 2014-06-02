@@ -8,12 +8,26 @@ using ExelConverter.Core.DataObjects;
 using ExelConverter.Core.Converter;
 using Helpers;
 using ExcelConverter.Parser;
+using ExelConverter.Core.ExelDataReader;
 
 namespace ExelConverter.Core.DataAccess
 {
     public class DataAccess : IDataAccess
     {
         public DataAccess() { }
+
+        private static bool? isNoLocking = null;
+        private static bool IsNoLocking
+        {
+            get
+            {
+                if (isNoLocking == null)
+                {
+                    isNoLocking = Environment.GetCommandLineArgs().Any(i => i.Like("*noLocks"));
+                }
+                return isNoLocking.Value;
+            }
+        }
 
         #region Main Database
 
@@ -402,6 +416,105 @@ namespace ExelConverter.Core.DataAccess
 
         #endregion
 
+        public SheetRulePair[] GetExportRulesIdByOperator(Operator op, IQueryable<ExelSheet> existedSheets)
+        {
+            var result = new SheetRulePair[] { };
+            bool wasException = false;
+            var logSesson = Log.SessionStart(string.Format("DataAccess.GetExportRulesIdByOperator(id:{0})", op == null ? "null" : op.Id.ToString()), true);
+            try
+            {
+                using (var dc = exelconverterEntities2.New())
+                {
+                    string export_rule =
+                        dc
+                        .operator_export_rule
+                        .Where(r => r.operator_id == op.Id && r.export_rules != null)
+                        .Select(r=>r.export_rules)
+                        .FirstOrDefault();
+
+                    if (!string.IsNullOrWhiteSpace(export_rule))
+                        result =
+                            export_rule
+                            .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(i => 
+                                {
+                                    var prts = i.Split(new char[] { ':' });
+                                    if (prts.Length == 2)
+                                        return new SheetRulePair()
+                                            {
+                                                Rule = op.MappingRules.FirstOrDefault(r => r.Id.ToString() == prts[0]),
+                                                Sheet = existedSheets.FirstOrDefault(s => s.Name.ToLower().Trim() == prts[1].ToLower().Trim())
+                                            };
+                                        else return null;
+                                })
+                            .Where(i => i != null)
+                            .ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                wasException = true;
+                Log.Add(logSesson, ex.GetExceptionText());
+                throw ex;
+            }
+            finally
+            {
+                Log.SessionEnd(logSesson, wasException);
+            }
+
+            return result;
+        }
+
+        public void SetExportedRulesForOperator(Operator op, SheetRulePair[] exportRules)
+        {
+            bool wasException = false;
+            var logSesson = Log.SessionStart(string.Format("DataAccess.SetExportedRulesForOperator(id:{0})", op == null ? "null" : op.Id.ToString()), true);
+            try
+            {
+                using (var dc = exelconverterEntities2.New())
+                {
+                    string ruleString = string.Empty;
+
+                    foreach(var itemToSave in 
+                                    exportRules
+                                        .Where(i => i.Sheet != null && !string.IsNullOrWhiteSpace(i.Sheet.Name))
+                                        .Select(i => string.Format("{0}:{1}",i.Rule.Id,i.Sheet.Name))
+                                        )
+                        ruleString += itemToSave + ";";
+
+                    var export_rule =
+                        dc
+                        .operator_export_rule
+                        .FirstOrDefault(r => r.operator_id == op.Id);
+
+                    if (export_rule != null)
+                    {
+                        if (export_rule.export_rules != ruleString)
+                        {
+                            export_rule.export_rules = ruleString;
+                            dc.SaveChanges();
+                        }
+                    } else
+                    {
+                        dc.operator_export_rule.Add(
+                            new operator_export_rule() { operator_id = (int)op.Id, export_rules = ruleString }
+                            );
+                        dc.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                wasException = true;
+                Log.Add(logSesson, ex.GetExceptionText());
+                throw ex;
+            }
+            finally
+            {
+                Log.SessionEnd(logSesson, wasException);
+            }
+        }
+
         public ExelConvertionRule[] GetRulesByOperator(Operator op)
         {
             //var dc = exelconverterEntities2.Default;
@@ -438,24 +551,6 @@ namespace ExelConverter.Core.DataAccess
                     ids = ids == null ? new int[] { } : ids;
                     bool isIdsEmpty = ids.Count() == 0;
 
-                    //result =
-                    //    (
-                    //        from l in dc.convertion_rules
-                    //        where isIdsEmpty || ids.Contains(l.id)
-                    //        select l
-                    //    )
-                    //    .AsEnumerable()
-                    //    .Select(cr =>
-                    //        {
-                    //            ExelConvertionRule r = ExelConvertionRule.Deserilize(cr.convertion_rule);
-                    //            r.Id = cr.id;
-                    //            r.FkOperatorId = cr.fk_operator_id;
-                    //            return r;
-                    //        }
-                    //    ).ToArray();
-
-                    
-
                     result =
                         dc
                         .convertion_rules
@@ -475,7 +570,7 @@ namespace ExelConverter.Core.DataAccess
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(ex.GetExceptionText());
+                Log.Add(logSesson, ex.GetExceptionText());
                 throw ex;
             }
             finally
@@ -597,6 +692,10 @@ namespace ExelConverter.Core.DataAccess
             bool wasException = false;
 
             var result = new Dictionary<Operator, User>();
+
+            if (IsNoLocking)
+                return result;
+
             DateTime startDateTime = DateTime.UtcNow;
             try
             {
@@ -681,6 +780,10 @@ namespace ExelConverter.Core.DataAccess
             bool wasException = false;
             var logSession = Log.SessionStart("DataAccess.SetOperatorLocker()", true);
             bool result = false;
+
+            if (IsNoLocking)
+                return true;
+
             try
             {
                 using (var dc = exelconverterEntities2.New())
@@ -711,7 +814,7 @@ namespace ExelConverter.Core.DataAccess
                                 result = true;
                             }
                         } else
-                        {
+                        { 
                             dc.locks.Add(new locks() { id_company = (int)op.Id, id_user = (int)user.Id, locked_to = lockTo });
                             dc.SaveChanges();
                             result = true;

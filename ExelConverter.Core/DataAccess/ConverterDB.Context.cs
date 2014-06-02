@@ -28,5 +28,6 @@ namespace ExelConverter.Core.DataAccess
         public DbSet<convertion_rules> convertion_rules { get; set; }
         public DbSet<locks> locks { get; set; }
         public DbSet<parsers> parsers { get; set; }
+        public DbSet<operator_export_rule> operator_export_rule { get; set; }
     }
 }

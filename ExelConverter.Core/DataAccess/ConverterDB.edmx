@@ -8,6 +8,7 @@
         <EntityContainer Name="exelconverterModelStoreContainer">
           <EntitySet Name="convertion_rules" EntityType="exelconverterModel.Store.convertion_rules" store:Type="Tables" Schema="excelconverter_alpha" />
           <EntitySet Name="locks" EntityType="exelconverterModel.Store.locks" store:Type="Tables" Schema="excelconverter_alpha" />
+          <EntitySet Name="operator_export_rule" EntityType="exelconverterModel.Store.operator_export_rule" store:Type="Tables" Schema="excelconverter_alpha" />
           <EntitySet Name="parsers" EntityType="exelconverterModel.Store.parsers" store:Type="Tables" Schema="excelconverter_alpha" />
         </EntityContainer>
         <EntityType Name="convertion_rules">
@@ -27,6 +28,13 @@
           <Property Name="locked_to" Type="datetime" Nullable="false" />
           <Property Name="id_user" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="operator_export_rule">
+          <Key>
+            <PropertyRef Name="operator_id" />
+          </Key>
+          <Property Name="operator_id" Type="int" Nullable="false" />
+          <Property Name="export_rules" Type="longtext" />
+        </EntityType>
         <EntityType Name="parsers">
           <Key>
             <PropertyRef Name="id" />
@@ -43,6 +51,7 @@
           <EntitySet Name="convertion_rules" EntityType="exelconverterModel.convertion_rules" />
           <EntitySet Name="locks" EntityType="exelconverterModel.locks" />
           <EntitySet Name="parsers" EntityType="exelconverterModel.parsers" />
+          <EntitySet Name="operator_export_rule" EntityType="exelconverterModel.operator_export_rule" />
         </EntityContainer>
         <EntityType Name="convertion_rules">
           <Key>
@@ -68,6 +77,13 @@
           <Property Type="Guid" Name="id" Nullable="false" />
           <Property Type="String" Name="url" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="xml" Nullable="false" MaxLength="1073741823" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="operator_export_rule">
+          <Key>
+            <PropertyRef Name="operator_id" />
+          </Key>
+          <Property Type="Int32" Name="operator_id" Nullable="false" />
+          <Property Type="String" Name="export_rules" MaxLength="1073741823" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -100,6 +116,14 @@
                 <ScalarProperty Name="xml" ColumnName="xml" />
                 <ScalarProperty Name="url" ColumnName="url" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="operator_export_rule">
+            <EntityTypeMapping TypeName="exelconverterModel.operator_export_rule">
+              <MappingFragment StoreEntitySet="operator_export_rule">
+                <ScalarProperty Name="export_rules" ColumnName="export_rules" />
+                <ScalarProperty Name="operator_id" ColumnName="operator_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -89,5 +89,9 @@ namespace ExelConverter.Core.DataAccess
         bool FillRectExists(FillArea area);
 
         bool[] FillRectExists(FillArea[] area);
+
+        SheetRulePair[] GetExportRulesIdByOperator(Operator op, IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> existedSheets);
+
+        void SetExportedRulesForOperator(Operator SelectedOperator, SheetRulePair[] exportRules);
     }
 }

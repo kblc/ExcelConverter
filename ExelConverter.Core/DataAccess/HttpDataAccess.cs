@@ -400,8 +400,9 @@ namespace ExelConverter.Core.DataAccess
                 Database = database,
                 ConvertZeroDateTime = true,
                 AllowZeroDateTime = true,
-                DefaultCommandTimeout = 10000,
-                ConnectionTimeout = 10000
+                DefaultCommandTimeout = 15,
+                ConnectionTimeout = 15,
+                CharacterSet = "utf8"
             }.ConnectionString;
         }
 

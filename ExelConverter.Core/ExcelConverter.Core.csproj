@@ -197,6 +197,9 @@
     <Compile Include="DataAccess\news.cs">
       <DependentUpon>AppDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataAccess\operator_export_rule.cs">
+      <DependentUpon>ConverterDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataAccess\operator_orders.cs">
       <DependentUpon>AppDB.tt</DependentUpon>
     </Compile>
