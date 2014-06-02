@@ -972,30 +972,34 @@ namespace ExelConverterLite.ViewModel
                 var i = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + SelectedSheet.MainHeaderRowCount;
 
                 var url = photoConvertionData.Blocks.Run(SelectedSheet, i, photoConvertionData);
-                var imageParser = new ImagesParser(url);
-                var bitmap = imageParser.GetImage();
-                bitmap.DownloadCompleted += (s, e) =>
-                {
-                    var a = bitmap.Height;
-                    if (!SelectedOperator.MappingRule.PhotoParsingData.Any(ppd => ppd.Height == bitmap.PixelHeight
-                    && ppd.Width == bitmap.PixelWidth))
+
+                if (!string.IsNullOrWhiteSpace(url) && Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                { 
+                    var imageParser = new ImagesParser(url);
+                    var bitmap = imageParser.GetImage();
+                    bitmap.DownloadCompleted += (s, e) =>
                     {
-                        var ipd = new ImageParsingData
+                        var a = bitmap.Height;
+                        if (!SelectedOperator.MappingRule.PhotoParsingData.Any(ppd => ppd.Height == bitmap.PixelHeight
+                        && ppd.Width == bitmap.PixelWidth))
                         {
-                            Height = bitmap.PixelHeight,
-                            Width = bitmap.PixelWidth,
-                            ImageUrl = url
-                        };
-                        ipd.DrawingArea.Background = new ImageBrush(bitmap);
-                        SelectedOperator.MappingRule.PhotoParsingData.Add(ipd);
-                    }
-                    else
-                    {
-                        var ipd = SelectedOperator.MappingRule.PhotoParsingData.FirstOrDefault(ppd => ppd.Height == bitmap.PixelHeight && ppd.Width == bitmap.PixelWidth);
-                        ipd.DrawingArea.Background = new ImageBrush(bitmap);
-                    }
+                            var ipd = new ImageParsingData
+                            {
+                                Height = bitmap.PixelHeight,
+                                Width = bitmap.PixelWidth,
+                                ImageUrl = url
+                            };
+                            ipd.DrawingArea.Background = new ImageBrush(bitmap);
+                            SelectedOperator.MappingRule.PhotoParsingData.Add(ipd);
+                        }
+                        else
+                        {
+                            var ipd = SelectedOperator.MappingRule.PhotoParsingData.FirstOrDefault(ppd => ppd.Height == bitmap.PixelHeight && ppd.Width == bitmap.PixelWidth);
+                            ipd.DrawingArea.Background = new ImageBrush(bitmap);
+                        }
                     
-                };
+                    };
+                }
             }
         }
 
@@ -1006,29 +1010,34 @@ namespace ExelConverterLite.ViewModel
                 var mapConvertionData = SelectedOperator.MappingRule.ConvertionData.Single(cd => cd.PropertyId == "Location_img");
                 var i = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + SelectedSheet.MainHeaderRowCount;
                 var url = mapConvertionData.Blocks.Run(SelectedSheet, i, mapConvertionData);
-                var imageParser = new ImagesParser(url);
-                var bitmap = imageParser.GetImage();
-                bitmap.DownloadCompleted += (s, e) =>
-                {
-                    var a = bitmap.Height;
-                    if (!SelectedOperator.MappingRule.MapParsingData.Any(ppd => ppd.Height == bitmap.PixelHeight
-                    && ppd.Width == bitmap.PixelWidth))
+
+                if (!string.IsNullOrWhiteSpace(url) && Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                { 
+                    var imageParser = new ImagesParser(url);
+                    var bitmap = imageParser.GetImage();
+                    bitmap.DownloadCompleted += (s, e) =>
                     {
-                        var ipd = new ImageParsingData
+                        var a = bitmap.Height;
+                        if (!SelectedOperator.MappingRule.MapParsingData.Any(ppd => ppd.Height == bitmap.PixelHeight
+                        && ppd.Width == bitmap.PixelWidth))
                         {
-                            Height = bitmap.PixelHeight,
-                            Width = bitmap.PixelWidth,
-                            ImageUrl = url
-                        };
-                        ipd.DrawingArea.Background = new ImageBrush(bitmap);
-                        SelectedOperator.MappingRule.MapParsingData.Add(ipd);
-                    }
-                    else
-                    {
-                        var ipd = SelectedOperator.MappingRule.MapParsingData.FirstOrDefault(ppd => ppd.Height == bitmap.PixelHeight && ppd.Width == bitmap.PixelWidth);
-                        ipd.DrawingArea.Background = new ImageBrush(bitmap);
-                    }
-                };
+                            var ipd = new ImageParsingData
+                            {
+                                Height = bitmap.PixelHeight,
+                                Width = bitmap.PixelWidth,
+                                ImageUrl = url
+                            };
+                            ipd.DrawingArea.Background = new ImageBrush(bitmap);
+                            SelectedOperator.MappingRule.MapParsingData.Add(ipd);
+                        }
+                        else
+                        {
+                            var ipd = SelectedOperator.MappingRule.MapParsingData.FirstOrDefault(ppd => ppd.Height == bitmap.PixelHeight && ppd.Width == bitmap.PixelWidth);
+                            ipd.DrawingArea.Background = new ImageBrush(bitmap);
+                        }
+                    };
+
+                }
             }
         }
 
