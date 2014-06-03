@@ -177,7 +177,7 @@ namespace ExelConverterLite.View
                     }
                     catch (Exception ex)
                     {
-                        System.Windows.Forms.MessageBox.Show(string.Format("Ошибка входа в систему:{0}{1}", Environment.NewLine, ex.Message), "Ошибка авторизации", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        System.Windows.Forms.MessageBox.Show(string.Format("Ошибка входа в систему:{0}{1}", Environment.NewLine, ex.GetExceptionText()), "Ошибка авторизации", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     finally
                     {

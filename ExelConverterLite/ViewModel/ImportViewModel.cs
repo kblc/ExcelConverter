@@ -78,6 +78,11 @@ namespace ExelConverterLite.ViewModel
             OperatorsList = new List<Operator>();
             InitializeCoommands();
             InitializeData();
+
+            SheetHeaders.CollectionChanged += (s, e) =>
+                {
+                    var abc = "a";
+                };
         }
 
         ~ImportViewModel()

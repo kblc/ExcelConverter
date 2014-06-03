@@ -103,35 +103,48 @@ namespace ExelConverter.Core.ExelDataReader
         public double Similarity(ExelRow exelRow, int maxRowsCount = 0)
         {
             double result = 0.0;
+            bool wasError = false;
+            var logSession = Helpers.Log.SessionStart("ExelRow.Similarity()", true);
+            try
+            { 
+                if (maxRowsCount == 0)
+                    maxRowsCount = int.MaxValue;
 
-            if (maxRowsCount == 0)
-                maxRowsCount = int.MaxValue;
+                //if (exelRow.Cells.Count == this.Cells.Count)
+                //{
 
-            //if (exelRow.Cells.Count == this.Cells.Count)
-            //{
+                int maxValue = Math.Min(Math.Min(exelRow.Cells.Count, this.Cells.Count), maxRowsCount);
 
-            int maxValue = Math.Min(Math.Min(exelRow.Cells.Count, this.Cells.Count), maxRowsCount);
+                if (maxValue > 0)
+                    for (int i = 0; i < maxValue; i++)
+                    {
+                        result += string.IsNullOrEmpty(exelRow.Cells[i].Value) == string.IsNullOrEmpty(this.Cells[i].Value) ? 0.45 : 0.0;
+                        result += Math.Abs(exelRow.Cells[i].UniqueWeight - this.Cells[i].UniqueWeight) < 0.07 ? 0.15 : 0.0;
+                        result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.ForegroundColor,this.Cells[i].CellStyle.ForegroundColor) ? 0.2 : 0.0;
+                        result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.BackgroundColor, this.Cells[i].CellStyle.BackgroundColor) ? 0.2 : 0.0;
+                    }
+                result = result / maxValue;
+                //}
 
-            if (maxValue > 0)
-                for (int i = 0; i < maxValue; i++)
+                if (maxRowsCount == int.MaxValue)
                 {
-                    result += string.IsNullOrEmpty(exelRow.Cells[i].Value) == string.IsNullOrEmpty(this.Cells[i].Value) ? 0.45 : 0.0;
-                    result += Math.Abs(exelRow.Cells[i].UniqueWeight - this.Cells[i].UniqueWeight) < 0.07 ? 0.15 : 0.0;
-                    result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.ForegroundColor,this.Cells[i].CellStyle.ForegroundColor) ? 0.2 : 0.0;
-                    result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.BackgroundColor, this.Cells[i].CellStyle.BackgroundColor) ? 0.2 : 0.0;
+                    result = result * 0.55;
+                    result += ((double)Math.Min(this.NotEmptyCells.Count(), exelRow.NotEmptyCells.Count()) / (double)Math.Max(this.NotEmptyCells.Count(), exelRow.NotEmptyCells.Count())) * 0.4;
+
+                    //result += (this.NotEmptyCells.Count() == exelRow.NotEmptyCells.Count()) ? 0.4 : 0;
+                    result += (this.UniqueNotEmptyCells.Count() == exelRow.UniqueNotEmptyCells.Count()) ? 0.05 : 0;
                 }
-            result = result / maxValue;
-            //}
-
-            if (maxRowsCount == int.MaxValue)
-            {
-                result = result * 0.55;
-                result += ((double)Math.Min(this.NotEmptyCells.Count(), exelRow.NotEmptyCells.Count()) / (double)Math.Max(this.NotEmptyCells.Count(), exelRow.NotEmptyCells.Count())) * 0.4;
-
-                //result += (this.NotEmptyCells.Count() == exelRow.NotEmptyCells.Count()) ? 0.4 : 0;
-                result += (this.UniqueNotEmptyCells.Count() == exelRow.UniqueNotEmptyCells.Count()) ? 0.05 : 0;
             }
-
+            catch(Exception ex)
+            {
+                wasError = true;
+                Helpers.Log.Add(logSession, ex);
+                throw ex;
+            }
+            finally
+            {
+               Helpers.Log.SessionEnd(logSession, wasError);
+            }
             return result;
         }
     }

@@ -37,8 +37,7 @@ namespace ExelConverter.Core.ExelDataReader
         {
             var totalRowsCount = 0;
             var loaded = 0;
-            foreach (Worksheet sheet in WorkBook.Worksheets)
-                totalRowsCount += sheet.Cells.Rows.Count;
+            totalRowsCount = WorkBook.Worksheets.Cast<Worksheet>().Select(i => i.Cells.Rows.Count).Sum();
 
             Result = new List<ExelSheet>();
 
@@ -46,6 +45,16 @@ namespace ExelConverter.Core.ExelDataReader
             {
                 ExelSheet sht = new ExelSheet() { Name = sheet.Name };
                 var hLinks = sheet.Hyperlinks.Cast<Hyperlink>();
+
+                int maxColumnIndex = sheet.Cells.Rows.Cast<Row>().Select(c => 
+                        {
+                            if (c.LastCell != null)
+                                for (int i = c.LastCell.Column; i >= 0; i--)
+                                    if (!string.IsNullOrWhiteSpace(c.LastCell.Value == null ? null : c.LastCell.Value.ToString().Trim()))
+                                        return i;
+                            return 0;
+                        }
+                    ).Max();
 
                 foreach (Row row in sheet.Cells.Rows)
                 //for (var i = 0; i < sheet.Cells.Rows.Count; i++)
@@ -57,8 +66,11 @@ namespace ExelConverter.Core.ExelDataReader
                     if (sheet.Cells.Count > 0)
                     {
                         //var columnsCount = sheet.Cells.Rows[index].LastCell.Column;
-                        var columnsCount = sheet.Cells.Rows[index].LastCell == null ? 0 : sheet.Cells.Rows[index].LastCell.Column;
-                        for (var k = 0; k <= columnsCount; k++) //sheet.Cells.Columns.Count
+                        var currMaxColumnsIndex = sheet.Cells.Rows[index].LastCell == null ? 0 : sheet.Cells.Rows[index].LastCell.Column;
+
+                        #region Read data from cells
+
+                        for (var k = 0; k <= Math.Min(currMaxColumnsIndex, maxColumnIndex); k++) //sheet.Cells.Columns.Count
                         {
                             var cell = sheet.Cells[index, k];
                             var c = new ExelCell();
@@ -126,19 +138,26 @@ namespace ExelConverter.Core.ExelDataReader
                             r.Cells.Add(c);
                         }
 
-                        //bool canAdd = !DeleteEmptyRows;
-                        //if (!canAdd)
-                        //    foreach (ExelCell c in r.Cells)
-                        //        if (!string.IsNullOrWhiteSpace(c.Value) || !string.IsNullOrWhiteSpace(c.HyperLink) || (!ColorsEqual(c.Color, DefColor0) && !ColorsEqual(c.Color, DefColor1)))
-                        //        {
-                        //            canAdd = true;
-                        //            break;
-                        //        }
+                        #endregion
 
-                        //if (canAdd)
+                        var lastStyle = (maxColumnIndex > 0) ? r.Cells[Math.Min(currMaxColumnsIndex, maxColumnIndex)].CellStyle : new Style();
+
+                        for (int i = 0; i < Math.Abs(maxColumnIndex - currMaxColumnsIndex); i++ )
+                            r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
+
+                            //bool canAdd = !DeleteEmptyRows;
+                            //if (!canAdd)
+                            //    foreach (ExelCell c in r.Cells)
+                            //        if (!string.IsNullOrWhiteSpace(c.Value) || !string.IsNullOrWhiteSpace(c.HyperLink) || (!ColorsEqual(c.Color, DefColor0) && !ColorsEqual(c.Color, DefColor1)))
+                            //        {
+                            //            canAdd = true;
+                            //            break;
+                            //        }
+
+                            //if (canAdd)
                         sht.Rows.Add(r);
                         loaded++;
-                        FileLoader.ReportProgress((int)((double)loaded / (double)totalRowsCount * 10000));
+                        FileLoader.ReportProgress((int)((double)loaded / (double)totalRowsCount));
                     }
 
                 }

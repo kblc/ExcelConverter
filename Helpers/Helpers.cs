@@ -138,6 +138,16 @@ namespace Helpers
             }
         }
 
+        public static void Add(Guid session, Exception ex)
+        {
+            Add(session, ex.GetExceptionText());
+        }
+
+        public static void Add(Exception ex)
+        {
+            Add(ex.GetExceptionText());
+        }
+
         public static void Clear()
         {
             if (!string.IsNullOrEmpty(LogFileName) && File.Exists(Environment.CurrentDirectory + Path.DirectorySeparatorChar + LogFileName))
