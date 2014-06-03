@@ -36,8 +36,10 @@ namespace ExelConverterLite.ViewModel
         private void Save()
         {
             for (int i = exportRules.Count - 1; i >= 0; i--)
-                if (exportRules[i].Sheet == null)
+            { 
+                if (string.IsNullOrWhiteSpace(exportRules[i].SheetName))
                     exportRules.RemoveAt(i);
+            }
 
             App.Locator.Import.ExportRules = exportRules;
             View.ViewLocator.ExportSetupView.DialogResult = true;

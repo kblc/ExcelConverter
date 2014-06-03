@@ -58,21 +58,20 @@ namespace ExelConverter.Core.DataAccess
             bool wasException = false;
             try
             {
+                int[] lIds = ids == null ? new int[] { } : ids;
+
                 using (var dc = alphaEntities.New())
-                //var dc = alphaEntities.Default;
                 {
                     result = dc.companies
                         .Where(c => c.type == "operator")
-                        .AsEnumerable()
+                        .Where(c => lIds.Count() == 0 || lIds.Contains((int)c.id))
                         .Select(c => 
-                            {
-                                return new Operator
+                                new Operator()
                                     {
                                         Id = c.id,
                                         Name = c.name
-                                    };
-                            })
-                        .Where(c => ids == null || ids.Contains((int)c.Id))
+                                    }
+                            )
                         .ToArray();
                 }
             }
@@ -440,10 +439,10 @@ namespace ExelConverter.Core.DataAccess
                                 {
                                     var prts = i.Split(new char[] { ':' });
                                     if (prts.Length == 2)
-                                        return new SheetRulePair()
+                                        return new SheetRulePair(existedSheets)
                                             {
                                                 Rule = op.MappingRules.FirstOrDefault(r => r.Id.ToString() == prts[0]),
-                                                Sheet = existedSheets.FirstOrDefault(s => s.Name.ToLower().Trim() == prts[1].ToLower().Trim())
+                                                SheetName = prts[1].ToLower().Trim()
                                             };
                                         else return null;
                                 })
@@ -478,7 +477,7 @@ namespace ExelConverter.Core.DataAccess
                     foreach(var itemToSave in 
                                     exportRules
                                         .Where(i => i.Sheet != null && !string.IsNullOrWhiteSpace(i.Sheet.Name))
-                                        .Select(i => string.Format("{0}:{1}",i.Rule.Id,i.Sheet.Name))
+                                        .Select(i => string.Format("{0}:{1}",i.Rule.Id,i.SheetName))
                                         )
                         ruleString += itemToSave + ";";
 

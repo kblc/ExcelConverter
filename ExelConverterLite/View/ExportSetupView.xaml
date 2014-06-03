@@ -18,8 +18,6 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-
-
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="30" />
@@ -32,8 +30,13 @@
                   CanUserAddRows="True"
                   CanUserDeleteRows="True">
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Вкладка" SelectedItemBinding="{Binding Sheet}" DisplayMemberPath="{Binding Sheet.Name}" ItemsSource="{StaticResource AviableSheetsCollection}"/>
-                <DataGridComboBoxColumn Header="Правило" SelectedItemBinding="{Binding Rule}" DisplayMemberPath="{Binding Rule.Name}" ItemsSource="{StaticResource AviableRulesCollection}"/>
+                <DataGridComboBoxColumn Header="Вкладка" 
+                                        SelectedItemBinding="{Binding SheetName}" 
+                                        ItemsSource="{StaticResource AviableSheetsCollection}"/>
+                <DataGridComboBoxColumn Header="Правило" 
+                                        SelectedItemBinding="{Binding Rule}" 
+                                        DisplayMemberPath="Name" 
+                                        ItemsSource="{StaticResource AviableRulesCollection}"/>
             </DataGrid.Columns>
         </DataGrid>       
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="2" >

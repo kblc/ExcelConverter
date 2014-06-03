@@ -26,8 +26,28 @@ namespace ExelConverter.Core.Converter
 {
     public class SheetRulePair
     {
-        public ExelConverter.Core.ExelDataReader.ExelSheet Sheet { get; set; }
+        public IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> AllowedSheets { get; set; }
+        public SheetRulePair(IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> allowedSheets) : this()
+        {
+            this.AllowedSheets = allowedSheets;
+        }
+        public SheetRulePair() { }
+        public ExelConverter.Core.ExelDataReader.ExelSheet Sheet
+        {
+            get
+            {
+                if (AllowedSheets == null)
+                    return null;
+                else
+                    return AllowedSheets.FirstOrDefault(s => s.Name.ToLower().Trim() == SheetName);
+            }
+            set
+            {
+                SheetName = value == null ? string.Empty : value.Name;
+            }
+        }
         public ExelConverter.Core.Converter.ExelConvertionRule Rule { get; set; }
+        public string SheetName { get; set; }
     }
 
     public interface ICopyFrom<T>

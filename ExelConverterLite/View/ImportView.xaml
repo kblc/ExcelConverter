@@ -685,16 +685,11 @@
                     <Button 
                         Margin="2" 
                         Content="Экспорт"
-                        x:Name="ExportButton"
-                        Command="{Binding ToCsvCommand}"
-                        CommandParameter="{Binding ElementName=CheckBoxSetup, Path=IsChecked}"/>
-                    <CheckBox 
-                        VerticalAlignment="Center"
-                        Content="Настроить"
-                        x:Name="CheckBoxSetup"
-                        IsChecked="False"
-                        IsEnabled="{Binding ElementName=ExportButton, Path=IsEnabled}"
-                    />
+                        Command="{Binding ToCsvCommand}"/>
+                    <Button 
+                        Margin="4,2" 
+                        Content="Настроить..."
+                        Command="{Binding ExportSetupCommand}"/>
                 </StackPanel>
             </Grid>
         </Grid>

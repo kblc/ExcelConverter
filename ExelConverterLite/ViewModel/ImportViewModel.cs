@@ -44,10 +44,10 @@ namespace ExelConverterLite.ViewModel
         }
     }
 
-    public class AviableSheetsCollection : ObservableCollection<ExelConverter.Core.ExelDataReader.ExelSheet>
+    public class AviableSheetsCollection : ObservableCollection<string>
     {
         public AviableSheetsCollection()
-            : base(App.Locator.Import.DocumentSheets)
+            : base(App.Locator.Import.ExportRules.Select(r => r.SheetName ))
         {
         }
     }
@@ -151,17 +151,8 @@ namespace ExelConverterLite.ViewModel
             UpdateOperatorCommand = new RelayCommand(UpdateOperator, () => { return IsViewModelValid; });
             UpdateMappingsTableCommand = new RelayCommand<string>(UpdateMappingsTable, (s) => { return IsDocumentLoaded; });
             ClearMappingsTableCommand = new RelayCommand<string>(ClearMappingsTable);
-            ToCsvCommand = 
-                new RelayCommand<object>( 
-                    (b) => 
-                        {
-                            if (b != null)
-                                ToCsv((bool)b);
-                        },
-                    (b2) => 
-                    { 
-                        return IsDocumentLoaded && IsViewModelValid;
-                    });
+            ToCsvCommand = new RelayCommand(ToCsv, () => { return IsDocumentLoaded && IsViewModelValid; });
+            ExportSetupCommand = new RelayCommand(ExportSetup, () => { return IsViewModelValid && SelectedOperator != null; });
             ReExportFileCommand = new RelayCommand(ReExportFile, () => IsDocumentLoaded && IsViewModelValid);
             AddMappingCommand = new RelayCommand<string>(AddMapping);
             EditOperatorCommand = new RelayCommand(EditOperator);
@@ -362,8 +353,8 @@ namespace ExelConverterLite.ViewModel
 
                 SaveImageParsingData(storedRules);
 
-                if (exportRules != null)
-                    SaveExportRules(exportRules.ToArray());
+                //if (exportRules != null)
+                //    SaveExportRules(exportRules.ToArray());
 
                 if (needRefresh)
                 {
@@ -757,23 +748,25 @@ namespace ExelConverterLite.ViewModel
                 if (exportRules != null)
                     return exportRules;
 
-                var savedRules = _appSettingsDataAccess.GetExportRulesIdByOperator(SelectedOperator, DocumentSheets.AsQueryable());
-
+                var savedRules = _appSettingsDataAccess.GetExportRulesIdByOperator(SelectedOperator, DocumentSheets == null ? null : DocumentSheets.AsQueryable());
+                foreach (var r in savedRules.Where(r2 => r2.Rule == null))
+                    r.Rule = App.Locator.Import.NullRule;
+                
                 exportRules = new ObservableCollection<SheetRulePair>(savedRules);
-                foreach (var sheet in DocumentSheets)
-                {
-                    if (!exportRules
-                        .Where(s => s.Sheet != null)
-                        .Select(s => s.Sheet).Contains(sheet))
-                        exportRules.Add( 
-                            new SheetRulePair() 
-                            {
-                                Sheet = sheet,
-                                Rule = SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == sheet.Name.ToLower()) 
-                                       ?? SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == ExelConvertionRule.DefaultName.ToLower())
-                            }
-                   );
-                }
+
+                if (DocumentSheets != null)
+                    foreach (var sheet in DocumentSheets)
+                    {
+                        if (!exportRules.Select(s => s.SheetName).Contains(sheet.Name))
+                            exportRules.Add(
+                                new SheetRulePair(DocumentSheets.AsQueryable()) 
+                                {
+                                    Sheet = sheet,
+                                    Rule = SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == sheet.Name.ToLower()) 
+                                           ?? SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == ExelConvertionRule.DefaultName.ToLower())
+                                }
+                       );
+                    }
 
                 return exportRules;
             }
@@ -784,24 +777,25 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
-        public RelayCommand<object> ToCsvCommand { get; private set; }
-        private void ToCsv(object setup)
+        public RelayCommand ExportSetupCommand { get; private set; }
+        private void ExportSetup()
+        {
+            var res = View.ViewLocator.ExportSetupView.ShowDialog(App.Current.MainWindow);
+            if (res != null && res.Value)
+            {
+                foreach (var rule in ExportRules.Where(r => r.AllowedSheets == null))
+                    rule.AllowedSheets = DocumentSheets.AsQueryable();
+                SaveExportRules(ExportRules.ToArray());
+            } else
+                ExportRules = null;
+        }
+
+        public RelayCommand ToCsvCommand { get; private set; }
+        private void ToCsv()
         {
             try
             {
-                if (setup != null && (bool)setup)
-                {
-                    var res = View.ViewLocator.ExportSetupView.ShowDialog(App.Current.MainWindow);
-                    if (res != null && res.Value)
-                    {
-                        View.ViewLocator.ExportView.ShowDialog(App.Current.MainWindow);
-                    }
-                }
-                else
-                {
-                    ExportRules = null;
-                    View.ViewLocator.ExportView.ShowDialog(App.Current.MainWindow);
-                }
+                View.ViewLocator.ExportView.ShowDialog(App.Current.MainWindow);
             }
             catch
             {
