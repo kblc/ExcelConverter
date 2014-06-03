@@ -54,7 +54,9 @@ namespace ExelConverter.Core.ExelDataReader
                                         return i;
                             return 0;
                         }
-                    ).Max();
+                    )
+                    .Union(new int[] { 0 })
+                    .Max();
 
                 foreach (Row row in sheet.Cells.Rows)
                 //for (var i = 0; i < sheet.Cells.Rows.Count; i++)
@@ -109,15 +111,32 @@ namespace ExelConverter.Core.ExelDataReader
                             }
                             if (cell.IsMerged)
                             {
-                                var content = "";
+                                var intersect = new Func<int,int,int,int,bool>((x1,x2,y1,y2) =>
+                                    {
+                                        return
+                                            (x1 <= y1 && x2 >= y1)
+                                            || (x2 >= y1 && x2 <= y2)
+                                            ;
+                                    });
+
+
+                                var range = cell.GetMergedRange();
+                                var mLinks = hLinks.FirstOrDefault(
+                                    l => 
+                                        intersect(l.Area.StartColumn, l.Area.EndColumn, range.FirstColumn, range.FirstColumn+range.ColumnCount)
+                                        && intersect(l.Area.StartRow, l.Area.EndRow, range.FirstRow, range.FirstRow + range.RowCount)
+                                        );
+                                if (mLinks != null)
+                                    c.HyperLink = mLinks.Address;
+
+                                var content = string.Empty;
                                 var values = (IEnumerable)cell.GetMergedRange().Value;
                                 if (values != null)
-                                {
                                     foreach (var value in values)
                                     {
                                         content += value;
                                     }
-                                }
+                                
                                 c.Value = content;
                             }
                             else if (cell.Value != null)

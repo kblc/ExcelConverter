@@ -39,7 +39,7 @@ namespace ExelConverter.Core.Converter
                 if (AllowedSheets == null)
                     return null;
                 else
-                    return AllowedSheets.FirstOrDefault(s => s.Name.ToLower().Trim() == SheetName);
+                    return AllowedSheets.FirstOrDefault(s => s.Name.ToLower().Trim() == SheetName.ToLower().Trim());
             }
             set
             {
