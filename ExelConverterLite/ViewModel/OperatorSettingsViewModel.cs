@@ -18,16 +18,16 @@ namespace ExelConverterLite.ViewModel
     {
         private IDataAccess _appSettingsDataAccess;
 
-        private Operator _tempOperator;
+        //private Operator _tempOperator;
 
         public OperatorSettingsViewModel(IDataAccess appSettingsDataAccess)
         {
             _appSettingsDataAccess = appSettingsDataAccess;
             
             Operator = App.Locator.Import.SelectedOperator;
-            _tempOperator = App.Locator.Import.SelectedOperator;
+            //_tempOperator = App.Locator.Import.SelectedOperator;
             OperatorName = Operator.Name;
-            Operator.MappingRule = Operator.MappingRules.FirstOrDefault();
+            //Operator.MappingRule = Operator.MappingRules.FirstOrDefault();
             SaveChangesCommand = new RelayCommand(SaveChanges);
             CancelCommand = new RelayCommand(Cancel);
             ClosingCommand = new RelayCommand(CancelChanges);
@@ -66,27 +66,31 @@ namespace ExelConverterLite.ViewModel
         private void SaveChanges()
         {
             Operator.Name = OperatorName;
-            var storedRules = _appSettingsDataAccess.GetRulesByOperator(Operator);
-            foreach (var r in storedRules)
-            {
-                if (!App.Locator.Import.SelectedOperator.MappingRules.Any(mr => mr.Id == r.Id))
-                {
-                    _appSettingsDataAccess.RemoveOperatorRule(r);
-                }
-            }
 
-            var newRules = App.Locator.Import.SelectedOperator.MappingRules.Where(mr => mr.Id == 0).ToArray();
-            _appSettingsDataAccess.AddOperatorRules(newRules);
+            //var storedRules = _appSettingsDataAccess.GetRulesByOperator(Operator);
+            //foreach (var r in storedRules)
+            //{
+            //    if (!App.Locator.Import.SelectedOperator.MappingRules.Any(mr => mr.Id == r.Id))
+            //    {
+            //        _appSettingsDataAccess.RemoveOperatorRule(r);
+            //    }
+            //}
 
-            var updatedRules = App.Locator.Import.SelectedOperator.MappingRules.Where(mr => mr.Id != 0).ToArray();
-            _appSettingsDataAccess.UpdateOperatorRules(updatedRules);
+            //var newRules = App.Locator.Import.SelectedOperator.MappingRules.Where(mr => mr.Id == 0).ToArray();
+            //_appSettingsDataAccess.AddOperatorRules(newRules);
 
-            App.Locator.Import.SelectedOperator.MappingRules = 
-                new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(App.Locator.Import.SelectedOperator));
-            App.Locator.Import.SelectedOperator.MappingRule = App.Locator.Import.SelectedOperator.MappingRules.FirstOrDefault();
-            //App.Locator.Import.SelectedOperator.MappingRule.ConvertionData = new ObservableCollection<FieldConvertionData>(App.Locator.Import.SelectedOperator.MappingRule.ConvertionData);
-            App.Locator.Import.SelectedOperator.MappingRule.RaisePropertyChanged("ConvertionData");
-            App.Locator.Import.SelectedField = App.Locator.Import.SelectedOperator.MappingRule.ConvertionData.FirstOrDefault();
+            //var updatedRules = App.Locator.Import.SelectedOperator.MappingRules.Where(mr => mr.Id != 0).ToArray();
+            //_appSettingsDataAccess.UpdateOperatorRules(updatedRules);
+
+            //App.Locator.Import.SelectedOperator.MappingRules = 
+            //    new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(App.Locator.Import.SelectedOperator));
+            //App.Locator.Import.SelectedOperator.MappingRule = App.Locator.Import.SelectedOperator.MappingRules.FirstOrDefault();
+            ////App.Locator.Import.SelectedOperator.MappingRule.ConvertionData = new ObservableCollection<FieldConvertionData>(App.Locator.Import.SelectedOperator.MappingRule.ConvertionData);
+            //App.Locator.Import.SelectedOperator.MappingRule.RaisePropertyChanged("ConvertionData");
+            //App.Locator.Import.SelectedField = App.Locator.Import.SelectedOperator.MappingRule.ConvertionData.FirstOrDefault();
+
+            App.Locator.Import.SaveRules(false);
+            
             View.ViewLocator.OperatorSettingsView.Close();
         }
 

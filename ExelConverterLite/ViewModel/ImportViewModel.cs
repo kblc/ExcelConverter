@@ -343,7 +343,8 @@ namespace ExelConverterLite.ViewModel
 
                 foreach (var currentRule in SelectedOperator.MappingRules.Where(mr => mr.Id > 0))
                 {
-                    var oldRule = storedRules.Where(i => i.Name == currentRule.Name).FirstOrDefault();
+                    var oldRule = storedRules.FirstOrDefault(i => i.Id == currentRule.Id)
+                                    ?? storedRules.FirstOrDefault(i => i.Name == currentRule.Name);
                     if (oldRule != null && oldRule.Serialize().Trim() != currentRule.Serialize().Trim())
                     {
                         updateRules.Add(currentRule);
@@ -687,6 +688,7 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand EditOperatorCommand { get; private set; }
         private void EditOperator()
         {
+            SaveRules(false);
             View.ViewLocator.OperatorSettingsView.ShowDialog(App.Current.MainWindow);
             ExportRules = null;
         }
@@ -946,6 +948,7 @@ namespace ExelConverterLite.ViewModel
             var rule = basedOnCurrentRule ? ExelConvertionRule.DeserializeFromB64String(SelectedOperator.MappingRule.Serialize()) : new ExelConvertionRule();
             rule.FkOperatorId = (int)SelectedOperator.Id;
             rule.Name = SelectedSheet.Name;
+            rule.Id = 0;
             SelectedOperator.MappingRules.Add(rule);
             SelectedOperator.MappingRule = rule;
         }
