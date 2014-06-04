@@ -59,16 +59,14 @@ namespace ExelConverter.Core.ExelDataReader
                     .Max();
                 #region Read all rows
                 foreach (Row row in sheet.Cells.Rows)
-                //for (var i = 0; i < sheet.Cells.Rows.Count; i++)
                 {
-                    var index = row.Index; //i;
+                    var index = row.Index;
 
                     var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
                     var r = new ExelRow();
                     if (sheet.Cells.Count > 0)
                     {
-                        //var columnsCount = sheet.Cells.Rows[index].LastCell.Column;
-                        var currMaxColumnsIndex = sheet.Cells.Rows[index].LastCell == null ? 0 : sheet.Cells.Rows[index].LastCell.Column;
+                        var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
 
                         #region Read data from cells
 
@@ -164,16 +162,6 @@ namespace ExelConverter.Core.ExelDataReader
                         for (int i = 0; i < Math.Abs(maxColumnIndex - currMaxColumnsIndex); i++ )
                             r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
 
-                            //bool canAdd = !DeleteEmptyRows;
-                            //if (!canAdd)
-                            //    foreach (ExelCell c in r.Cells)
-                            //        if (!string.IsNullOrWhiteSpace(c.Value) || !string.IsNullOrWhiteSpace(c.HyperLink) || (!ColorsEqual(c.Color, DefColor0) && !ColorsEqual(c.Color, DefColor1)))
-                            //        {
-                            //            canAdd = true;
-                            //            break;
-                            //        }
-
-                            //if (canAdd)
                         sht.Rows.Add(r);
                         loaded++;
                         FileLoader.ReportProgress((int)((double)loaded / (double)totalRowsCount));
@@ -197,6 +185,8 @@ namespace ExelConverter.Core.ExelDataReader
 
                 if (sht.Rows.Count > 0)
                 {
+                    #region Delete bottom
+
                     //#### Try to delete bottom info ####
                     //get last empty index
                     int lastEmptyRowsInDataIndex =
@@ -222,12 +212,14 @@ namespace ExelConverter.Core.ExelDataReader
 
                         for (int z = sht.Rows.Count - 1; z >= lastEmptyRowsInDataIndex; z--)
                         {
-                            if (sht.Rows[z].NotEmptyCells.Count() <= 4 && !similarityIndexes.Select(s => s.Similarity(sht.Rows[z])).Any(d => d < 0.5))
+                            if (sht.Rows[z].NotEmptyCells.Count() <= 4 && !similarityIndexes.Select(s => s.Similarity(sht.Rows[z])).Any(d => d > 0.6))
                                 sht.Rows.RemoveAt(z);
                             else
                                 break;
                         }
                     }
+
+                    #endregion
 
                     //Delete all empty rows from data
                     if (DeleteEmptyRows)
@@ -236,28 +228,10 @@ namespace ExelConverter.Core.ExelDataReader
                             var r1 = sht.Rows[z];
                             if (r1.IsEmpty)
                                 sht.Rows.RemoveAt(z);
-                            //else
-                            //    break;
                         }
 
                     if (sht.Rows.Count > 0)
-                    {
-                        int maxFiledColumn = 0;
-                        foreach (ExelRow r in sht.Rows)
-                            for (int i = 0; i < r.Cells.Count; i++)
-                            {
-                                if (!string.IsNullOrWhiteSpace(r.Cells[i].Value) && i > maxFiledColumn)
-                                    maxFiledColumn = i;
-                            }
-
-                        foreach (ExelRow r in sht.Rows)
-                            for (int i = r.Cells.Count - 1; i > maxFiledColumn; i--)
-                            {
-                                r.Cells.RemoveAt(i);
-                            }
-
                         Result.Add(sht);
-                    }
                 }
             }
         }
