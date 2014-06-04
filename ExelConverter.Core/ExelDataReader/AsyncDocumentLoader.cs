@@ -57,7 +57,7 @@ namespace ExelConverter.Core.ExelDataReader
                     )
                     .Union(new int[] { 0 })
                     .Max();
-
+                #region Read all rows
                 foreach (Row row in sheet.Cells.Rows)
                 //for (var i = 0; i < sheet.Cells.Rows.Count; i++)
                 {
@@ -180,6 +180,11 @@ namespace ExelConverter.Core.ExelDataReader
                     }
 
                 }
+                #endregion
+                
+                FillMergedCells(sht);
+
+                //Delete empty rows from end
                 if (DeleteEmptyRows)
                     for (int z = sht.Rows.Count - 1; z >= 0; z--)
                     {
@@ -187,30 +192,52 @@ namespace ExelConverter.Core.ExelDataReader
                         if (r1.IsEmpty)
                             sht.Rows.RemoveAt(z);
                         else
-                            break;
+                           break;
                     }
+
                 if (sht.Rows.Count > 0)
                 {
-                    List<int> emptyIndexes = new List<int>(sht.Rows.Where(row => row.IsEmpty).Select(row => sht.Rows.IndexOf(row)).OrderByDescending(i => i));
-                    //int last = emptyIndexes.Where(i => i > (double)sht.Rows.Count * 0.9).FirstOrDefault();
-                    int last = emptyIndexes.FirstOrDefault();
-                    if (last > 0)
+                    //#### Try to delete bottom info ####
+                    //get last empty index
+                    int lastEmptyRowsInDataIndex =
+                        sht.Rows
+                        .Where(row => row.IsEmpty)
+                        .Select(row => sht.Rows.IndexOf(row))
+                        .OrderByDescending(i => i)
+                        .FirstOrDefault();
+                    //get last non empty index before last empty to check similarity
+                    int lastNotEmptyRowsInDataIndexBeforeEmpty =
+                        sht.Rows
+                        .Where(row => !row.IsEmpty)
+                        .Select(row => sht.Rows.IndexOf(row))
+                        .Where(i => i < lastEmptyRowsInDataIndex)
+                        .OrderByDescending(i => i)
+                        .FirstOrDefault();
+
+                    if (lastEmptyRowsInDataIndex > 4 && sht.Rows.Count - lastEmptyRowsInDataIndex < 15)
                     {
-                        for (int z = sht.Rows.Count - 1; z >= last; z--)
-                            if (sht.Rows[z].NotEmptyCells.Count() <= 4)
+                        List<ExelRow> similarityIndexes = new List<ExelRow>();
+                        for (int i = lastNotEmptyRowsInDataIndexBeforeEmpty; i >= 0 && i > lastNotEmptyRowsInDataIndexBeforeEmpty - 10; i--)
+                            similarityIndexes.Add(sht.Rows[i]);
+
+                        for (int z = sht.Rows.Count - 1; z >= lastEmptyRowsInDataIndex; z--)
+                        {
+                            if (sht.Rows[z].NotEmptyCells.Count() <= 4 && !similarityIndexes.Select(s => s.Similarity(sht.Rows[z])).Any(d => d < 0.5))
                                 sht.Rows.RemoveAt(z);
                             else
                                 break;
+                        }
                     }
 
+                    //Delete all empty rows from data
                     if (DeleteEmptyRows)
                         for (int z = sht.Rows.Count - 1; z >= 0; z--)
                         {
                             var r1 = sht.Rows[z];
                             if (r1.IsEmpty)
                                 sht.Rows.RemoveAt(z);
-                            else
-                                break;
+                            //else
+                            //    break;
                         }
 
                     if (sht.Rows.Count > 0)
@@ -229,7 +256,6 @@ namespace ExelConverter.Core.ExelDataReader
                                 r.Cells.RemoveAt(i);
                             }
 
-                        FillMergedCells(sht);
                         Result.Add(sht);
                     }
                 }
