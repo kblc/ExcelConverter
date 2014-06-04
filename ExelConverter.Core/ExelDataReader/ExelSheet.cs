@@ -496,6 +496,8 @@ namespace ExelConverter.Core.ExelDataReader
             var result = new DataTable();
             if (Rows != null && Rows.Count > 0)
             {
+                result.Columns.Add("#");
+                result.Columns.Add("##");
                 var maxCoulumnsCount = Rows.Max(r => r.Cells.Count);
                 for (var i = 0; i < maxCoulumnsCount; i++)
                 {
@@ -505,7 +507,7 @@ namespace ExelConverter.Core.ExelDataReader
                 var rows = Rows.Take(count == int.MaxValue ? Rows.Count : Math.Min(Rows.Count, count)).ToArray();
                 for (var i = 0; i < rows.Length; i++)
                 {
-                    result.Rows.Add(rows[i].Cells.ToArray());
+                    result.Rows.Add(new ExelCell[] { new ExelCell() { Value = (i+1).ToString() }, new ExelCell() { Value = (rows[i].Index+1).ToString() } }.Union(rows[i].Cells.ToArray()).ToArray());
                 }
             }
             return result;

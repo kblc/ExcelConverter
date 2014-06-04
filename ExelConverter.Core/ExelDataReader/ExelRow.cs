@@ -147,5 +147,7 @@ namespace ExelConverter.Core.ExelDataReader
             }
             return result;
         }
+
+        public int Index { get; set; }
     }
 }

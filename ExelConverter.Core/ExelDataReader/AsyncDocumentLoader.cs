@@ -63,7 +63,7 @@ namespace ExelConverter.Core.ExelDataReader
                     var index = row.Index;
 
                     var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
-                    var r = new ExelRow();
+                    var r = new ExelRow() { Index = index };
                     if (sheet.Cells.Count > 0)
                     {
                         var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
