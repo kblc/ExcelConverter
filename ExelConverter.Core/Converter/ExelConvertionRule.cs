@@ -227,29 +227,54 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        private ObservableCollection<SearchTag> _mainHeaderSearchTags;
+        private ObservableCollection<SearchTag> _mainHeaderSearchTags = null;
         public ObservableCollection<SearchTag> MainHeaderSearchTags
         {
-            get { return _mainHeaderSearchTags ?? (_mainHeaderSearchTags = new ObservableCollection<SearchTag>()); }
+            get
+            {
+                if (_mainHeaderSearchTags == null)
+                {
+                    _mainHeaderSearchTags = new ObservableCollection<SearchTag>();
+                    foreach (var defTag in 
+                        SettingsProvider
+                        .CurrentSettings
+                        .HeaderSearchTags
+                        .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(i => i.Trim())
+                        .Where(i => !string.IsNullOrEmpty(i)))
+                        _mainHeaderSearchTags.Add(new SearchTag() { Tag = defTag.Trim() });
+                }
+                return _mainHeaderSearchTags; 
+            }
             set
             {
-                if (_mainHeaderSearchTags != value)
+                if (_mainHeaderSearchTags == value)
+                    return;
+
+                MainHeaderSearchTags.Clear();
+                if (value != null)
                 {
-                    _mainHeaderSearchTags = value;
-                    RaisePropertyChanged("");
+                    foreach (var i in value)
+                        MainHeaderSearchTags.Add(new SearchTag().CopyFrom(i));
+                    RaisePropertyChanged("MainHeaderSearchTags");
                 }
             }
         }
 
-        private ObservableCollection<SearchTag> _sheetHeadersSearchTags;
+        private ObservableCollection<SearchTag> _sheetHeadersSearchTags = null;
         public ObservableCollection<SearchTag> SheetHeadersSearchTags
         {
             get { return _sheetHeadersSearchTags ?? (_sheetHeadersSearchTags = new ObservableCollection<SearchTag>()); }
             set
             {
-                if (_sheetHeadersSearchTags != value)
+                if (_sheetHeadersSearchTags == value)
+                    return;
+
+                SheetHeadersSearchTags.Clear();
+                if (value != null)
                 {
-                    _sheetHeadersSearchTags = value;
+                    foreach (var i in value)
+                        SheetHeadersSearchTags.Add(new SearchTag().CopyFrom(i));
                     RaisePropertyChanged("SheetHeadersSearchTags");
                 }
             }
@@ -656,12 +681,8 @@ namespace ExelConverter.Core.Converter
 
         public ExelConvertionRule CopyFrom(ExelConvertionRule source)
         {
-            SheetHeadersSearchTags.Clear();
-            foreach (var item in source.SheetHeadersSearchTags)
-                SheetHeadersSearchTags.Add((new SearchTag()).CopyFrom(item));
-            MainHeaderSearchTags.Clear();
-            foreach (var item in source.MainHeaderSearchTags)
-                MainHeaderSearchTags.Add((new SearchTag()).CopyFrom(item));
+            SheetHeadersSearchTags = source.SheetHeadersSearchTags;
+            MainHeaderSearchTags = source.MainHeaderSearchTags;
             MapParsingData.Clear();
             foreach (var item in source.MapParsingData)
                 MapParsingData.Add((new ImageParsingData()).CopyFrom(item));

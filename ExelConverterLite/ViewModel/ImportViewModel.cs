@@ -79,10 +79,10 @@ namespace ExelConverterLite.ViewModel
             InitializeCoommands();
             InitializeData();
 
-            SheetHeaders.CollectionChanged += (s, e) =>
-                {
-                    var abc = "a";
-                };
+            //SheetHeaders.CollectionChanged += (s, e) =>
+            //    {
+            //        var abc = "a";
+            //    };
         }
 
         ~ImportViewModel()
@@ -300,7 +300,6 @@ namespace ExelConverterLite.ViewModel
 
         private void UpdateSheetHeaders()
         {
-            
             if (SelectedSheet != null)
             {
                 Sharp = SelectedSheet.AsDataTable(SettingsProvider.CurrentSettings.PreloadedRowsCount);
@@ -762,7 +761,7 @@ namespace ExelConverterLite.ViewModel
                 if (DocumentSheets != null)
                     foreach (var sheet in DocumentSheets)
                     {
-                        if (!exportRules.Select(s => s.SheetName).Contains(sheet.Name))
+                        if (!exportRules.Select(s => s.SheetName.ToLower().Trim()).Contains(sheet.Name.ToLower().Trim()))
                             exportRules.Add(
                                 new SheetRulePair(DocumentSheets.AsQueryable()) 
                                 {

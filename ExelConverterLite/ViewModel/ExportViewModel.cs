@@ -124,7 +124,7 @@ namespace ExelConverterLite.ViewModel
 
                 Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.DocumentSheets.Count));
 
-                foreach (var item in App.Locator.Import.ExportRules)
+                foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
                 {
                     var mappingRule = item.Rule;
                     var ds = item.Sheet;
