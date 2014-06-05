@@ -67,6 +67,7 @@ namespace ExelConverter.Core.Converter
         public ExelConvertionRule()
         {
             UpdateMappingTablesValues();
+            UpdateAfterDeserialize(this);
         }
 
         [NonSerialized]
@@ -197,53 +198,41 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        private bool _findMainHeaderByTags;
-        [field: NonSerializedAttribute()]
-        public bool FindMainHeaderByTags
-        {
-            get { return _findMainHeaderByTags; }
-            set
-            {
-                if (_findMainHeaderByTags != value)
-                {
-                    _findMainHeaderByTags = value;
-                    RaisePropertyChanged("FindMainHeaderByTags");
-                }
-            }
-        }
+        //private bool _findMainHeaderByTags;
+        //[field: NonSerializedAttribute()]
+        //public bool FindMainHeaderByTags
+        //{
+        //    get { return _findMainHeaderByTags; }
+        //    set
+        //    {
+        //        if (_findMainHeaderByTags != value)
+        //        {
+        //            _findMainHeaderByTags = value;
+        //            RaisePropertyChanged("FindMainHeaderByTags");
+        //        }
+        //    }
+        //}
 
-        private bool _findSheetHeadersByTags;
-        [field: NonSerializedAttribute()]
-        public bool FindSheetHeadersByTags
-        {
-            get { return _findSheetHeadersByTags; }
-            set
-            {
-                if (_findSheetHeadersByTags != value)
-                {
-                    _findSheetHeadersByTags = value;
-                    RaisePropertyChanged("FindSheetHeadersByTags");
-                }
-            }
-        }
+        //private bool _findSheetHeadersByTags;
+        //[field: NonSerializedAttribute()]
+        //public bool FindSheetHeadersByTags
+        //{
+        //    get { return _findSheetHeadersByTags; }
+        //    set
+        //    {
+        //        if (_findSheetHeadersByTags != value)
+        //        {
+        //            _findSheetHeadersByTags = value;
+        //            RaisePropertyChanged("FindSheetHeadersByTags");
+        //        }
+        //    }
+        //}
 
-        private ObservableCollection<SearchTag> _mainHeaderSearchTags = null;
+        private ObservableCollection<SearchTag> _mainHeaderSearchTags = new ObservableCollection<SearchTag>();
         public ObservableCollection<SearchTag> MainHeaderSearchTags
         {
             get
             {
-                if (_mainHeaderSearchTags == null)
-                {
-                    _mainHeaderSearchTags = new ObservableCollection<SearchTag>();
-                    foreach (var defTag in 
-                        SettingsProvider
-                        .CurrentSettings
-                        .HeaderSearchTags
-                        .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(i => i.Trim())
-                        .Where(i => !string.IsNullOrEmpty(i)))
-                        _mainHeaderSearchTags.Add(new SearchTag() { Tag = defTag.Trim() });
-                }
                 return _mainHeaderSearchTags; 
             }
             set
@@ -251,30 +240,30 @@ namespace ExelConverter.Core.Converter
                 if (_mainHeaderSearchTags == value)
                     return;
 
-                MainHeaderSearchTags.Clear();
+                _mainHeaderSearchTags.Clear();
                 if (value != null)
                 {
                     foreach (var i in value)
-                        MainHeaderSearchTags.Add(new SearchTag().CopyFrom(i));
+                        _mainHeaderSearchTags.Add(new SearchTag().CopyFrom(i));
                     RaisePropertyChanged("MainHeaderSearchTags");
                 }
             }
         }
 
-        private ObservableCollection<SearchTag> _sheetHeadersSearchTags = null;
+        private ObservableCollection<SearchTag> _sheetHeadersSearchTags = new ObservableCollection<SearchTag>();
         public ObservableCollection<SearchTag> SheetHeadersSearchTags
         {
-            get { return _sheetHeadersSearchTags ?? (_sheetHeadersSearchTags = new ObservableCollection<SearchTag>()); }
+            get { return _sheetHeadersSearchTags; }
             set
             {
                 if (_sheetHeadersSearchTags == value)
                     return;
 
-                SheetHeadersSearchTags.Clear();
+                _sheetHeadersSearchTags.Clear();
                 if (value != null)
                 {
                     foreach (var i in value)
-                        SheetHeadersSearchTags.Add(new SearchTag().CopyFrom(i));
+                        _sheetHeadersSearchTags.Add(new SearchTag().CopyFrom(i));
                     RaisePropertyChanged("SheetHeadersSearchTags");
                 }
             }
@@ -661,7 +650,34 @@ namespace ExelConverter.Core.Converter
             foreach (var convData in rule.ConvertionData)
                 foreach (var block in convData.Blocks.Blocks)
                     block.UpdateFunctionsList();
+
+            rule._mainHeaderSearchTags.CollectionChanged += (s, e) =>
+            {
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                {
+                    foreach (var i in e.NewItems.Cast<SearchTag>())
+                        i.PropertyChanged += (s2, e2) =>
+                            {
+                                rule.RaisePropertyChanged("MainHeaderSearchTagsItem");
+                            };
+                }
+                rule.RaisePropertyChanged("MainHeaderSearchTagsItems");
+            };
+
+            rule._sheetHeadersSearchTags.CollectionChanged += (s, e) =>
+            {
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                {
+                    foreach (var i in e.NewItems.Cast<SearchTag>())
+                        i.PropertyChanged += (s2, e2) =>
+                        {
+                            rule.RaisePropertyChanged("SheetHeadersSearchTagsItem");
+                        };
+                }
+                rule.RaisePropertyChanged("SheetHeadersSearchTagsItems");
+            };
         }
+
 
         #endregion
         #region INotifyPropertyChanged
@@ -697,8 +713,8 @@ namespace ExelConverter.Core.Converter
                 ConvertionData.Add(cd);
             }
 
-            FindSheetHeadersByTags = source.FindSheetHeadersByTags;
-            FindMainHeaderByTags = source.FindMainHeaderByTags;
+            //FindSheetHeadersByTags = source.FindSheetHeadersByTags;
+            //FindMainHeaderByTags = source.FindMainHeaderByTags;
             Name = source.Name;
             FkOperatorId = source.FkOperatorId;
             _selectedPhotoParsingData = null;

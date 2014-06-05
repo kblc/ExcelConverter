@@ -10,6 +10,11 @@ namespace ExelConverter.Core.ExelDataReader
 
     public class ExelCell
     {
+        public ExelCell()
+        {
+            IsMerged = false;
+        }
+
         public string Value { get; set; }
 
         public System.Drawing.Color Color { get; set; }

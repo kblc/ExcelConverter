@@ -434,6 +434,27 @@
 
                 <Rectangle Fill="Black" Grid.Row="2" Height="2" Margin="3,3,0,3" />
                 <TabControl Grid.Row="3"  FontSize="12" Margin="2" >
+                    <TabControl.Resources>
+                        <!-- A brush -->
+                        <SolidColorBrush x:Key="BgBrushM" Color="LightCoral"/>
+                        <SolidColorBrush x:Key="BgBrushH" Color="LightBlue"/>
+                        <SolidColorBrush x:Key="BgBrushS" Color="LightGreen"/>
+
+                        <!-- Your row style -->
+                        <Style x:Key="HighlightRow" TargetType="{x:Type DataGridRow}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding type}" Value="M">
+                                    <Setter Property="Background" Value="{StaticResource BgBrushM}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding type}" Value="H">
+                                    <Setter Property="Background" Value="{StaticResource BgBrushH}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding type}" Value="S">
+                                    <Setter Property="Background" Value="{StaticResource BgBrushS}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TabControl.Resources>
                     <TabItem>
                         <TabItem.Header>
                             <WrapPanel Orientation="Horizontal">
@@ -444,9 +465,10 @@
                         </TabItem.Header>
                         <DataGrid x:Name="MainDataGrid" VerticalScrollBarVisibility="Auto" CanUserAddRows="False" CanUserReorderColumns="False"
                                   CanUserSortColumns="False" HorizontalScrollBarVisibility="Auto"
-                                  ItemsSource="{Binding Path=Sharp.DefaultView}"/>
+                                  ItemsSource="{Binding Path=Sharp.DefaultView}"
+                                  RowStyle="{StaticResource HighlightRow}"/>
                     </TabItem>
-                    <TabItem Header="Заголовки">
+                    <TabItem Header="Заголовки" Height="22" VerticalAlignment="Top">
                         <!--IsSelected="{Binding Path=IsMouseOver, Source={RelativeSource Self}}"-->
                         <Grid>
                             <Grid.RowDefinitions>
@@ -492,12 +514,15 @@
                                         <RowDefinition Height="25" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <CheckBox Content="Доп. теги для поиска столбцов" 
+                                    <TextBlock Text="Доп. теги для поиска столбцов" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" />
+                                    <!--<CheckBox Content="Доп. теги для поиска столбцов" 
                                               IsChecked="{Binding Path=SelectedOperator.MappingRule.FindMainHeaderByTags}"
-                                              VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" x:Name="cb1" />
-                                    <DataGrid Grid.Row="1" AutoGenerateColumns="False" 
+                                              VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" x:Name="cb1" />-->
+                                    <DataGrid Grid.Row="1" 
+                                              AutoGenerateColumns="False" 
                                               ItemsSource="{Binding Path=SelectedOperator.MappingRule.MainHeaderSearchTags, Mode=TwoWay}"
-                                              IsEnabled="{Binding ElementName=cb1, Path=IsChecked}">
+                                              >
+                                        <!--IsEnabled="{Binding ElementName=cb1, Path=IsChecked}"-->
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Тэги" Binding="{Binding Tag, UpdateSourceTrigger=PropertyChanged}"/>
                                         </DataGrid.Columns>
@@ -508,12 +533,13 @@
                                         <RowDefinition Height="25" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <CheckBox Content="Поиск заголовков по тэгам" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2"
+                                    <TextBlock Text="Доп. теги для поиска заголовков" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" />
+                                    <!--<CheckBox Content="Поиск заголовков по тэгам" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2"
                                               IsChecked="{Binding Path=SelectedOperator.MappingRule.FindSheetHeadersByTags}"
-                                              x:Name="cb2"/>
+                                              x:Name="cb2"/>-->
                                     <DataGrid Grid.Row="1" AutoGenerateColumns="False"
-                                              IsEnabled="{Binding ElementName=cb2, Path=IsChecked}"
                                               ItemsSource="{Binding Path=SelectedOperator.MappingRule.SheetHeadersSearchTags}">
+                                        <!--IsEnabled="{Binding ElementName=cb2, Path=IsChecked}"-->
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Тэги" Binding="{Binding Tag, UpdateSourceTrigger=PropertyChanged}"/>
                                         </DataGrid.Columns>

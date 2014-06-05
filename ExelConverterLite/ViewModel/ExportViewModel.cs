@@ -133,10 +133,20 @@ namespace ExelConverterLite.ViewModel
                         if (ds.MainHeader == null)
                         {
                             Log.Add(string.Format("should update main header row..."));
-                            if (mappingRule.FindMainHeaderByTags)
-                                ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags.Select(h => h.Tag).ToArray());
-                            else
-                                ds.UpdateMainHeaderRow(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }));
+
+                            ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags
+                                    .Select(h => h.Tag)
+                                    .Union(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }))
+                                    .Select(i => i.Trim())
+                                    .Where(i => !string.IsNullOrEmpty(i))
+                                    .Distinct()
+                                    .ToArray());
+
+                            ds.UpdateHeaders(mappingRule.SheetHeadersSearchTags
+                                    .Select(h => h.Tag.Trim())
+                                    .Where(i => !string.IsNullOrEmpty(i))
+                                    .Distinct()
+                                    .ToArray());
                         }
 
                         var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds));

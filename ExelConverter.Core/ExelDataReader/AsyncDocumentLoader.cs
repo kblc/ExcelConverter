@@ -50,8 +50,16 @@ namespace ExelConverter.Core.ExelDataReader
                         {
                             if (c.LastCell != null)
                                 for (int i = c.LastCell.Column; i >= 0; i--)
-                                    if (!string.IsNullOrWhiteSpace(c.LastCell.Value == null ? null : c.LastCell.Value.ToString().Trim()))
+                                {
+                                    var cell = c.GetCellOrNull(i);
+                                    if (!string.IsNullOrWhiteSpace(
+                                                cell == null || cell.Value == null 
+                                                ? null
+                                                : cell.Value.ToString().Trim()
+                                            )
+                                        )
                                         return i;
+                                }
                             return 0;
                         }
                     )
@@ -109,6 +117,7 @@ namespace ExelConverter.Core.ExelDataReader
                             }
                             if (cell.IsMerged)
                             {
+                                c.IsMerged = true;
                                 var intersect = new Func<int,int,int,int,bool>((x1,x2,y1,y2) =>
                                     {
                                         return
@@ -170,7 +179,7 @@ namespace ExelConverter.Core.ExelDataReader
                 }
                 #endregion
                 
-                FillMergedCells(sht);
+                //FillMergedCells(sht);
 
                 //Delete empty rows from end
                 if (DeleteEmptyRows)

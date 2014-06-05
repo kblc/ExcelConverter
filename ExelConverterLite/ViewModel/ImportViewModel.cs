@@ -78,7 +78,7 @@ namespace ExelConverterLite.ViewModel
             OperatorsList = new List<Operator>();
             InitializeCoommands();
             InitializeData();
-
+            StartSharpControl();
             //SheetHeaders.CollectionChanged += (s, e) =>
             //    {
             //        var abc = "a";
@@ -181,7 +181,7 @@ namespace ExelConverterLite.ViewModel
                         },
                     (b2) =>
                         {
-                            return SelectedSheet != null && SelectedOperator != null && SelectedOperator.MappingRules != null && SelectedOperator.MappingRules.Count <= 20;
+                            return SelectedSheet != null && SelectedOperator != null && SelectedOperator.MappingRules != null;
                         });
             SaveRuleCommand = new RelayCommand(SaveRule, () => SelectedOperator != null && SelectedOperator.MappingRule != null);
             LoadRuleCommand = new RelayCommand(LoadRule);
@@ -284,18 +284,35 @@ namespace ExelConverterLite.ViewModel
         public void UpdateMainHeaderRow()
         {
             SheetHeaders.Clear();
-            if (SelectedOperator.MappingRule.FindMainHeaderByTags)
-            {
-                SelectedSheet.UpdateMainHeaderRow(SelectedOperator.MappingRule.MainHeaderSearchTags.Select(h => h.Tag).ToArray());
-            }
-            else
-            {
-                SelectedSheet.UpdateMainHeaderRow(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }));
-            }
+
+            SelectedSheet.UpdateMainHeaderRow(
+                SelectedOperator.MappingRule.MainHeaderSearchTags
+                    .Select(h => h.Tag)
+                    .Union(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    .Select(i => i != null ? i.Trim() : null)
+                    .Where(i => !string.IsNullOrEmpty(i))
+                    .Distinct()
+                    .ToArray()
+                    );
+
             foreach (var header in SelectedSheet.MainHeader.Cells)
             {
                 SheetHeaders.Add(((ExelCell)header).Value);
             }
+
+            UpdateSharp();
+        }
+
+        public void UpdateSheetHeaderRow()
+        {
+            SelectedSheet.UpdateHeaders(
+                    SelectedOperator.MappingRule.SheetHeadersSearchTags
+                    .Select(h => (h != null && h.Tag != null) ? h.Tag.Trim() : null)
+                    .Where(i => !string.IsNullOrEmpty(i))
+                    .Distinct()
+                    .ToArray()
+                );
+            UpdateSharp();
         }
 
         private void UpdateSheetHeaders()
@@ -303,15 +320,24 @@ namespace ExelConverterLite.ViewModel
             if (SelectedSheet != null)
             {
                 Sharp = SelectedSheet.AsDataTable(SettingsProvider.CurrentSettings.PreloadedRowsCount);
-
-                if (SelectedSheet.Rows.Count != 0)
+                if (SelectedSheet.Rows.Count > 0)
                 {
-                    UpdateMainHeaderRow();
-                    SelectedSheet.UpdateHeaders();
-                    if (SelectedSheet != null && SelectedOperator.MappingRules.Any(r => SelectedSheet.Name.ToLower().Contains(r.Name.ToLower())))
+                    if (SelectedSheet != null)
                     {
-                        SelectedOperator.MappingRule = SelectedOperator.MappingRules.Where(r => SelectedSheet.Name.ToLower().Contains(r.Name.ToLower())).FirstOrDefault();
+                        var savedExportRule = ExportRules
+                            .Where(r => r.Rule != null && r.Rule != NullRule)
+                            .FirstOrDefault(r => SelectedSheet.Name.ToLower().Contains(r.SheetName.ToLower()));
+                        
+                        if (savedExportRule != null)
+                            SelectedOperator.MappingRule = savedExportRule.Rule; 
+                        else
+                            SelectedOperator.MappingRule = 
+                                SelectedOperator.MappingRules.FirstOrDefault(r => SelectedSheet.Name.ToLower().Contains(r.Name.ToLower()))
+                                ?? SelectedOperator.MappingRule
+                                ?? SelectedOperator.MappingRules.FirstOrDefault();
                     }
+                    UpdateMainHeaderRow();
+                    UpdateSheetHeaderRow();
                 }
             }
             if (SelectedOperator != null && SelectedOperator.MappingRules.Count > 0)
@@ -656,7 +682,8 @@ namespace ExelConverterLite.ViewModel
                         SelectedSheet = document.Sheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
                         DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
                         Sharp = SelectedSheet.AsDataTable();
-                        SelectedSheet.UpdateHeaders();
+                        //UpdateMainHeaderRow();
+                        UpdateSheetHeaderRow();
                     };
 
                     DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
@@ -938,8 +965,8 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand UpdateFoundedHeadersCommand { get; private set; }
         private void UpdateFoundedHeaders()
         {
-            SelectedSheet.UpdateHeaders();
             UpdateMainHeaderRow();
+            UpdateSheetHeaderRow();
         }
 
         public RelayCommand<object> AddRuleCommand { get; private set; }
@@ -1226,7 +1253,6 @@ namespace ExelConverterLite.ViewModel
             {
                 if (_selectedSheet != value)
                 {
-
                     SheetChanging();
                     _selectedSheet = value;
                     RaisePropertyChanged("SelectedSheet");
@@ -1276,6 +1302,93 @@ namespace ExelConverterLite.ViewModel
                     _sharp = value;
                     RaisePropertyChanged("Sharp");
                 }
+            }
+        }
+
+        public void StartSharpControl()
+        {
+            this.PropertyChanging += (s, e) =>
+            {
+                if (e.PropertyName == "SelectedOperator")
+                {
+                    if (SelectedOperator != null)
+                    { 
+                        SelectedOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
+                        if (SelectedOperator.MappingRule != null)
+                            SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
+                    }
+                }
+            };
+
+            this.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == "SelectedOperator")
+                    {
+                        if (SelectedOperator != null)
+                        { 
+                            SelectedOperator.PropertyChanged += SelectedOperator_PropertyChanged;    
+                            if (SelectedOperator.MappingRule != null)
+                                SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
+                        }
+                    }
+                };
+
+            if (SelectedOperator != null)
+            {
+                SelectedOperator.PropertyChanged += SelectedOperator_PropertyChanged;
+                if (SelectedOperator.MappingRule != null)
+                    SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
+            }
+        }
+
+        private ExelConvertionRule oldMappingRule = null;
+        private void SelectedOperator_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "MappingRule")
+            {
+                if (oldMappingRule != null)
+                    oldMappingRule.PropertyChanged -= MappingRule_PropertyChanged;
+                oldMappingRule = null;
+                if (SelectedOperator != null && SelectedOperator.MappingRule != null)
+                {
+                    oldMappingRule = SelectedOperator.MappingRule;
+                    SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
+                }
+            }
+        }
+
+        private void MappingRule_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Like("MainHeaderSearchTags*") && Sharp != null)
+            {
+                UpdateMainHeaderRow();
+            }
+            if (e.PropertyName.Like("SheetHeadersSearchTags*") && Sharp != null)
+            {
+                UpdateSheetHeaderRow();
+            }
+        }
+
+        private void UpdateSharp()
+        {
+            int[] headers = SelectedSheet.SheetHeaders.Headers.Select(s => s.RowNumber).ToArray();
+            int[] subHeaders = SelectedSheet.SheetHeaders.Subheaders.Select(s => s.RowNumber).ToArray(); 
+            int[] main = new int[SelectedSheet.MainHeaderRowCount];   
+            for(int i = 0; i<SelectedSheet.MainHeaderRowCount; i++)
+                main[i] = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + i;
+
+            for (int i = 0; i < Sharp.Rows.Count; i++)
+            {
+                string rowType = string.Empty;
+                if (main.Contains(i))
+                    rowType = "M";
+                else if (headers.Contains(i))
+                    rowType = "H";
+                else if (subHeaders.Contains(i))
+                    rowType = "S";
+
+                if (Sharp.Rows[i]["type"].ToString() != rowType)
+                    Sharp.Rows[i]["type"] = rowType;
             }
         }
 
