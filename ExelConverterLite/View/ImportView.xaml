@@ -439,6 +439,7 @@
                         <SolidColorBrush x:Key="BgBrushM" Color="LightCoral"/>
                         <SolidColorBrush x:Key="BgBrushH" Color="LightBlue"/>
                         <SolidColorBrush x:Key="BgBrushS" Color="LightGreen"/>
+                        <SolidColorBrush x:Key="BgBrushD" Color="LightGray"/>
 
                         <!-- Your row style -->
                         <Style x:Key="HighlightRow" TargetType="{x:Type DataGridRow}">
@@ -451,6 +452,9 @@
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding type}" Value="S">
                                     <Setter Property="Background" Value="{StaticResource BgBrushS}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding type}" Value="D">
+                                    <Setter Property="Background" Value="{StaticResource BgBrushD}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

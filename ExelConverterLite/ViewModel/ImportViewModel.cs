@@ -1377,10 +1377,14 @@ namespace ExelConverterLite.ViewModel
             for(int i = 0; i<SelectedSheet.MainHeaderRowCount; i++)
                 main[i] = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + i;
 
+            var mainStart = main.OrderBy(i => i).FirstOrDefault();
+
             for (int i = 0; i < Sharp.Rows.Count; i++)
             {
                 string rowType = string.Empty;
-                if (main.Contains(i))
+                if (i < mainStart)
+                    rowType = "D";
+                else if (main.Contains(i))
                     rowType = "M";
                 else if (headers.Contains(i))
                     rowType = "H";

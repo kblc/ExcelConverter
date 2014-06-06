@@ -164,28 +164,42 @@ namespace ExelConverter.Core.ExelDataReader
             var result = new List<int>();
             var endHeaderRowIndex = Rows.IndexOf(MainHeader) + (MainHeaderRowCount - 1);
 
-            Guid logSession = Log.SessionStart("GetAllHeadersData()");
+            Guid logSession = Log.SessionStart("ExelSheet.GetAllHeadersData()", true);
             Log.Add(logSession, string.Format("HeaderSearchAlgorithm = {0}", ExelConverter.Core.Properties.Settings.Default.HeaderSearchAlgorithm));
             Log.Add(logSession, string.Format("rows count for import: '{0}' from '{1}' main row", Rows.Count, endHeaderRowIndex));
             try
             {
                 if (Rows.Count > endHeaderRowIndex)
                 {
+                    #region Tagged
+
+                    var rowIndexesForHeadersWithTags =
+                            Rows
+                            .AsParallel()
+                            .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
+                            .Where(r => r.UniqueWeight + (IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray()) ? 0.3 : -1) > 0.8)
+                            .Select(r => Rows.IndexOf(r))
+                            .ToArray();
+
+                    Log.Add(logSession, string.Format("founded '{0}' TAGGED rows for sheets candidate.", rowIndexesForHeadersWithTags.Length));
+                    
+                    #endregion
                     #region By values
 
                     Log.Add(logSession, string.Format("calculating by values..."));
 
-                    var lengthsList =
+                    var rowIndexesForHeadersByValue =
                         Rows
+                            .AsParallel()
                             .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
                             .AsParallel()
-                            .Select(r => r.UniqueNotEmptyCells.Count())
-                            .GroupBy(r => r)
+                            .GroupBy(r => r.UniqueNotEmptyCells.Count())
                             .Select(g =>
                                 new
                                 {
-                                    Length = g.FirstOrDefault(),
-                                    Count = g.Count()
+                                    Length = g.FirstOrDefault().UniqueNotEmptyCells.Count(),
+                                    Count = g.Count(),
+                                    Rows = g.Cast<ExelRow>()
                                 }
                                 )
                             .Where(i =>
@@ -193,99 +207,59 @@ namespace ExelConverter.Core.ExelDataReader
                                 && i.Count <= ExelConverter.Core.Properties.Settings.Default.HeaderSearchAlgorithm_2_MaxHeaderCount
                                 )
                             .OrderBy(d => d.Count)
-                            .Select(i => i.Length)
+                            .Take(10)
+                            .AsParallel()
+                            .SelectMany(g => g.Rows.Select(r => Rows.IndexOf(r)))
+                            .Distinct()
                             .ToArray();
 
-                    //only first N items
-                    if (lengthsList.Length > 10)
-                        lengthsList = lengthsList.Take(10).ToArray();
-
-                    var rowIndexesForHeaders =
-                        Rows
-                        //.AsParallel()
-                        .Where(r => 
-                            Rows.IndexOf(r) > endHeaderRowIndex
-                            )
-                        .Where(r =>
-                            lengthsList.Contains(r.UniqueNotEmptyCells.Count())
-                            || IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray())
-                            )
-                        .Where(r =>
-                                (
-                                    !r.IsNotHeader
-                                    && r.UniqueWeight > 0.0
-                                ) || r.UniqueWeight + (IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray()) ? 0.3 : 0) > 0.8
-                            )
-                        .Select(r => Rows.IndexOf(r))
-                        .ToArray();
-
-                    string msg = string.Empty;
-                    foreach (uint i in lengthsList)
-                        msg += i + ";";
-                    Log.Add(logSession, string.Format("cells lenghtes: '{0}'", msg));
-
-                    List<int> res = new List<int>(rowIndexesForHeaders);
-                    SomeCalculations(res, endHeaderRowIndex, tags);
-                    Log.Add(logSession, string.Format("cells count with this lengthes: '{0}'", res.Count));
-
-                    //foreach (int i in res)
-                    //    if (!result.Contains(i))
-                    //        result.Add(i);
+                    Log.Add(logSession, string.Format("founded '{0}' rows for sheets candidate; Need check.", rowIndexesForHeadersByValue.Length));
 
                     #endregion
                     #region By style
                     Log.Add(logSession, string.Format("calculating by styles..."));
 
-                    var weightsList =
-                            Rows
-                                .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
-                                .AsParallel()
-                                .Select(r => r.UniqueWeight)
-                                .GroupBy(r => r)
-                                .Select(g =>
-                                    new
-                                    {
-                                        Wight = g.FirstOrDefault(),
-                                        Count = g.Count()
-                                    }
-                                    )
-                                .Where(i =>
-                                    i.Wight > 0
-                                    && i.Count <= ExelConverter.Core.Properties.Settings.Default.HeaderSearchAlgorithm_2_MaxHeaderCount
-                                    )
-                                .OrderBy(d => d.Count)
-                                .Select(i => i.Wight)
-                                .ToArray();
-
-                    if (weightsList.Length > 3)
-                        weightsList = weightsList.Take(3).ToArray();
-
-                    var rowIndexesForHeaders2 =
+                    var rowIndexesForHeadersByWeight =
                         Rows
-                        .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
-                        .Where(r =>
-                            (
-                                !r.IsNotHeader
-                                && weightsList.Contains(r.UniqueWeight)
-                            )
-                            || IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray())
-                            )
-                        .Select(r => Rows.IndexOf(r))
-                        .ToArray();
+                            .AsParallel()
+                            .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
+                            .AsParallel()
+                            .GroupBy(r => r.UniqueWeight)
+                            .Select(g =>
+                                new
+                                {
+                                    Weight = g.FirstOrDefault().UniqueWeight,
+                                    Count = g.Count(),
+                                    Rows = g.Cast<ExelRow>()
+                                }
+                                )
+                            .Where(i =>
+                                i.Weight > 0
+                                && i.Count <= ExelConverter.Core.Properties.Settings.Default.HeaderSearchAlgorithm_2_MaxHeaderCount
+                                )
+                            .OrderBy(d => d.Count)
+                            .Take(3)
+                            .AsParallel()
+                            .SelectMany(g => g.Rows.Select(r => Rows.IndexOf(r)))
+                            .Distinct()
+                            .ToArray();
 
-                    string msg2 = string.Empty;
-                    foreach (double i in weightsList)
-                        msg2 += i.ToString("0.000") + ";";
-
-                    Log.Add(logSession, string.Format("cells weightes: '{0}'", msg2));
-
-                    List<int> res2 = new List<int>(rowIndexesForHeaders2);
-                    SomeCalculations(res2, endHeaderRowIndex, tags);
-
-                    Log.Add(logSession, string.Format("cells count with this lengthes: '{0}'", res2.Count));
+                    Log.Add(logSession, string.Format("founded '{0}' rows for sheets candidate; Need check.", rowIndexesForHeadersByWeight.Length));
 
                     #endregion
-                    result.AddRange(res.Union(res2).Distinct().OrderBy(i => i));
+
+                    List<int> res = new List<int>(
+                        rowIndexesForHeadersWithTags
+                        .Union(rowIndexesForHeadersByValue)
+                        .Union(rowIndexesForHeadersByWeight)
+                        .Distinct()
+                        .OrderBy(i => i)
+                        );
+
+                    Log.Add(logSession, string.Format("Calculation for '{0}' rows starts...", res.Count));
+                    SomeCalculations(res, endHeaderRowIndex, tags);
+                    Log.Add(logSession, string.Format("Calculation end with '{0}' rows.", res.Count));
+                    result.AddRange(res);
                 }
             }
             finally
@@ -327,132 +301,179 @@ namespace ExelConverter.Core.ExelDataReader
 
         private void SomeCalculations(List<int> result, int endHeaderRowIndex, string[] tags)
         {
-            var Coeff = new Func<ExelRow, double>((row) =>
-            {
-                return 1.0 - (GetIntersectedCount(tags, row.UniqueNotEmptyCells.Select(c => c.Value).ToArray()) / row.UniqueNotEmptyCells.Count()) * 0.3;
-            });
+            var logSessiong = Log.SessionStart("ExelSheet.SomeCalculations()", true);
+            bool wasException = false;
 
-            #region remove headers if step by step > 2
-            for (int i = result.Count - 1; i >= 0; i--)
-            {
-                int n = 1;
-                int index = result[i];
+            try
+            { 
+                string indexes = string.Empty;
+                string tags2 = string.Empty;
 
-                double similarityD = 0;
-                double similatityD4 = 0;
+                if (result != null)
+                    foreach (var ind in result)
+                        indexes += ind.ToString() + ";";
 
-                while (
-                        result.Contains(index - n) &&
-                        (similarityD = Rows[index].Similarity(Rows[index - n])) * Coeff(Rows[index]) * Coeff(Rows[index-n]) > 0.45 &&
-                        (similatityD4 = Rows[index].Similarity(Rows[index - n], 4)) * Coeff(Rows[index]) * Coeff(Rows[index - n]) > 0.8)
-                {
-                    n++;
-                }
-                if (n > 2)
-                {
-                    int deleted = 0;
-                    for (int z = 0; z < n; z++)
+                if (tags != null)
+                    foreach (var tag in tags)
+                        tags2 += tag + ";";
+
+                Log.Add(logSessiong, string.Format("Incoming indexes: '{0}'.", indexes));
+                Log.Add(logSessiong, string.Format("Incoming tags: '{0}'.", tags2));
+
+                if (result != null)
+                { 
+                    var Coeff = new Func<ExelRow, double>((row) =>
                     {
-                        result.Remove(index - z);
-                        deleted++;
-                    }
-                    i -= deleted - 1;
-                }
-            }
-            #endregion
+                        var cnt = row.UniqueNotEmptyCells.Count();
+                        var defCoeff = 1.0;
+                        if (cnt > 0)
+                            return
+                                defCoeff -
+                                (GetIntersectedCount(tags, row.UniqueNotEmptyCells.Select(c => c.Value).ToArray()) / row.UniqueNotEmptyCells.Count()) * 0.3;
+                        else
+                            return defCoeff;
+                    });
 
-            #region remove bottom groups
-            if (result.Count > 0)
-            {
-                for(int i=Rows.Count-1; i>=0; i++)
-                {
-                    if (result.Contains(i))
-                        result.Remove(i);
-                    else
-                        break;
-                }
-            }
-            #endregion
-
-            #region calc similarity with other lines
-            for (int i = result.Count - 1; i >= 0; i--)
-            {
-                int index = result[i];
-
-                List<int> similarityIndexes = new List<int>();
-
-                for (int n = 1; n < Rows.Count; n++)
-                {
-                    if (!result.Contains(index + n) && (index + n) < Rows.Count)
-                        similarityIndexes.Add(index + n);
-                    if (!result.Contains(index - n) && (index - n) > endHeaderRowIndex)
-                        similarityIndexes.Add(index - n);
-                    if (similarityIndexes.Count > 10)
-                        break;
-                }
-
-                double coeff = Coeff(Rows[index]);
-
-                foreach(int similarityIndex in similarityIndexes)
-                {
-                    double similarityD = Rows[index].Similarity(Rows[similarityIndex]);
-                    double similarityD4 = Rows[index].Similarity(Rows[similarityIndex], 4);
-                    double similarityHalf = Rows[index].Similarity(Rows[similarityIndex], (int)((float)Rows[similarityIndex].Cells.Count / (float)2));
-                    if (
-                        similarityD * coeff > 0.78 
-                        || (similarityD * coeff > 0.65 && similarityD4 * coeff > 0.95)
-                        || (Rows[similarityIndex].Cells.Count > 10 && similarityD * coeff > 0.3 && similarityD4 * coeff > 0.8 && similarityHalf > 0.7)
-                        )
+                    #region remove headers if step by step > 2
+                    for (int i = result.Count - 1; i >= 0; i--)
                     {
-                        result.Remove(index);
-                        break;
-                    }
-                }
-            }
-
-            #region add
-            if (result.Count > 0)
-            {
-                double averageWeight = result.Select(i => Rows[i].UniqueWeight).Average();
-                double maxWeight = result.Select(i => Rows[i].UniqueWeight).Max();
-                double minWeight = result.Select(i => Rows[i].UniqueWeight).Min();
-                double moduleWeight = (maxWeight - minWeight) / 4;
-
-                if (moduleWeight == 0.0)
-                    moduleWeight = 0.001;
-
-                for (int i = result.Count - 1; i >= 0; i--)
-                    if (Rows[result[i]].UniqueWeight < averageWeight - moduleWeight)
-                    {
+                        int n = 1;
                         int index = result[i];
 
-                        List<int> similarityIndexes = new List<int>();
+                        double similarityD = 0;
+                        double similatityD4 = 0;
 
-                        for (int n = 1; n < Rows.Count; n++)
+                        while (
+                                result.Contains(index - n) &&
+                                (similarityD = Rows[index].Similarity(Rows[index - n])) * Coeff(Rows[index]) * Coeff(Rows[index-n]) > 0.45 &&
+                                (similatityD4 = Rows[index].Similarity(Rows[index - n], 4)) * Coeff(Rows[index]) * Coeff(Rows[index - n]) > 0.8)
                         {
-                            if (!result.Contains(index + n) && (index + n) < Rows.Count)
-                                similarityIndexes.Add(index + n);
-                            if (!result.Contains(index - n) && (index - n) > Rows.IndexOf(MainHeader) + MainHeaderRowCount - 1)
-                                similarityIndexes.Add(index - n);
-
-                            if (similarityIndexes.Count > 15)
-                                break;
+                            n++;
                         }
-
-                        foreach (int similarityIndex in similarityIndexes)
+                        if (n > 2)
                         {
-                            double similarityD = Rows[index].Similarity(Rows[similarityIndex], (int)((double)Rows[index].Cells.Count / 4.0));
-                            if (similarityD > 0.78)
+                            int deleted = 0;
+                            for (int z = 0; z < n; z++)
                             {
-                                result.Remove(index);
-                                break;
+                                result.Remove(index - z);
+                                deleted++;
                             }
+                            i -= deleted - 1;
                         }
                     }
-            }
-            #endregion
+                    #endregion
 
-            #endregion
+                    #region remove bottom groups
+                    if (result.Count > 0)
+                    {
+                        for(int i=Rows.Count-1; i>=0; i++)
+                        {
+                            if (result.Contains(i))
+                                result.Remove(i);
+                            else
+                                break;
+                        }
+                    }
+                    #endregion
+
+                    #region calc similarity with other (non headers) lines and remove header if similary like simple row
+
+                    var oldResCnt = 0;
+                    while (result.Count != oldResCnt)
+                    {
+                        oldResCnt = result.Count;
+                        foreach(var index in result.OrderByDescending(i=>i).ToArray())
+                        {
+                            double coeff = Coeff(Rows[index]);
+                            int maxCountToTake = 7;
+                            var simIndexesRight =
+                                    Rows
+                                        .AsParallel()
+                                        .Select(r => Rows.IndexOf(r))
+                                        .Where(inx => inx > index && !result.Contains(inx))
+                                        .OrderBy(inx => inx)
+                                        .Take(maxCountToTake);
+                            var simIndexesLeft =
+                                    Rows
+                                        .AsParallel()
+                                        .Select(r => Rows.IndexOf(r))
+                                        .Where(inx => inx < index && inx > endHeaderRowIndex && !result.Contains(inx))
+                                        .OrderByDescending(inx => inx)
+                                        .Take(maxCountToTake);
+
+                            if (simIndexesLeft
+                                    .Union(simIndexesRight)
+                                    .OrderBy(inx => (double)Math.Abs(inx - index) + ((inx - index) < 0 ? 0.5 : 0))
+                                    .AsParallel()
+                                    .Any(similarityIndex =>
+                                            {
+                                                double similarityD = Rows[index].Similarity(Rows[similarityIndex]);
+                                                double similarityD4 = Rows[index].Similarity(Rows[similarityIndex], 4);
+                                                double similarityHalf = Rows[index].Similarity(Rows[similarityIndex], (int)((float)Rows[similarityIndex].Cells.Count / (float)2));
+
+                                                return (similarityD * coeff > 0.78 && similarityD4 * coeff > 0.60)
+                                                       || (similarityD * coeff > 0.65 && similarityD4 * coeff > 0.95)
+                                                       || (Rows[similarityIndex].Cells.Count >= 10 && similarityD * coeff > 0.3 && similarityD4 * coeff > 0.8 && similarityHalf > 0.7)
+                                                       ;
+                                            }))
+                                result.Remove(index);
+                        }
+                    }
+
+                    #region add
+                    if (result.Count > 0)
+                    {
+                        double averageWeight = result.Select(i => Rows[i].UniqueWeight).Average();
+                        double maxWeight = result.Select(i => Rows[i].UniqueWeight).Max();
+                        double minWeight = result.Select(i => Rows[i].UniqueWeight).Min();
+                        double moduleWeight = (maxWeight - minWeight) / 4;
+
+                        if (moduleWeight == 0.0)
+                            moduleWeight = 0.001;
+
+                        for (int i = result.Count - 1; i >= 0; i--)
+                            if (Rows[result[i]].UniqueWeight < averageWeight - moduleWeight)
+                            {
+                                int index = result[i];
+
+                                List<int> similarityIndexes = new List<int>();
+
+                                for (int n = 1; n < Rows.Count; n++)
+                                {
+                                    if (!result.Contains(index + n) && (index + n) < Rows.Count)
+                                        similarityIndexes.Add(index + n);
+                                    if (!result.Contains(index - n) && (index - n) > Rows.IndexOf(MainHeader) + MainHeaderRowCount - 1)
+                                        similarityIndexes.Add(index - n);
+
+                                    if (similarityIndexes.Count > 15)
+                                        break;
+                                }
+
+                                foreach (int similarityIndex in similarityIndexes)
+                                {
+                                    double similarityD = Rows[index].Similarity(Rows[similarityIndex], (int)((double)Rows[index].Cells.Count / 4.0));
+                                    if (similarityD > 0.78)
+                                    {
+                                        result.Remove(index);
+                                        break;
+                                    }
+                                }
+                            }
+                    }
+                    #endregion
+
+                    #endregion
+                }
+            }
+            catch(Exception ex)
+            {
+                wasException = true;
+                Log.Add(logSessiong, ex);
+            }
+            finally
+            {
+                Log.SessionEnd(logSessiong, wasException);
+            }
         }
 
         #region Something for calculation version = 1

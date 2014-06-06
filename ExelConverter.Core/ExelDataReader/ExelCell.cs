@@ -49,7 +49,7 @@ namespace ExelConverter.Core.ExelDataReader
                     result += CellStyle.BackgroundColor != null && !AsyncDocumentLoader.DefColors.Any(clr => AsyncDocumentLoader.ColorsEqual(clr, CellStyle.BackgroundColor)) ? (double)0.2 : (double)0.0;
                     result += CellStyle.ForegroundColor != null && !AsyncDocumentLoader.DefColors.Any(clr => AsyncDocumentLoader.ColorsEqual(clr, CellStyle.ForegroundColor)) ? (double)0.2 : (double)0.0;
                     result += CellStyle.Font != null && CellStyle.Font.IsBold ? 0.2 : 0.0;
-                    result += CellStyle.Font != null && (CellStyle.Font.IsItalic) ? 0.2 : 0.0;
+                    result += CellStyle.Font != null && CellStyle.Font.IsItalic ? 0.2 : 0.0;
                     result += CellStyle.Font != null && CellStyle.Font.Color != null && !(AsyncDocumentLoader.ColorsEqual(CellStyle.Font.Color, System.Drawing.Color.FromArgb(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MinValue))) ? 0.2 : 0.0;
                 }
                 return result;
