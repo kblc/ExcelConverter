@@ -58,7 +58,8 @@ namespace ExelConverter.Core.ExelDataReader
                                                 : cell.Value.ToString().Trim()
                                             )
                                         )
-                                        return i;
+                                        return cell.IsMerged ? cell.GetMergedRange().FirstColumn + cell.GetMergedRange().ColumnCount - 1 : i;
+                                        //return i;
                                 }
                             return 0;
                         }

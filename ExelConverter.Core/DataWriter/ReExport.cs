@@ -45,12 +45,13 @@ namespace ExelConverter.Core.DataWriter
 
                     ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
 
-                    Guid logSession = Log.SessionStart("ReExport.ReExport()");
+                    bool wasException = false;
+                    Guid logSession = Log.SessionStart("ReExport.ReExport()", true);
                     try
                     {
                         #region Read Rules
 
-                        Log.Add(string.Format("total sheets count: '{0}'", ruleToSheets.Count()));
+                        Log.Add(logSession, string.Format("total sheets count: '{0}'", ruleToSheets.Count()));
                         int rulesToSheets = ruleToSheets.Count();
 
                         int ind = 0;
@@ -62,7 +63,7 @@ namespace ExelConverter.Core.DataWriter
                             {
                                 if (ds.MainHeader == null)
                                 {
-                                    Log.Add(string.Format("should update main header row..."));
+                                    Log.Add(logSession, string.Format("should update main header row..."));
 
                                     ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags
                                         .Select(h => h.Tag)
@@ -80,19 +81,19 @@ namespace ExelConverter.Core.DataWriter
                                 }
 
                                 var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds, new string[] { "Code" }));
-                                Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
+                                Log.Add(logSession, string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
                                 rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
-                                Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
+                                Log.Add(logSession, string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
                             }
 
                             ind++;
                             readRulesProgress.Value = ((float)ind / (float)rulesToSheets) * 100;
                         }
-                        Log.Add(string.Format("total row count to export: '{0}'", rowsToExport.Count));
+                        Log.Add(logSession, string.Format("total row count to export: '{0}'", rowsToExport.Count));
 
                         #endregion
                         #region Get Links
-                        Log.Add(string.Format("Try to get links..."));
+                        Log.Add(logSession, string.Format("Try to get links..."));
                         List<ReExportData> idsToGet = new List<ReExportData>(rowsToExport.Select(i => new ReExportData(i.Code)).Cast<ReExportData>());
 
                         string outerMap;
@@ -100,7 +101,7 @@ namespace ExelConverter.Core.DataWriter
 
                         HttpDataClient.Default.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
                         //HttpDataAccess.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
-                        Log.Add(string.Format("Links getted"));
+                        Log.Add(logSession, string.Format("Links getted"));
                         getLinksProgress.Value = 100;
                         #endregion
                         #region Write Excel File
@@ -128,20 +129,45 @@ namespace ExelConverter.Core.DataWriter
 
                                 if (!string.IsNullOrWhiteSpace(CodeColumnName))
                                 {
-                                    var headerRow = sheet.Cells.Rows[r.Sheet.Rows.IndexOf(r.Sheet.MainHeader)];
-                                    for (int i = headerRow.FirstCell == null ? 0 : headerRow.FirstCell.Column; i < (headerRow.LastCell == null ? 0 : headerRow.LastCell.Column + 1); i++)
+                                    var headerRow = sheet.Cells.Rows[r.Sheet.MainHeader.Index];
+
+                                    int fHeader = headerRow.FirstCell == null ? 0 : headerRow.FirstCell.Column;
+                                    int lHeader = headerRow.LastCell == null ? 0 : headerRow.LastCell.Column;
+                                    for (int i = fHeader; i <= lHeader; i++)
                                     {
-                                        string cellValue = headerRow.GetCellByIndex(i).StringValue;
-                                        if (!string.IsNullOrWhiteSpace(cellValue) && cellValue.ToLower().Trim() == CodeColumnName.ToLower().Trim())
+                                        var cell = headerRow.GetCellOrNull(i);
+                                        if (cell != null)
                                         {
-                                            CodeColumnIndex = i;
-                                            break;
+                                            string cellValue = cell.StringValue;
+                                            if (!string.IsNullOrWhiteSpace(cellValue) && cellValue.ToLower().Trim() == CodeColumnName.ToLower().Trim())
+                                            {
+                                                CodeColumnIndex = i;
+                                                break;
+                                            }
                                         }
                                     }
                                     #region Add cells to rows
                                     if (CodeColumnIndex >= 0)
                                     {
-                                        int lastIndex = headerRow.LastCell.Column;
+                                        int lastIndex = sheet.Cells.Rows.Cast<Row>().Select(c =>
+                                            {
+                                                if (c.LastCell != null)
+                                                    for (int i = c.LastCell.Column; i >= 0; i--)
+                                                    {
+                                                        var cell = c.GetCellOrNull(i);
+                                                        if (!string.IsNullOrWhiteSpace(
+                                                                    cell == null || cell.Value == null
+                                                                    ? null
+                                                                    : cell.Value.ToString().Trim()
+                                                                )
+                                                            )
+                                                            return cell.IsMerged ? cell.GetMergedRange().FirstColumn + cell.GetMergedRange().ColumnCount - 1 : i;
+                                                    }
+                                                return 0;
+                                            }
+                                        )
+                                        .Union(new int[] { 0 })
+                                        .Max();
 
                                         var h0 = sheet.Cells[headerRow.Index, lastIndex + 0];
                                         var h1 = sheet.Cells[headerRow.Index, lastIndex + 1];
@@ -199,7 +225,7 @@ namespace ExelConverter.Core.DataWriter
                                             int lastRowIndex = sheet.Cells.LastCell.Row;
 
                                             int rowAdd = 3;
-                                            
+
                                             if (outerPdf != null)
                                             {
                                                 var outer0 = sheet.Cells[lastRowIndex + rowAdd, CodeColumnIndex + 0];
@@ -227,23 +253,27 @@ namespace ExelConverter.Core.DataWriter
                                         }
 
                                     }
+                                    else
+                                        throw new Exception(string.Format("в Excel-файле невозможно найти колонку с кодом '{0}'", CodeColumnName));
                                     #endregion
                                 }
+                                else
+                                    throw new Exception("Отсутствует правило для определения кода");
                             }
                         }
                         wb.Save(fileName);
                         #endregion
-                        e.Result = null;
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(logSession, string.Format("exception occured:{0}{1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
-                        e.Result = ex;
+                        wasException = true;
+                        Log.Add(ex);
+                        throw ex;
                     }
                     finally
                     {
                         current.ReportProgress(100);
-                        Log.SessionEnd(logSession);
+                        Log.SessionEnd(logSession, wasException);
                     }
                 };
             result.WorkerReportsProgress = true;

@@ -855,17 +855,15 @@ namespace ExelConverterLite.ViewModel
                         BackgroundWorker bw = ReExport.Start(dlg.FileName, SelectedOperator.Id, ExportRules.ToArray());
                         bw.RunWorkerCompleted += (s, e) => 
                         {
-                            if (!e.Cancelled && (e.Result is Exception || e.Error != null))
+                            if (e.Error != null && !e.Cancelled)
                             {
-                                Exception ex = e.Error != null ? e.Error : e.Result as Exception;
-                                Log.Add(string.Format("ReExportFile() :: exception detected:{0}'{1}'{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
-                                MessageBox.Show("При попытке реэкспорта файла произошла ошибка:" + Environment.NewLine + ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("При попытке реэкспорта файла произошла ошибка:" + Environment.NewLine + e.Error.Message+ Environment.NewLine + "Подробности смотрите в log-файле.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                             //hide wait dialog
                         };
                         bw.ProgressChanged += (s, e) =>
                         {
-
+                            //show progress
                         };
                         //show wait dialog
                         bw.RunWorkerAsync();
@@ -1307,37 +1305,32 @@ namespace ExelConverterLite.ViewModel
 
         public void StartSharpControl()
         {
-            this.PropertyChanging += (s, e) =>
-            {
-                if (e.PropertyName == "SelectedOperator")
-                {
-                    if (SelectedOperator != null)
-                    { 
-                        SelectedOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
-                        if (SelectedOperator.MappingRule != null)
-                            SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
-                    }
-                }
-            };
-
             this.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == "SelectedOperator")
                     {
                         if (SelectedOperator != null)
-                        { 
+                        {
+                            SelectedOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
                             SelectedOperator.PropertyChanged += SelectedOperator_PropertyChanged;    
                             if (SelectedOperator.MappingRule != null)
+                            {
+                                SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
                                 SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
+                            }
                         }
                     }
                 };
 
             if (SelectedOperator != null)
             {
+                SelectedOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
                 SelectedOperator.PropertyChanged += SelectedOperator_PropertyChanged;
                 if (SelectedOperator.MappingRule != null)
+                { 
+                    SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
                     SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
+                }
             }
         }
 
@@ -1352,6 +1345,7 @@ namespace ExelConverterLite.ViewModel
                 if (SelectedOperator != null && SelectedOperator.MappingRule != null)
                 {
                     oldMappingRule = SelectedOperator.MappingRule;
+                    SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
                     SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
                 }
             }
