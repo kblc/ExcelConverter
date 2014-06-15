@@ -420,9 +420,13 @@ namespace ExelConverter.Core.Converter
         {
             foreach (var row in list)
             {
-                var sameIds = list.Where(r => r.Code == row.Code && row != r).ToArray();
-                for (var i = 0; i < sameIds.Length; i++)
-                    sameIds[i].Code = string.Format("{0}_{1}", sameIds[i].Code, i + 1);
+                var sameIds = list
+                    .AsParallel()
+                    .Where(r => r.Code == row.Code)
+                    .ToArray();
+                if (sameIds.Length > 1)
+                    for (var i = 0; i < sameIds.Length; i++)
+                        sameIds[i].Code = string.Format("{0}_{1}", sameIds[i].Code, i + 1);
             }
         }
 
