@@ -149,6 +149,19 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
+        private ReExportProgressViewModel _reExportProgress;
+        public ReExportProgressViewModel ReExportProgress
+        {
+            get
+            {
+                if (_reExportProgress == null)
+                {
+                    _reExportProgress = new ReExportProgressViewModel();
+                }
+                return _reExportProgress;
+            }
+        }
+
         public static void Cleanup()
         {
 

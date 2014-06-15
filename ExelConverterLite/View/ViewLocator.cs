@@ -145,6 +145,19 @@ namespace ExelConverterLite.View
             }
         }
 
+        private static ReExportProgressView _reExportProgressView;
+        public static ReExportProgressView ReExportProgressView
+        {
+            get
+            {
+                if (_reExportProgressView == null || _reExportProgressView.IsClosed)
+                {
+                    _reExportProgressView = new ReExportProgressView();
+                }
+                return _reExportProgressView;
+            }
+        }
+
         private static ExportLogView _exportLogView;
         public static ExportLogView ExportLogView
         {

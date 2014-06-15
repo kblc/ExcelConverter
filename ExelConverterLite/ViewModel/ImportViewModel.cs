@@ -851,6 +851,7 @@ namespace ExelConverterLite.ViewModel
                 {
                     try
                     {
+                        var dlgWnd = View.ViewLocator.ReExportProgressView;
                         File.Copy(Path, dlg.FileName, true);
                         BackgroundWorker bw = ReExport.Start(dlg.FileName, SelectedOperator.Id, ExportRules.ToArray());
                         bw.RunWorkerCompleted += (s, e) => 
@@ -859,18 +860,20 @@ namespace ExelConverterLite.ViewModel
                             {
                                 MessageBox.Show("При попытке реэкспорта файла произошла ошибка:" + Environment.NewLine + e.Error.Message+ Environment.NewLine + "Подробности смотрите в log-файле.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
-                            //hide wait dialog
+                            dlgWnd.DialogResult = false;
                         };
                         bw.ProgressChanged += (s, e) =>
                         {
-                            //show progress
+                            App.Locator.ReExportProgress.ProgressValue = e.ProgressPercentage;
                         };
                         //show wait dialog
                         bw.RunWorkerAsync();
+                        App.Locator.ReExportProgress.ProgressText = " Выполняется реэксопрт файла... ";
+                        dlgWnd.ShowDialog(App.Current.MainWindow);
                     }
                     catch(Exception ex)
                     {
-                        Log.Add(string.Format("ReExportFile() :: exception detected:{0}'{1}'{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
+                        Log.Add(ex.GetExceptionText("ImportViewModel.ReExportFileCommand()"));
                         MessageBox.Show("При попытке реэкспорта файла произошла ошибка:" + Environment.NewLine + ex.Message,"Ошибка",MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 } 

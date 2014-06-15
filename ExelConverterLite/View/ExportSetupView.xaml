@@ -6,7 +6,7 @@
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
         DataContext="{Binding ExportSetup, Source={StaticResource Locator}}"
         Title="Настройки правил экспорта"
-        ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="#DDDDDD" >
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="#DDDDDD" >
     <Window.Resources>
         <ResourceDictionary>
             <viewModel:AviableRulesCollection x:Key="AviableRulesCollection"/>
