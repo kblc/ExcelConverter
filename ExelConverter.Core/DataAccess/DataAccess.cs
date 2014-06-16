@@ -9,6 +9,7 @@ using ExelConverter.Core.Converter;
 using Helpers;
 using ExcelConverter.Parser;
 using ExelConverter.Core.ExelDataReader;
+using System.Data.Entity.Validation;
 
 namespace ExelConverter.Core.DataAccess
 {
@@ -620,7 +621,7 @@ namespace ExelConverter.Core.DataAccess
                             if (!checkAfterUpdate || oldRule.Serialize().Trim() != (serializedRule = rule.Serialize()).Trim() && oldRule.SerializeXML().Trim() != rule.SerializeXML().Trim())
                             {
                                 needSave = true;
-                                rl.convertion_rule = null;// do not save old rule // serializedRule;
+                                rl.convertion_rule = string.Empty;// do not save old rule // serializedRule;
                                 rl.convertion_rule_image = rule.SerializeToBytes();
                             }
                         }
@@ -661,27 +662,49 @@ namespace ExelConverter.Core.DataAccess
         public void AddOperatorRules(ExelConvertionRule[] rules)
         {
             if (rules != null && rules.FirstOrDefault() != null)
-                using (var dc = exelconverterEntities2.New())
-                {
-                    convertion_rules[] convRules =
-                        rules.Select(
-                            r =>
-                                new convertion_rules
-                                    {
-                                        convertion_rule = null, // do not save old rule variant //r.Serialize(),
-                                        convertion_rule_image = r.SerializeToBytes(),
-                                        fk_operator_id = r.FkOperatorId
-                                    }
-                            )
-                         .ToArray();
+                try
+                { 
+                    using (var dc = exelconverterEntities2.New())
+                    {
+                        convertion_rules[] convRules =
+                            rules.Select(
+                                r =>
+                                    new convertion_rules
+                                        {
+                                            convertion_rule = string.Empty, // do not save old rule variant //r.Serialize(),
+                                            convertion_rule_image = r.SerializeToBytes(),
+                                            fk_operator_id = r.FkOperatorId
+                                        }
+                                )
+                             .ToArray();
 
-                    foreach (var rule in convRules)
-                        dc.convertion_rules.Add(rule);
+                        foreach (var rule in convRules)
+                            dc.convertion_rules.Add(rule);
                    
-                    dc.SaveChanges();
+                        dc.SaveChanges();
 
-                    for (int i = 0; i < convRules.Length; i++)
-                        rules[i].Id = convRules[i].id;
+                        for (int i = 0; i < convRules.Length; i++)
+                            rules[i].Id = convRules[i].id;
+                    }
+                }
+                catch(DbEntityValidationException ex)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (var failure in ex.EntityValidationErrors)
+                    {
+                        sb.AppendFormat("{0} failed validation\n", failure.Entry.Entity.GetType());
+                        foreach (var error in failure.ValidationErrors)
+                        {
+                            sb.AppendFormat("- {0} : {1}", error.PropertyName, error.ErrorMessage);
+                            sb.AppendLine();
+                        }
+                    }
+
+                    throw new DbEntityValidationException(
+                        "Entity Validation Failed - errors follow:\n" +
+                        sb.ToString(), ex
+                    ); // Add the original exception as the innerException
                 }
         }
 
