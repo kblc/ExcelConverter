@@ -55,6 +55,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -409,10 +413,6 @@
     <ProjectReference Include="..\ExcelConverter.Parser\ExcelConverter.Parser.csproj">
       <Project>{3f4df3ad-d1e9-4234-a74c-c89fcdd42f83}</Project>
       <Name>ExcelConverter.Parser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Helpers\Helpers.csproj">
-      <Project>{c46731b0-690f-4747-9bb7-b08ae61e24eb}</Project>
-      <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

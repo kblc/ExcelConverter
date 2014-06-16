@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelConverterLite", "ExelC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelConverter.Core", "ExelConverter.Core\ExcelConverter.Core.csproj", "{FD5887B1-3B28-4470-B9DB-19C5C0ACDFD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{C46731B0-690F-4747-9BB7-B08AE61E24EB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelConverter.Parser", "ExcelConverter.Parser\ExcelConverter.Parser.csproj", "{3F4DF3AD-D1E9-4234-A74C-C89FCDD42F83}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelConverter.Parser.Test", "ExcelConverter.Parser.Test\ExcelConverter.Parser.Test.csproj", "{4E82CF10-9567-4665-B423-D325E37811E8}"
@@ -50,16 +48,6 @@ Global
 		{FD5887B1-3B28-4470-B9DB-19C5C0ACDFD4}.Release|Mixed Platforms.Build.0 = Release|x86
 		{FD5887B1-3B28-4470-B9DB-19C5C0ACDFD4}.Release|x86.ActiveCfg = Release|x86
 		{FD5887B1-3B28-4470-B9DB-19C5C0ACDFD4}.Release|x86.Build.0 = Release|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Debug|x86.ActiveCfg = Debug|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Debug|x86.Build.0 = Debug|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Release|Any CPU.ActiveCfg = Release|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Release|Mixed Platforms.Build.0 = Release|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Release|x86.ActiveCfg = Release|x86
-		{C46731B0-690F-4747-9BB7-B08AE61E24EB}.Release|x86.Build.0 = Release|x86
 		{3F4DF3AD-D1E9-4234-A74C-C89FCDD42F83}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{3F4DF3AD-D1E9-4234-A74C-C89FCDD42F83}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{3F4DF3AD-D1E9-4234-A74C-C89FCDD42F83}.Debug|Mixed Platforms.Build.0 = Debug|x86

@@ -50,6 +50,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CefSharp-1.25.7\CefSharp.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -107,10 +111,6 @@
       <Name>ExifLib</Name>
       <Private>True</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-    </ProjectReference>
-    <ProjectReference Include="..\Helpers\Helpers.csproj">
-      <Project>{c46731b0-690f-4747-9bb7-b08ae61e24eb}</Project>
-      <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

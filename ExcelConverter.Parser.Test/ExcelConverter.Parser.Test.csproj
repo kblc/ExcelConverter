@@ -34,6 +34,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -97,10 +101,6 @@
     <ProjectReference Include="..\ExcelConverter.Parser\ExcelConverter.Parser.csproj">
       <Project>{3f4df3ad-d1e9-4234-a74c-c89fcdd42f83}</Project>
       <Name>ExcelConverter.Parser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Helpers\Helpers.csproj">
-      <Project>{c46731b0-690f-4747-9bb7-b08ae61e24eb}</Project>
-      <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
