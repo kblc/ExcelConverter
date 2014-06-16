@@ -55,7 +55,9 @@ namespace ExelConverter.Core.ExelDataReader
                     {
                         double weight = 0.0;
                         var uniqueCells = Rows[i].UniqueNotEmptyCells.Select(c => c.Value.Trim().ToLower()).ToArray();
-                        weight = tags.Where(tag => uniqueCells.Contains(tag.ToLower())).Count();
+                        weight = ExcludedTags(tags).Any(t => uniqueCells.Any(c => c.Like(t)) )
+                                ? 0
+                                : uniqueCells.Count( c => IncludedTags(tags).Any(t => c.Like(t)) );
                         weightDict.Add(i, weight);
                     }
 
@@ -269,32 +271,61 @@ namespace ExelConverter.Core.ExelDataReader
             return getAllHeadersData = result;
         }
 
-        private bool IsIntersected(string[] tags, string[] items)
+        private bool IsIntersected(string[] allTags, string[] items)
         {
-            return GetIntersectedCount(tags, items) > 0;
+            return GetIntersectedCount(allTags, items) > 0;
         }
-        private int GetIntersectedCount(string[] tags, string[] items)
+
+        private string DelStars(string str)
         {
-            if (tags == null || items == null)
+            if (string.IsNullOrWhiteSpace(str)) 
+                return string.Empty; 
+
+            while (str.Contains("**")) 
+                str = str.Replace("**", "*"); 
+            
+            return str;
+        }
+
+        private string[] IncludedTags(string[] allTags)
+        {
+            return
+                allTags
+                .Where(t => !string.IsNullOrEmpty(t) && t[0] != '-')
+                .Select(i => i != null ? DelStars("*" + i.Trim().ToLower().Replace(' ', '*') + "*") : null)
+                .Where(i => !string.IsNullOrWhiteSpace(i) && i != "*")
+                .ToArray()
+                ;
+        }
+
+        private string[] ExcludedTags(string[] allTags)
+        {
+            return
+                allTags
+                .Where(t => !string.IsNullOrEmpty(t) && t[0] == '-')
+                .Select(t => t.Substring(1))
+                .Select(i => i != null ? DelStars("*" + i.Trim().ToLower().Replace(' ', '*') + "*") : null)
+                .Where(i => !string.IsNullOrWhiteSpace(i) && i != "*")
+                .ToArray();
+        }
+
+        private int GetIntersectedCount(string[] allTags, string[] items)
+        {
+            if (allTags == null || items == null)
                 return 0;
 
-            var delStars = new Func<string, string>((str) => { if (str == null) return string.Empty; while (str.Contains("**")) str = str.Replace("**", "*"); return str; });
-
-            tags = tags
-                .Select(i => i != null ? delStars("*" + i.Trim().ToLower().Replace(' ', '*') + "*") : null)
-                .Where(i => i != null && i != "*")
-                .ToArray();
             items = items
-                .Select(i => i != null ? delStars(i.Trim().ToLower()).Replace("*"," ").Trim() : null)
+                .Select(i => i != null ? DelStars(i.Trim().ToLower()).Replace("*", " ").Trim() : null)
                 .Where(i => i != null)
                 .ToArray();
 
             int result = 0;
 
-            foreach (var i0 in tags)
-                foreach(var i1 in items)
-                if (i1.Like(i0))
-                    result++;
+            if (!ExcludedTags(allTags).Any(t => items.Any(i => i.Like(t)))) //if find excluded tag, then return zero
+                foreach (var i0 in IncludedTags(allTags))
+                    foreach(var i1 in items)
+                        if (i1.Like(i0))
+                            result++;
 
             return result;           
         }
@@ -366,7 +397,7 @@ namespace ExelConverter.Core.ExelDataReader
                     #region remove bottom groups
                     if (result.Count > 0)
                     {
-                        for(int i=Rows.Count-1; i>=0; i++)
+                        for (int i = Rows.Count - 1; i > endHeaderRowIndex; i++)
                         {
                             if (result.Contains(i))
                                 result.Remove(i);
@@ -462,6 +493,23 @@ namespace ExelConverter.Core.ExelDataReader
                     }
                     #endregion
 
+                    #endregion
+
+                    #region remove excluded tags
+
+                    string[] excludedTags = ExcludedTags(tags);
+
+                    if (result.Count > 0 && excludedTags.Length > 0)
+                    {
+                        var excludeHeaderIndexes =
+                                Rows
+                                    .Where(r => result.Contains(Rows.IndexOf(r)))
+                                    .Where(r => r.Cells.Any(c => excludedTags.Any(t => c.Value.Like(t))))
+                                    .Select(r => Rows.IndexOf(r));
+
+                        foreach (int ex in excludeHeaderIndexes)
+                            result.Remove(ex);
+                    }
                     #endregion
                 }
             }
