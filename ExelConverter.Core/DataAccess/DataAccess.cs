@@ -620,7 +620,7 @@ namespace ExelConverter.Core.DataAccess
                             if (!checkAfterUpdate || oldRule.Serialize().Trim() != (serializedRule = rule.Serialize()).Trim() && oldRule.SerializeXML().Trim() != rule.SerializeXML().Trim())
                             {
                                 needSave = true;
-                                rl.convertion_rule = serializedRule;
+                                rl.convertion_rule = null;// do not save old rule // serializedRule;
                                 rl.convertion_rule_image = rule.SerializeToBytes();
                             }
                         }
@@ -668,7 +668,7 @@ namespace ExelConverter.Core.DataAccess
                             r =>
                                 new convertion_rules
                                     {
-                                        convertion_rule = r.Serialize(),
+                                        convertion_rule = null, // do not save old rule variant //r.Serialize(),
                                         convertion_rule_image = r.SerializeToBytes(),
                                         fk_operator_id = r.FkOperatorId
                                     }
