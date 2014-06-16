@@ -654,6 +654,73 @@ namespace ExelConverterLite.ViewModel
                 }
         }
 
+        private RelayCommand<DataRowView> addTagToHeaderCommand = null;
+        public RelayCommand<DataRowView> AddTagToHeaderCommand { get { return addTagToHeaderCommand ?? (addTagToHeaderCommand = new RelayCommand<DataRowView>(AddTagToHeader)); } }
+        private void AddTagToHeader(DataRowView prm)
+        {
+            var tag = ((DataRowView)ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Item)
+                        .Row[ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Column.Header.ToString()].ToString();
+
+            if (!SelectedOperator.MappingRule.SheetHeadersSearchTags.Select(t => t.Tag).Any(t => t.Like(tag)))
+                SelectedOperator.MappingRule.SheetHeadersSearchTags.Add(new SearchTag() { Tag = tag });
+        }
+
+        private RelayCommand<DataRowView> delTagFromHeaderCommand = null;
+        public RelayCommand<DataRowView> DelTagFromHeaderCommand { get { return delTagFromHeaderCommand ?? (delTagFromHeaderCommand = new RelayCommand<DataRowView>(DelTagFromHeader)); } }
+        private void DelTagFromHeader(DataRowView prm)
+        {
+            var tag = ((DataRowView)ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Item)
+                        .Row[ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Column.Header.ToString()].ToString();
+
+            foreach (var fndTag in SelectedOperator.MappingRule.SheetHeadersSearchTags.Where(t => t.Tag.Like(tag)).ToArray())
+                SelectedOperator.MappingRule.SheetHeadersSearchTags.Remove(fndTag);
+        }
+
+        private RelayCommand<DataRowView> excludeTagFromHeaderCommand = null;
+        public RelayCommand<DataRowView> ExcludeTagFromHeaderCommand { get { return excludeTagFromHeaderCommand ?? (excludeTagFromHeaderCommand = new RelayCommand<DataRowView>(ExcludeTagFromHeader)); } }
+        private void ExcludeTagFromHeader(DataRowView prm)
+        {
+            DelTagFromHeader(prm);
+            var tag = ((DataRowView)ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Item)
+                        .Row[ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Column.Header.ToString()].ToString();
+
+            if (!SelectedOperator.MappingRule.SheetHeadersSearchTags.Select(t => t.Tag).Any(t => t.Like("-" + tag)))
+                SelectedOperator.MappingRule.SheetHeadersSearchTags.Add(new SearchTag() { Tag = "-" + tag });
+        }
+
+        private RelayCommand<DataRowView> includeTagToHeaderCommand = null;
+        public RelayCommand<DataRowView> IncludeTagToHeaderCommand { get { return includeTagToHeaderCommand ?? (includeTagToHeaderCommand = new RelayCommand<DataRowView>(IncludeTagToHeader)); } }
+        private void IncludeTagToHeader(DataRowView prm)
+        {
+            var tag = ((DataRowView)ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Item)
+                        .Row[ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Column.Header.ToString()].ToString();
+            
+            foreach (var fndTag in SelectedOperator.MappingRule.SheetHeadersSearchTags.Where(t => t.Tag.Like("-" + tag)).ToArray())
+                SelectedOperator.MappingRule.SheetHeadersSearchTags.Remove(fndTag);
+        }
+
+        private RelayCommand<DataRowView> addTagToMainHeaderCommand = null;
+        public RelayCommand<DataRowView> AddTagToMainHeaderCommand { get { return addTagToMainHeaderCommand ?? (addTagToMainHeaderCommand = new RelayCommand<DataRowView>(AddTagToMainHeader)); } }
+        private void AddTagToMainHeader(DataRowView prm)
+        {
+            var tag = ((DataRowView)ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Item)
+                        .Row[ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Column.Header.ToString()].ToString();
+
+            if (!SelectedOperator.MappingRule.MainHeaderSearchTags.Select(t => t.Tag).Any(t => t.Like(tag)))
+                SelectedOperator.MappingRule.MainHeaderSearchTags.Add(new SearchTag() { Tag = tag });
+        }
+
+        private RelayCommand<DataRowView> delTagFromMainHeaderCommand = null;
+        public RelayCommand<DataRowView> DelTagFromMainHeaderCommand { get { return delTagFromMainHeaderCommand ?? (delTagFromMainHeaderCommand = new RelayCommand<DataRowView>(DelTagFromMainHeader)); } }
+        private void DelTagFromMainHeader(DataRowView prm)
+        {
+            var tag = ((DataRowView)ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Item)
+                        .Row[ExelConverterLite.View.ViewLocator.ImportView.MainDataGrid.CurrentCell.Column.Header.ToString()].ToString();
+
+            foreach (var fndTag in SelectedOperator.MappingRule.MainHeaderSearchTags.Where(t => t.Tag.Like(tag)).ToArray())
+                SelectedOperator.MappingRule.MainHeaderSearchTags.Remove(fndTag);
+        }
+
         public RelayCommand SelectFileCommand { get; private set; }
         private void SelectFile()
         {
