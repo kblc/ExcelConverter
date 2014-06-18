@@ -440,7 +440,7 @@ namespace ExelConverterLite.ViewModel
                 }
                 //check stored
                 var storedMappingRule = storedRules.FirstOrDefault(r => r.Name == SelectedOperator.MappingRule.Name);
-                if (storedMappingRule != null && storedMappingRule.MapParsingData != null)
+                if (storedMappingRule != null && storedMappingRule.IsMapParsingDataLoaded && storedMappingRule.MapParsingData != null)
                     foreach (var mpData in storedMappingRule.MapParsingData)
                     {
                         areaListStored.AddRange(mpData.DrawingArea.Children.Cast<Rectangle>().Select(
@@ -479,7 +479,7 @@ namespace ExelConverterLite.ViewModel
                 );
 
                 var storedMappingRule = storedRules.FirstOrDefault(r => r.Name == SelectedOperator.MappingRule.Name);
-                if (storedMappingRule != null && storedMappingRule.PhotoParsingData != null)
+                if (storedMappingRule != null && storedMappingRule.IsPhotoParsingDataLoaded && storedMappingRule.PhotoParsingData != null)
                     foreach (var mpData in storedMappingRule.PhotoParsingData)
                     {
                         areaListStored.AddRange(mpData.DrawingArea.Children.Cast<Rectangle>().Select(
