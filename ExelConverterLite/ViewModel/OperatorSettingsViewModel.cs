@@ -112,12 +112,7 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand ClosingCommand { get; private set; }
         private void CancelChanges()
         {
-            App.Locator.Import.SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(App.Locator.Import.SelectedOperator));
-            App.Locator.Import.SelectedOperator.MappingRule = App.Locator.Import.SelectedOperator.MappingRules.FirstOrDefault();
-            if (App.Locator.Import.SelectedOperator.MappingRule != null)
-            {
-                App.Locator.Import.SelectedField = App.Locator.Import.SelectedOperator.MappingRule.ConvertionData.FirstOrDefault(); 
-            }
+            App.Locator.Import.RealUpdateOperatorAndRulesFromDatabase();
         }
     }
 }

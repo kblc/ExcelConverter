@@ -233,27 +233,25 @@ namespace ExelConverter.Core.DataAccess
 
         public bool[] FillRectExists(FillArea[] areas)
         {
-            List<bool> result = new List<bool>();
-            foreach (var itm in areas)
-                result.Add(false);
+            var result = new bool[] { };
             using (var dc = alphaEntities.New())
             {
-                //var dc = alphaEntities.Default;
-                for (int i = 0; i < areas.Length; i++)
-                {
-                    FillArea area = areas[i];
-                    result[i] = dc.import_rectangle.Any(ir => 
-                        (int)ir.companyId == area.FKOperatorID &&
-                        ir.height == area.Height && 
-                        ir.width == area.Width && 
-                        ir.type == area.Type &&
-                        ir.x1 == area.X1 && 
-                        ir.x2 == area.X2 && 
-                        ir.y1 == area.Y1 && 
-                        ir.y2 == area.Y2);
-                }
+                var cmpIds = areas.Select(a => a.FKOperatorID).Distinct().ToArray();
+                var rectangles = dc.import_rectangle.Where(r => cmpIds.Contains((int)r.companyId)).ToArray();
+                result =
+                    areas.Select(
+                        area => rectangles.Any(rect => 
+                            (int)rect.companyId == area.FKOperatorID &&
+                            rect.height == area.Height && 
+                            rect.width == area.Width && 
+                            rect.type == area.Type &&
+                            rect.x1 == area.X1 && 
+                            rect.x2 == area.X2 && 
+                            rect.y1 == area.Y1 && 
+                            rect.y2 == area.Y2)
+                        ).ToArray();
             }
-            return result.ToArray();
+            return result;
         }
 
         public void UpdateFillRectangle(FillArea area)

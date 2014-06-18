@@ -215,26 +215,7 @@ namespace ExelConverterLite.ViewModel
             ExportRules = null;
             if (SelectedOperator != null)
             {
-                SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(SelectedOperator));
-                SelectedOperator.MappingRule = SelectedOperator.MappingRules.FirstOrDefault();
-                if (SelectedOperator.MappingRules.Count == 0)
-                {
-                    var mappingRule = new ExelConvertionRule
-                    {
-                        FkOperatorId = (int)SelectedOperator.Id,
-                        Name = ExelConvertionRule.DefaultName
-                    };
-                    _appSettingsDataAccess.AddOperatorRule(mappingRule);
-                    OperatorChanged();
-                    return;
-                }
-                else
-                {
-                    SelectedField = SelectedOperator.MappingRule.ConvertionData.FirstOrDefault();
-                    SelectedOperator.MappingRule.InitializeImageParsingData();
-                }
-                AddBlockCommand.RaiseCanExecuteChanged();
-
+                RealUpdateOperatorAndRulesFromDatabase();
                 if (DocumentRows.Count == 0)
                 {
                     SheetHeaders.Clear();
@@ -346,6 +327,25 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
+        public void RealUpdateOperatorAndRulesFromDatabase()
+        {
+            SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(SelectedOperator));
+            if (SelectedOperator.MappingRules.Count == 0)
+            {
+                var mappingRule = new ExelConvertionRule
+                {
+                    FkOperatorId = (int)SelectedOperator.Id,
+                    Name = ExelConvertionRule.DefaultName
+                };
+                _appSettingsDataAccess.AddOperatorRule(mappingRule);
+            } 
+
+            SelectedOperator.MappingRule = SelectedOperator.MappingRules.FirstOrDefault();
+            SelectedField = SelectedOperator.MappingRule.ConvertionData.FirstOrDefault();
+
+            AddBlockCommand.RaiseCanExecuteChanged();
+        }
+
         public void SaveRules(bool needRefresh)
         {
             if (SelectedOperator != null)
@@ -358,9 +358,6 @@ namespace ExelConverterLite.ViewModel
 
                 var itemsToDelete = storedIds.Where(r => !SelectedOperator.MappingRules.Any(mr => mr.Id == r)).ToArray();
                 _appSettingsDataAccess.RemoveOpertaorRule(itemsToDelete);
-
-                foreach (var r in SelectedOperator.MappingRules.Where(r => itemsToDelete.Contains(r.Id)).ToArray())
-                    SelectedOperator.MappingRules.Remove(r);
 
                 #endregion
                 #region Save new rules
@@ -394,21 +391,8 @@ namespace ExelConverterLite.ViewModel
 
                 SaveImageParsingData(storedRules);
 
-                //if (exportRules != null)
-                //    SaveExportRules(exportRules.ToArray());
-
                 if (needRefresh)
-                {
-                    SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(App.Locator.Import.SelectedOperator));
-                    SelectedOperator.MappingRule = App.Locator.Import.SelectedOperator.MappingRules.FirstOrDefault();
-                    SelectedOperator.MappingRule.RaisePropertyChanged("ConvertionData");
-                    SelectedField = SelectedOperator.MappingRule.ConvertionData.FirstOrDefault();
-                }
-                else
-                {
-                    _appSettingsDataAccess.SetOperatorLocker(SelectedOperator, CurrentUser, false);
-                    SelectedOperator.LockedBy = null;
-                }
+                    RealUpdateOperatorAndRulesFromDatabase();
             }
         }
 
@@ -1031,7 +1015,7 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand SaveOperatorCommand { get; private set; }
         private void SaveOperator()
         {
-            SaveRules(true);
+            SaveRules(false);
         }
 
         public RelayCommand UpdateOperatorCommand { get; private set; }
@@ -1266,33 +1250,39 @@ namespace ExelConverterLite.ViewModel
             get { return _selectedOperator; }
             set
             {
+                if (_selectedOperator == value)
+                    return;
+
                 _repeatLocksUpdater.Stop();
+
                 bool wasException = false;
                 var logSession = Helpers.Log.SessionStart("ImportViewModel.SelectedOperator_set()", true);
                 try
                 {
-                    if (_selectedOperator != value && value != null)
+                    if (_selectedOperator != null)
                     {
-                        if (_selectedOperator != null)
-                        {
-                            SaveRules(false);
-                        }
+                        SaveRules(false);
+                        _appSettingsDataAccess.SetOperatorLocker(_selectedOperator, CurrentUser, false);
+                        SelectedOperator.LockedBy = null;
+                    }
 
-                        if (value == null || _appSettingsDataAccess.SetOperatorLocker(value, CurrentUser, true))
-                        {
-                            _selectedOperator = value;
-                            _selectedOperator.LockedBy = currentUser;
-                        }
-                        else
-                        {
-                            _selectedOperator = null;
-                            UpdateLockedOperators();
+                    if (value != null && _appSettingsDataAccess.SetOperatorLocker(value, CurrentUser, true))
+                    {
+                        _selectedOperator = value;
+                        _selectedOperator.LockedBy = currentUser;
+                    }
+                    else
+                    {
+                        _selectedOperator = null;
+                        UpdateLockedOperators();
+                        if (value != null)
+                        { 
                             User usr = _appSettingsDataAccess.GetOperatorLocker(value);
                             MessageBox.Show(string.Format("Изменение выбранного оператора '{0}' невозможно, так как в данный момент данный оператор редактируется в другом сеансе пользователем '{1}'", value.Name, usr != null ? usr.ToString() : "unknown"), "Изменение оператора", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
-
-                        OperatorChanged();
                     }
+
+                    OperatorChanged();   
                 }
                 catch(Exception ex)
                 {
