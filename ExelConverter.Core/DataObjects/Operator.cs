@@ -85,12 +85,28 @@ namespace ExelConverter.Core.DataObjects
             }
             set
             {
+                MappingRuleSavedData.Clear();
                 MappingRules.Clear();
                 if (value != null && value.Count > 0)
                     foreach (var r in value)
                         MappingRules.Add(r); else
                     MappingRules.Add(new ExelConvertionRule { Name = ExelConvertionRule.DefaultName });
+
+                foreach (var r in MappingRules)
+                    MappingRuleSavedData.Add(r.Id, r.SerializeToBytes());
+
                 RaisePropertyChanged("MappingRules");
+            }
+        }
+        
+        [NonSerialized]
+        private Dictionary<int, byte[]> mappingRuleSavedData = null;
+        [field: NonSerialized]
+        public Dictionary<int, byte[]> MappingRuleSavedData
+        {
+            get
+            {
+                return mappingRuleSavedData ?? (mappingRuleSavedData = new Dictionary<int, byte[]>());
             }
         }
 

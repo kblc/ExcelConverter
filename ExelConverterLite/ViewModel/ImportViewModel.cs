@@ -350,12 +350,17 @@ namespace ExelConverterLite.ViewModel
         {
             if (SelectedOperator != null)
             {
-                var storedRules = _appSettingsDataAccess.GetRulesByOperator(SelectedOperator);
+                var storedRules = SelectedOperator.MappingRuleSavedData.Select(d => ExelConvertionRule.DeserializeFromBytes(d.Value)).ToArray();
+                //_appSettingsDataAccess.GetRulesByOperator(SelectedOperator);
+                int[] storedIds = SelectedOperator.MappingRuleSavedData.Select(r => r.Key).ToArray();
 
                 #region Remove old rules
 
-                var itemsToDelete = storedRules.Where(r => !App.Locator.Import.SelectedOperator.MappingRules.Any(mr => mr.Id == r.Id)).ToArray();
+                var itemsToDelete = storedIds.Where(r => !SelectedOperator.MappingRules.Any(mr => mr.Id == r)).ToArray();
                 _appSettingsDataAccess.RemoveOpertaorRule(itemsToDelete);
+
+                foreach (var r in SelectedOperator.MappingRules.Where(r => itemsToDelete.Contains(r.Id)).ToArray())
+                    SelectedOperator.MappingRules.Remove(r);
 
                 #endregion
                 #region Save new rules
@@ -371,9 +376,14 @@ namespace ExelConverterLite.ViewModel
                 {
                     var oldRule = storedRules.FirstOrDefault(i => i.Id == currentRule.Id)
                                     ?? storedRules.FirstOrDefault(i => i.Name == currentRule.Name);
-                    if (oldRule != null && oldRule.Serialize().Trim() != currentRule.Serialize().Trim())
+                    if (oldRule != null)
                     {
-                        updateRules.Add(currentRule);
+                        byte[] oldBytes = SelectedOperator.MappingRuleSavedData[oldRule.Id];
+                            //oldRule.SerializeToBytes();
+                        byte[] currentBytes = currentRule.SerializeToBytes();
+
+                        if (!oldBytes.SequenceEqual(currentBytes))
+                            updateRules.Add(currentRule);
                     }
                 }
 
@@ -1373,14 +1383,24 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
+        private Operator oldOperator = null;
         public void StartSharpControl()
         {
             this.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == "SelectedOperator")
                     {
+                        if (oldOperator != null)
+                        {
+                            oldOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
+                            if (oldOperator.MappingRule != null)
+                                oldOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
+                        }
+
                         if (SelectedOperator != null)
                         {
+                            oldOperator = SelectedOperator;
+
                             SelectedOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
                             SelectedOperator.PropertyChanged += SelectedOperator_PropertyChanged;    
                             if (SelectedOperator.MappingRule != null)
@@ -1391,17 +1411,7 @@ namespace ExelConverterLite.ViewModel
                         }
                     }
                 };
-
-            if (SelectedOperator != null)
-            {
-                SelectedOperator.PropertyChanged -= SelectedOperator_PropertyChanged;
-                SelectedOperator.PropertyChanged += SelectedOperator_PropertyChanged;
-                if (SelectedOperator.MappingRule != null)
-                { 
-                    SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
-                    SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
-                }
-            }
+            RaisePropertyChanged("SelectedOperator");
         }
 
         private ExelConvertionRule oldMappingRule = null;

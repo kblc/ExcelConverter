@@ -790,7 +790,7 @@ namespace ExcelConverter.Core.Test
                 {
                     result = da.GetRulesByOperator(ops[i]);
                     foreach (var r in result)
-                        da.UpdateOperatorRules(new ExelConverter.Core.Converter.ExelConvertionRule[] { r }, false);
+                        da.UpdateOperatorRules(new ExelConverter.Core.Converter.ExelConvertionRule[] { r });
                 }
 
                 passed = true;

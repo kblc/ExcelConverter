@@ -68,7 +68,7 @@ namespace ExelConverter.Core.DataAccess
 
         ExelConvertionRule GetRule(int id);
 
-        void UpdateOperatorRules(ExelConvertionRule[] rules, bool checkAfterUpdate = true);
+        void UpdateOperatorRules(ExelConvertionRule[] rules);
 
         void AddOperatorRule(ExelConvertionRule rule);
 
@@ -77,6 +77,8 @@ namespace ExelConverter.Core.DataAccess
         void RemoveOperatorRule(ExelConvertionRule rule);
 
         void RemoveOpertaorRule(ExelConvertionRule[] rules);
+
+        void RemoveOpertaorRule(int[] rules);
 
         void AddFillRectangle(FillArea rect);
 

@@ -432,40 +432,54 @@ namespace ExelConverter.Core.Converter
 
         private void UpdateMappingTablesValues()
         {
-            if (!SettingsProvider.IsInitialized)
-                throw new Exception("SettingsProvider is not initialized!");
+            bool wasException = false;
+            var logSession = Log.SessionStart("ExcelConvertionRule.UpdateMappingTablesValues()", true);
+            try
+            { 
+                if (!SettingsProvider.IsInitialized)
+                    throw new Exception("SettingsProvider is not initialized!");
 
-            for (var j = 0; j < ConvertionData.Count; j++)
+                for (var j = 0; j < ConvertionData.Count; j++)
+                {
+                    //ConvertionData[j].UpdateFunctions(ExelConverter.Core.Converter.Functions.FunctionBase.GetSupportedFunctions());
+                    if (ConvertionData[j].PropertyId == "Type")
+                    {
+                        ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedTypes.Where(t => t != null).Select(t => t.Name).ToArray());
+                    }
+                    if (ConvertionData[j].PropertyId == "Side")
+                    {
+                        ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedSides);
+                    }
+                    if (ConvertionData[j].PropertyId == "Size")
+                    {
+                        ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedSizes.Select(s => s.Name).ToArray());
+                    }
+                    if (ConvertionData[j].PropertyId == "Region")
+                    {
+                        ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedRegions.Select(r => r.Name).ToArray());
+                    }
+                    if (ConvertionData[j].PropertyId == "City")
+                    {
+                        ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedCities.Select(c => c.Name).ToArray());
+                    }
+                    if (ConvertionData[j].PropertyId == "Light")
+                    {
+                        ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedLights);
+                    }
+                    if (ConvertionData[j].PropertyId == "Adress")
+                    {
+                        ConvertionData[j].PropertyId = "Address";
+                    }
+                }
+            }
+            catch(Exception ex)
             {
-                //ConvertionData[j].UpdateFunctions(ExelConverter.Core.Converter.Functions.FunctionBase.GetSupportedFunctions());
-                if (ConvertionData[j].PropertyId == "Type")
-                {
-                    ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedTypes.Where(t => t != null).Select(t => t.Name).ToArray());
-                }
-                if (ConvertionData[j].PropertyId == "Side")
-                {
-                    ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedSides);
-                }
-                if (ConvertionData[j].PropertyId == "Size")
-                {
-                    ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedSizes.Select(s => s.Name).ToArray());
-                }
-                if (ConvertionData[j].PropertyId == "Region")
-                {
-                    ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedRegions.Select(r => r.Name).ToArray());
-                }
-                if (ConvertionData[j].PropertyId == "City")
-                {
-                    ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedCities.Select(c => c.Name).ToArray());
-                }
-                if (ConvertionData[j].PropertyId == "Light")
-                {
-                    ConvertionData[j].MappingsTable.LoadAllowedValues(SettingsProvider.AllowedLights);
-                }
-                if (ConvertionData[j].PropertyId == "Adress")
-                {
-                    ConvertionData[j].PropertyId = "Address";
-                }
+                wasException = true;
+                Log.Add(logSession, ex);
+            }
+            finally
+            {
+                Log.SessionEnd(logSession, wasException);
             }
         }
 
@@ -652,8 +666,9 @@ namespace ExelConverter.Core.Converter
         {
             rule.UpdateMappingTablesValues();
             foreach (var convData in rule.ConvertionData)
-                foreach (var block in convData.Blocks.Blocks)
-                    block.UpdateFunctionsList();
+                //if (convData.Blocks != null && convData.Blocks.Blocks != null)
+                    foreach (var block in convData.Blocks.Blocks)
+                        block.UpdateFunctionsList();
 
             rule._mainHeaderSearchTags.CollectionChanged += (s, e) =>
             {

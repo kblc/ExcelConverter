@@ -478,11 +478,11 @@
                                   RowStyle="{StaticResource HighlightRow}">
                             <DataGrid.ContextMenu>
                                 <ContextMenu >
-                                    <MenuItem Header="Добавить как тег для осн. заголовка" 
+                                    <MenuItem Header="Добавить как тег для поиска столбцов" 
                                               Command="{Binding AddTagToMainHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"
                                               />
-                                    <MenuItem Header="Удалить как тег для осн. заголовка" 
+                                    <MenuItem Header="Удалить как тег для поиска столбцов" 
                                               Command="{Binding DelTagFromMainHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"/>
                                     <Separator/>

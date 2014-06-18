@@ -601,7 +601,7 @@ namespace ExelConverter.Core.DataAccess
             return rule;
         }
 
-        public void UpdateOperatorRules(Converter.ExelConvertionRule[] rules, bool checkAfterUpdate = true)
+        public void UpdateOperatorRules(Converter.ExelConvertionRule[] rules)
         {
             if (rules != null && rules.Length > 0)
                 using (var dc = exelconverterEntities2.New())
@@ -615,15 +615,15 @@ namespace ExelConverter.Core.DataAccess
                         var rl = dc.convertion_rules.Where(r => r.id == rule.Id).FirstOrDefault();
                         if (rl != null)
                         {
-                            ExelConvertionRule oldRule = GetRuleFromRow(rl);
+                            //ExelConvertionRule oldRule = GetRuleFromRow(rl);
 
-                            var serializedRule = string.Empty;
-                            if (!checkAfterUpdate || oldRule.Serialize().Trim() != (serializedRule = rule.Serialize()).Trim() && oldRule.SerializeXML().Trim() != rule.SerializeXML().Trim())
-                            {
+                            //var serializedRule = string.Empty;
+                            //if (!checkAfterUpdate || oldRule.Serialize().Trim() != (serializedRule = rule.Serialize()).Trim() && oldRule.SerializeXML().Trim() != rule.SerializeXML().Trim())
+                            //{
                                 needSave = true;
                                 rl.convertion_rule = string.Empty;// do not save old rule // serializedRule;
                                 rl.convertion_rule_image = rule.SerializeToBytes();
-                            }
+                            //}
                         }
                     }
                     if (needSave)
@@ -644,18 +644,19 @@ namespace ExelConverter.Core.DataAccess
         public void RemoveOpertaorRule(ExelConvertionRule[] rules)
         {
             if (rules != null && rules.Length > 0)
+                RemoveOpertaorRule(rules.Select(r => r.Id).ToArray());
+        }
+
+        public void RemoveOpertaorRule(int[] rulesIds)
+        {
+            if (rulesIds != null && rulesIds.Length > 0)
                 using (var dc = exelconverterEntities2.New())
                 {
-                    var ids = rules.Select(i => i.Id);
-
-                    var rl = dc.convertion_rules.Where(r => ids.Contains(r.id)).ToArray();
+                    var rl = dc.convertion_rules.Where(r => rulesIds.Contains(r.id)).ToArray();
                     foreach (var r in rl)
                         dc.convertion_rules.Remove(r);
                     
                     dc.SaveChanges();
-
-                    foreach (var r in rules)
-                        r.Id = 0;
                 }
         }
 
