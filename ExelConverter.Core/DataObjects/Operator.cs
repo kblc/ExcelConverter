@@ -66,8 +66,6 @@ namespace ExelConverter.Core.DataObjects
                 if (_mappingRule != value && (value == null || MappingRules.Contains(value)))
                 {
                     _mappingRule = value;
-                    if (_mappingRule != null)
-                        _mappingRule.InitializeImageParsingData();
                     RaisePropertyChanged("MappingRule");
                     RaisePropertyChanged("ConvertionData");
                 }
@@ -99,8 +97,12 @@ namespace ExelConverter.Core.DataObjects
                     else
                         MappingRules.Add(new ExelConvertionRule { Name = ExelConvertionRule.DefaultName });
 
-                foreach (var r in MappingRules)
-                    MappingRuleSavedData.Add(r.Id, r.SerializeToBytes());
+                foreach (var r in
+                            MappingRules
+                                .AsParallel()
+                                .Select(r => new { Id = r.Id, Data = r.SerializeToBytes() })
+                                .ToArray())
+                    MappingRuleSavedData.Add(r.Id, r.Data);
 
                 RaisePropertyChanged("MappingRules");
             }

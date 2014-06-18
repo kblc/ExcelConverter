@@ -71,30 +71,50 @@ namespace ExelConverter.Core.Converter
         }
 
         [NonSerialized]
+        private bool isMapParsingDataLoaded = false;
+        [field: NonSerialized]
+        public bool IsMapParsingDataLoaded { get { return isMapParsingDataLoaded; } }
+
+        [NonSerialized]
         private ObservableCollection<ImageParsingData> _mapParsingData;
         public ObservableCollection<ImageParsingData> MapParsingData
         {
-            get { return _mapParsingData ?? (_mapParsingData = new ObservableCollection<ImageParsingData>()); }
+            get 
+            {
+                isMapParsingDataLoaded = true;
+                return _mapParsingData ?? (_mapParsingData = LoadMap());
+            }
             set
             {
                 if (_mapParsingData != value)
                 {
                     _mapParsingData = value;
+                    isMapParsingDataLoaded = true;
                     RaisePropertyChanged("MapParsingData");
                 }
             }
         }
 
         [NonSerialized]
+        private bool isPhotoParsingDataLoaded = false;
+        [field: NonSerialized]
+        public bool IsPhotoParsingDataLoaded { get { return isPhotoParsingDataLoaded; } }
+
+        [NonSerialized]
         private ObservableCollection<ImageParsingData> _photoParsingData;
         public ObservableCollection<ImageParsingData> PhotoParsingData
         {
-            get { return _photoParsingData ?? (_photoParsingData = new ObservableCollection<ImageParsingData>()); }
+            get
+            {
+                isPhotoParsingDataLoaded = true;
+                return _photoParsingData ?? (_photoParsingData = LoadPhoto()); 
+            }
             set
             {
                 if (_photoParsingData != value)
                 {
                     _photoParsingData = value;
+                    isPhotoParsingDataLoaded = true;
                     RaisePropertyChanged("PhotoParsingData");
                 }
             }
@@ -197,36 +217,6 @@ namespace ExelConverter.Core.Converter
                 }
             }
         }
-
-        //private bool _findMainHeaderByTags;
-        //[field: NonSerializedAttribute()]
-        //public bool FindMainHeaderByTags
-        //{
-        //    get { return _findMainHeaderByTags; }
-        //    set
-        //    {
-        //        if (_findMainHeaderByTags != value)
-        //        {
-        //            _findMainHeaderByTags = value;
-        //            RaisePropertyChanged("FindMainHeaderByTags");
-        //        }
-        //    }
-        //}
-
-        //private bool _findSheetHeadersByTags;
-        //[field: NonSerializedAttribute()]
-        //public bool FindSheetHeadersByTags
-        //{
-        //    get { return _findSheetHeadersByTags; }
-        //    set
-        //    {
-        //        if (_findSheetHeadersByTags != value)
-        //        {
-        //            _findSheetHeadersByTags = value;
-        //            RaisePropertyChanged("FindSheetHeadersByTags");
-        //        }
-        //    }
-        //}
 
         private ObservableCollection<SearchTag> _mainHeaderSearchTags = new ObservableCollection<SearchTag>();
         public ObservableCollection<SearchTag> MainHeaderSearchTags
@@ -395,27 +385,6 @@ namespace ExelConverter.Core.Converter
             return result;
         }
 
-        //private string RenameRepeatingId(List<OutputRow> list ,string value, int repeatNumber = 1)
-        //{
-        //    var result = string.Empty;
-        //    var temp = value;
-        //    for (; ; )
-        //    {
-        //        if (list.Any(r => r.Code == temp))
-        //        {
-        //            temp = value + "_" + repeatNumber;
-        //            repeatNumber++;
-        //        }
-        //        else
-        //        {
-        //            result = temp;
-        //            break;
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
         public static void RemoveRepeatingId(List<OutputRow> list)
         {
             foreach (var row in list)
@@ -483,12 +452,12 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        public void InitializeImageParsingData()
+        public ObservableCollection<ImageParsingData> LoadMap()
         {
             _appDataAccess = new DataAccess.DataAccess();
+            var result = new ObservableCollection<ImageParsingData>();
             #region Map
-            MapParsingData = new ObservableCollection<ImageParsingData>();
-            var mapSizes = 
+            var mapSizes =
                 _appDataAccess
                 .GetFillRects(FkOperatorId, "location")
                 .Select(r => new { Width = r.Width, Height = r.Height })
@@ -528,12 +497,19 @@ namespace ExelConverter.Core.Converter
                         _appDataAccess.RemoveFillRectangle(rect.ID);
                     };
                 }
-                MapParsingData.Add(ipd);
+                result.Add(ipd);
             }
             #endregion
+            return result;
+        }
+
+        public ObservableCollection<ImageParsingData> LoadPhoto()
+        {
+            _appDataAccess = new DataAccess.DataAccess();
+            var result = new ObservableCollection<ImageParsingData>();
             #region Photo
             PhotoParsingData = new ObservableCollection<ImageParsingData>();
-            var photoSizes = 
+            var photoSizes =
                 _appDataAccess
                 .GetFillRects(FkOperatorId, "photo")
                 .Select(r => new { Width = r.Width, Height = r.Height })
@@ -572,9 +548,10 @@ namespace ExelConverter.Core.Converter
                         _appDataAccess.RemoveFillRectangle(rect.ID);
                     };
                 }
-                PhotoParsingData.Add(ipd);
+                result.Add(ipd);
             }
             #endregion
+            return result;
         }
 
         #endregion

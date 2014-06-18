@@ -97,10 +97,15 @@ namespace ExelConverterLite.ViewModel
 
         private void UpdateLockedOperators()
         {
+            if (_appSettingsDataAccess != null)
+            { 
             var lockers = _appSettingsDataAccess.GetOperatorLockers();
             //update operators
             foreach (Operator op in Operators)
                 op.LockedBy = lockers.Where(l => l.Key.Id == op.Id).Select(l => l.Value).FirstOrDefault();
+            if (SelectedOperator != null && SelectedOperator.LockedBy == null)
+                SelectedOperator.LockedBy = CurrentUser;
+            }
         }
 
         public void InitializeData()
@@ -369,20 +374,33 @@ namespace ExelConverterLite.ViewModel
 
                 List<ExelConvertionRule> updateRules = new List<ExelConvertionRule>();
 
-                foreach (var currentRule in SelectedOperator.MappingRules.Where(mr => mr.Id > 0))
-                {
-                    var oldRule = storedRules.FirstOrDefault(i => i.Id == currentRule.Id)
-                                    ?? storedRules.FirstOrDefault(i => i.Name == currentRule.Name);
-                    if (oldRule != null)
-                    {
-                        byte[] oldBytes = SelectedOperator.MappingRuleSavedData[oldRule.Id];
-                            //oldRule.SerializeToBytes();
-                        byte[] currentBytes = currentRule.SerializeToBytes();
-
-                        if (!oldBytes.SequenceEqual(currentBytes))
-                            updateRules.Add(currentRule);
-                    }
-                }
+                foreach (var currentRule in
+                                SelectedOperator
+                                .MappingRules
+                                .Where(mr => mr.Id > 0)
+                                .AsParallel()
+                                .Select(r => new
+                                {
+                                    Rule = r,
+                                    StoredRule = storedRules.FirstOrDefault(i => i.Id == r.Id)
+                                        ?? storedRules.FirstOrDefault(i => i.Name == r.Name)
+                                })
+                                .Where(r => r.StoredRule != null)
+                                .ToArray()
+                                .AsParallel()
+                                .Select(r =>
+                                     new
+                                        {
+                                            Rule = r.Rule,
+                                            Data = r.Rule.SerializeToBytes(),
+                                            StoredRule = r.StoredRule,
+                                            StoredRuleData = (r.StoredRule == null ? new byte[] { } : SelectedOperator.MappingRuleSavedData[r.StoredRule.Id])
+                                        }
+                                )
+                                .Where(r => !r.StoredRuleData.SequenceEqual(r.Data))
+                                .Select(r => r.Rule)
+                                .ToArray())
+                    updateRules.Add(currentRule);
 
                 if (updateRules.Count > 0)
                     _appSettingsDataAccess.UpdateOperatorRules(updateRules.ToArray());
@@ -401,7 +419,7 @@ namespace ExelConverterLite.ViewModel
             List<FillArea> areaList = new List<FillArea>();
             List<FillArea> areaListStored = new List<FillArea>();
 
-            if (SelectedOperator.MappingRule != null && SelectedOperator.MappingRule.MapParsingData != null)
+            if (SelectedOperator.MappingRule != null && SelectedOperator.MappingRule.IsMapParsingDataLoaded && SelectedOperator.MappingRule.MapParsingData != null)
             {
                 foreach (var mpData in SelectedOperator.MappingRule.MapParsingData)
                 {
@@ -442,7 +460,7 @@ namespace ExelConverterLite.ViewModel
                     }
             }
 
-            if (SelectedOperator.MappingRule != null && SelectedOperator.MappingRule.PhotoParsingData != null)
+            if (SelectedOperator.MappingRule != null && SelectedOperator.MappingRule.IsPhotoParsingDataLoaded && SelectedOperator.MappingRule.PhotoParsingData != null)
             foreach (var ppData in SelectedOperator.MappingRule.PhotoParsingData)
             {
                 areaList.AddRange(ppData.DrawingArea.Children.Cast<Rectangle>().Select(

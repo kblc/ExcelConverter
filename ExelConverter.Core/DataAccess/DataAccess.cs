@@ -523,6 +523,7 @@ namespace ExelConverter.Core.DataAccess
                     .convertion_rules
                     .Where(cr => cr.fk_operator_id == op.Id)
                     .AsEnumerable()
+                    .AsParallel()
                     .Select(cr => 
                         {
                             ExelConvertionRule r = GetRuleFromRow(cr);
