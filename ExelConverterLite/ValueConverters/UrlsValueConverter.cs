@@ -15,10 +15,10 @@ using ExelConverter.Core.ImagesParser;
 
 namespace ExelConverterLite.ValueConverters
 {
-    public class ImageUrl
-    {
-        public string Url { get; set; }
-    }
+    //public class ImageUrl
+    //{
+    //    public string Url { get; set; }
+    //}
 
     public class ImageSource
     {
@@ -35,14 +35,20 @@ namespace ExelConverterLite.ValueConverters
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
             {
                 var row = (DataRowView)value;
-                var urls = row.Row.ItemArray.Where(itm => itm != null && ((string)itm).Contains("http")).Select(u => new ImageUrl { Url = (string)u }).ToArray();
+                var urls = row
+                    .Row
+                    .ItemArray
+                    .Where(itm => itm != null && itm != DBNull.Value && (itm.ToString()).Contains("http"))
+                    //.Select(u => new ImageUrl { Url = u.ToString() })
+                    .Select(u => u.ToString())
+                    .ToArray();
                 foreach (var url in urls)
                 {
-                    var imParser = new ImagesParser(url.Url);
+                    var imParser = new ImagesParser(url);
                     result.Add(new ImageSource
                     {
                         Source = imParser.GetImage(),
-                        ImageUrl = url.Url
+                        ImageUrl = url
                     });
                 }   
             }));
