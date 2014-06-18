@@ -680,8 +680,13 @@ namespace ExcelConverter.Core.Test
                 DataAccess da = new DataAccess();
                 ExelConverter.Core.Settings.SettingsProvider.Initialize(da);
 
-                result = da.GetRules(new int[] { (int)da.GetOperators()[0].Id });
+                var operators = da.GetOperators();
 
+                for (int i = 0; i < Math.Min(3, operators.Length); i++)
+                {
+                    var id = new Random().Next(operators.Length - 1);
+                    result = da.GetRules(new int[] { (int)operators[id].Id });
+                }
                 passed = true;
             }
             catch (Exception ex) { exception = ex.GetExceptionText(); }

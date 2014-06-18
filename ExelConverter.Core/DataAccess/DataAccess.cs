@@ -570,7 +570,7 @@ namespace ExelConverter.Core.DataAccess
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSesson, ex.GetExceptionText());
+                Log.Add(logSesson, ex);
                 throw ex;
             }
             finally
