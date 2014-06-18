@@ -611,7 +611,7 @@ namespace ExelConverter.Core.ExelDataReader
                 for (var i = 0; i < rows.Length; i++)
                 {
                     result.Rows.Add(
-                        new ExelCell[] { new ExelCell() { Value = (i+1).ToString() }, new ExelCell() { Value = (rows[i].Index+1).ToString() } }
+                        new ExelCell[] { new ExelCell() { Value = i.ToString() }, new ExelCell() { Value = (rows[i].Index+1).ToString() } }
                         .Union(rows[i].Cells.ToArray())
                         .Union(new ExelCell[] { new ExelCell() { Value = string.Empty } })
                         .ToArray());
