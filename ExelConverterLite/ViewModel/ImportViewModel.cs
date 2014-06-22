@@ -1292,9 +1292,9 @@ namespace ExelConverterLite.ViewModel
                     else
                     {
                         _selectedOperator = null;
-                        UpdateLockedOperators();
                         if (value != null)
-                        { 
+                        {
+                            UpdateLockedOperators();
                             User usr = _appSettingsDataAccess.GetOperatorLocker(value);
                             MessageBox.Show(string.Format("Изменение выбранного оператора '{0}' невозможно, так как в данный момент данный оператор редактируется в другом сеансе пользователем '{1}'", value.Name, usr != null ? usr.ToString() : "unknown"), "Изменение оператора", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }

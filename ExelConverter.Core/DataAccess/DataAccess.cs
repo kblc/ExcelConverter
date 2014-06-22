@@ -710,38 +710,29 @@ namespace ExelConverter.Core.DataAccess
 
         public Dictionary<Operator, User> GetOperatorLockers(Operator operatorFilter = null)
         {
-            var logSession = Log.SessionStart(string.Format("DataAccess.GetOperatorLockers(operatorFilter:'{0}')", operatorFilter == null ? "null" : operatorFilter.Id.ToString()), true);
-            bool wasException = false;
-
             var result = new Dictionary<Operator, User>();
-
             if (IsNoLocking)
                 return result;
 
-            DateTime startDateTime = DateTime.UtcNow;
+            var logSession = Log.SessionStart(string.Format("DataAccess.GetOperatorLockers(operatorFilter:'{0}')", operatorFilter == null ? "null" : operatorFilter.Id.ToString()), true);
+            bool wasException = false;
             try
             {
-                using (var conn = new MySql.Data.MySqlClient.MySqlConnection(exelconverterEntities2.ProviderConnectionString))
-                using (MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand("SELECT now();", conn))
-                {
-                    conn.Open();
-                    var rd = cmd.ExecuteReader();
-                    rd.Read();
-                    startDateTime = rd.GetDateTime(0);
-                }
+                DateTime startDateTime = GetServerDateTime();
+
+                long opId = operatorFilter == null ? -1 : operatorFilter.Id;
 
                 using (var dbApp = exelconverterEntities2.New())
                 using (var dbMain = alphaEntities.New())
                 {
-                    //var dc = exelconverterEntities2.Default;
-
                     var curLocks =
                         (
-                            from l in dbApp.locks.Where(l => l.locked_to > startDateTime).ToList()
+                            from l in dbApp.locks.Where(
+                                l => (l.locked_to > startDateTime)
+                                     && (opId == -1 || l.id_company == opId)
+                                ).ToList()
                             join user in dbMain.users on l.id_user equals user.id
                             join op in dbMain.companies on l.id_company equals op.id
-                            where operatorFilter == null || op.id == operatorFilter.Id
-                            //where l.locked_to > startDateTime
                             select new
                             {
                                 User = new User()
@@ -763,20 +754,6 @@ namespace ExelConverter.Core.DataAccess
 
                     foreach (var l in curLocks)
                         result.Add(l.Operator, l.User);
-
-
-                    //var currentLocks = dc.locks.Where(l => l.locked_to > startDateTime);
-                    //if (currentLocks != null && currentLocks.FirstOrDefault() != null)
-                    //{
-                    //    Operator[] ops = GetOperators();
-                    //    User[] users = GetUsers();
-                    //    foreach (var lock_ in currentLocks)
-                    //    {
-                    //        result.Add(
-                    //            ops.FirstOrDefault(o => o.Id == lock_.id_company),
-                    //            users.FirstOrDefault(u => u.Id == lock_.id_user));
-                    //    }
-                    //}
                 }
             }
             catch(Exception ex)
@@ -797,84 +774,71 @@ namespace ExelConverter.Core.DataAccess
             return res.Count() > 0 ? res.Single().Value : null;
         }
 
+        private DateTime GetServerDateTime()
+        {
+            DateTime curDate = DateTime.UtcNow; //should get it from server
+
+            using (var conn = new MySql.Data.MySqlClient.MySqlConnection(exelconverterEntities2.ProviderConnectionString))
+            using (MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand("SELECT now();", conn))
+            {
+                conn.Open();
+                var rd = cmd.ExecuteReader();
+                rd.Read();
+                curDate = rd.GetDateTime(0);
+            }
+
+            return curDate;
+        }
+
+        private DateTime GetDateTimeToLock(DateTime? curDateTime = null)
+        {
+            return (curDateTime ?? GetServerDateTime()) + TimeSpan.FromMinutes(5);
+        }
+
         public bool SetOperatorLocker(Operator op, User user, bool _lock)
         {
+            if (IsNoLocking)
+                return true;
+
             bool wasException = false;
             var logSession = Log.SessionStart("DataAccess.SetOperatorLocker()", true);
             bool result = false;
-
-            if (IsNoLocking)
-                return true;
 
             try
             {
                 using (var dc = exelconverterEntities2.New())
                 {
-                    DateTime curDate = DateTime.UtcNow; //should get it from server
-
-                    using(var conn = new MySql.Data.MySqlClient.MySqlConnection(exelconverterEntities2.ProviderConnectionString))
-                    using(MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand("SELECT now();", conn))
-                    {
-                        conn.Open();
-                        var rd = cmd.ExecuteReader();
-                        rd.Read();
-                        curDate = rd.GetDateTime(0);
-                    }
-
-                    DateTime lockTo = curDate + TimeSpan.FromMinutes(5);
-
                     if (_lock)
                     {
-                        var currentLock = dc.locks.FirstOrDefault(l => l.id_company == op.Id);
+                        DateTime curDate = GetServerDateTime();
+
+                        //Берем исключительно последнюю блокировку для данного оператора
+                        var currentLock = dc.locks.Where(l => l.id_company == op.Id).OrderByDescending(l => l.locked_to).FirstOrDefault();
                         if (currentLock != null)
                         {
+                            //Если это блокировка текущего пользователя или если это старая блокировка (пофиг кем сделанная)
                             if (currentLock.id_user == user.Id || currentLock.locked_to < curDate)
                             {
-                                currentLock.locked_to = lockTo;
+                                currentLock.locked_to = GetDateTimeToLock(curDate);
                                 currentLock.id_user = (int)user.Id;
                                 dc.SaveChanges();
                                 result = true;
                             }
                         } else
-                        { 
-                            dc.locks.Add(new locks() { id_company = (int)op.Id, id_user = (int)user.Id, locked_to = lockTo });
+                        {
+                            dc.locks.Add(new locks() { id_company = (int)op.Id, id_user = (int)user.Id, locked_to = GetDateTimeToLock(curDate) });
                             dc.SaveChanges();
                             result = true;
                         }
                     } else
                     {
-                        var currentLock = dc.locks.FirstOrDefault(l => l.id_company == op.Id && l.id_user == user.Id);
-                        if (currentLock != null)
-                        {
+                        foreach (var currentLock in dc.locks.Where(l => l.id_company == op.Id && l.id_user == user.Id).ToArray())
                             dc.locks.Remove(currentLock);
-                            dc.SaveChanges();
-                            result = true;
-                        }
+                        
+                        dc.SaveChanges();
+                        result = true;
                     }
-
-
-
-                    //var dc = exelconverterEntities2.Default;
-                    //if (user != null)
-                    //{
-                    //    var currentLocks = dc.locks.Where(l => l.id_user == user.Id && op.Id == l.id_company).ToArray();
-                    //    if (currentLocks != null && currentLocks.Length > 0)
-                    //    {
-                    //        foreach(var item in currentLocks)
-                    //            item.locked_to = lockTo;
-                    //    }
-                    //    else
-                    //        dc.locks.Add(new locks() { id_company = (int)op.Id, id_user = (int)user.Id, locked_to = lockTo });
-                    //}
-                    //else
-                    //{
-                    //    var itemsToRemove = dc.locks.Where(l => l.id_company == op.Id).ToArray();
-                    //    foreach (var item in itemsToRemove)
-                    //        dc.locks.Remove(item);
-                    //}
-                    //dc.SaveChanges();
                 }
-                //result = true;
             }
             catch(Exception ex)
             {

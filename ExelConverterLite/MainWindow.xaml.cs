@@ -26,7 +26,7 @@ namespace ExelConverterLite
         {
             if (SettingsProvider.DataBasesEnabled)
             {
-                App.Locator.Import.SaveRules(false);
+                App.Locator.Import.SelectedOperator = null;
                 App.Locator.Settings.Settings.SaveToRegistry();
             }
         }
