@@ -742,7 +742,7 @@
                     </TabItem>
                 </TabControl>
 
-                <ProgressBar Grid.Row="4" Minimum="0" Maximum="10000" Value="{Binding LoadingProgress}" Foreground="#00FF00" Height="5" Margin="3" />
+                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding LoadingProgress}" Foreground="#00FF00" Height="5" Margin="3" />
                 <StackPanel Grid.Row="5"  Orientation="Horizontal" Margin="2" >
                     <Button 
                         Margin="2" 

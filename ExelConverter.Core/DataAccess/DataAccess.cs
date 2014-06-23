@@ -304,13 +304,14 @@ namespace ExelConverter.Core.DataAccess
             try
             {
                 var pIds = ids == null ? new Guid[] { } : ids;
+                bool isEmptyIds = pIds.Length <= 0;
 
                 using (var dc = exelconverterEntities2.New())
                 {
                     var res = dc
                             .parsers
+                            .Where(p => isEmptyIds || pIds.Contains(p.id))
                             .AsEnumerable()
-                            .Where(p => pIds.Length == 0 || pIds.Contains(p.id))
                             .Select(parser =>
                             {
                                 Parser p = Parser.Deserialize(parser.xml, typeof(Parser)) as Parser;
@@ -364,54 +365,58 @@ namespace ExelConverter.Core.DataAccess
         }
         public Guid[] ParsersInsert(Parser[] parsers, bool needSave = true)
         {
-            List<Guid> result = new List<Guid>();
+            Guid[] result =new Guid[] { };
             if (parsers != null)
                 using (var dc = exelconverterEntities2.New())
                 {
-                    //var dc = exelconverterEntities2.Default;
                     var alreadyInserted = ParsersUpdate(parsers, false);
-
-                    foreach (var p in parsers.Where(pr => !alreadyInserted.Contains(pr.Id)))
-                    {
-                        dc.parsers.Add(new parsers
-                        {
-                            id = p.Id,
-                            url = p.Url,
-                            xml = p.Serialize()
-                        });
-
-                        result.Add(p.Id);
-                    }
+                    var parsersToInsert =
+                            parsers
+                            .Where(pr => !alreadyInserted.Contains(pr.Id))
+                            .Select(p => new parsers
+                                {
+                                    id = p.Id,
+                                    url = p.Url,
+                                    xml = p.Serialize()
+                                })
+                            .ToArray();
+                    result = parsersToInsert.Select(p => p.id).ToArray();
 
                     if (needSave)
+                    { 
+                        foreach (var p in parsersToInsert)
+                            dc.parsers.Add(p);
                         dc.SaveChanges();
+                    }
                 }
-            return result.ToArray();
+            return result;
         }
         public Guid[] ParsersUpdate(Parser[] parsers, bool needSave = true)
         {
-            List<Guid> result = new List<Guid>();
+            Guid[] result = new Guid[] { };
             if (parsers != null)
                 using (var dc = exelconverterEntities2.New())
                 {
-                    //var dc = exelconverterEntities2.Default;
                     var ids = parsers.Select(p => p.Id).ToArray();
                     var parsersInDb = dc.parsers.Where(p => ids.Contains(p.id));
-                    foreach (var p in parsersInDb)
-                    {
-                        var pToUpdate = parsers.FirstOrDefault(p2 => p2.Id == p.id);
-                        if (pToUpdate != null)
-                        {
-                            p.url = pToUpdate.Url;
-                            p.xml = pToUpdate.Serialize();
 
-                            result.Add(p.id);
+                    result = parsersInDb.Select(p => p.id).Distinct().ToArray();
+
+                    if (needSave && parsersInDb.Count() > 0)
+                    { 
+                        foreach (var p in parsersInDb)
+                        {
+                            var pToUpdate = parsers.FirstOrDefault(p2 => p2.Id == p.id);
+                            if (pToUpdate != null)
+                            {
+                                p.url = pToUpdate.Url;
+                                p.xml = pToUpdate.Serialize();
+                            }
                         }
-                    }
-                    if (needSave)
                         dc.SaveChanges();
+                    }
                 }
-            return result.ToArray();
+            return result;
         }
 
         #endregion

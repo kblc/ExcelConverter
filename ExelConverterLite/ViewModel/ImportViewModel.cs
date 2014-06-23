@@ -747,6 +747,8 @@ namespace ExelConverterLite.ViewModel
                     {
                         document.Loader.FileLoader.CancelAsync();
                     }
+                    
+                    LoadingProgress = 0;
                     document = new ExelDocument(Path, ExelConverterLite.Properties.Settings.Default.Import_DeleteEmptyRows);
                     document.Loader.FileLoader.ProgressChanged += (s, e) =>
                     {
@@ -755,18 +757,24 @@ namespace ExelConverterLite.ViewModel
 
                     document.Loader.FileLoader.RunWorkerCompleted += (s, e) =>
                     {
-                        LoadingProgress = 10000;
+                        LoadingProgress = 100;
                         IsDocumentLoaded = true;
                         
-                        SelectedSheet = document.Sheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
                         DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
+                        SelectedSheet = 
+                            SelectedSheet == null 
+                            ? DocumentSheets.FirstOrDefault()
+                            : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
                         Sharp = SelectedSheet.AsDataTable();
                         //UpdateMainHeaderRow();
                         UpdateSheetHeaderRow();
                     };
-
+                    //Берем уже первые предзагруженные строки
                     DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
                     SelectedSheet = DocumentSheets.FirstOrDefault();
+                    UpdateMainHeaderRow();
+                
+                    document.FullLoad();
                 }
             }
             catch(Exception e)
