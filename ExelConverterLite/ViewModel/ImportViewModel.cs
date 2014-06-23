@@ -157,7 +157,7 @@ namespace ExelConverterLite.ViewModel
         private void InitializeCoommands()
         {
             SelectFileCommand = new RelayCommand(SelectFile);
-            LoadDocumentCommand = new RelayCommand(LoadDocument, () => { return IsDocumentLoaded && IsViewModelValid; });
+            //LoadDocumentCommand = new RelayCommand(LoadDocument, () => { return IsDocumentLoaded && IsViewModelValid; });
             UpdateOperatorCommand = new RelayCommand(UpdateOperator, () => { return IsViewModelValid; });
             UpdateMappingsTableCommand = new RelayCommand<string>(UpdateMappingsTable, (s) => { return IsDocumentLoaded; });
             ClearMappingsTableCommand = new RelayCommand<string>(ClearMappingsTable);
@@ -221,22 +221,25 @@ namespace ExelConverterLite.ViewModel
             if (SelectedOperator != null)
             {
                 RealUpdateOperatorAndRulesFromDatabase();
-                if (DocumentRows.Count == 0)
+
+                if (SelectedSheet == null || SelectedSheet.Rows.Count == 0)
                 {
                     SheetHeaders.Clear();
                     foreach (var rule in SelectedOperator.MappingRules)
-                        foreach(var data in rule.ConvertionData)
-                            foreach(var block in data.Blocks.Blocks)
-                                {
-                                    foreach (var func in block.UsedFunctions)
-                                        if (func.Function != null && !string.IsNullOrWhiteSpace(func.Function.ColumnName) && !SheetHeaders.Contains(func.Function.ColumnName))
-                                            SheetHeaders.Add(func.Function.ColumnName);
+                        foreach (var data in rule.ConvertionData)
+                            foreach (var block in data.Blocks.Blocks)
+                            {
+                                foreach (var func in block.UsedFunctions)
+                                    if (func.Function != null && !string.IsNullOrWhiteSpace(func.Function.ColumnName) && !SheetHeaders.Contains(func.Function.ColumnName))
+                                        SheetHeaders.Add(func.Function.ColumnName);
 
-                                    foreach (var srule in block.StartRules)
-                                        if (srule.Rule != null && !string.IsNullOrWhiteSpace(srule.Rule.ColumnName) && !SheetHeaders.Contains(srule.Rule.ColumnName))
-                                            SheetHeaders.Add(srule.Rule.ColumnName);
-                                }
+                                foreach (var srule in block.StartRules)
+                                    if (srule.Rule != null && !string.IsNullOrWhiteSpace(srule.Rule.ColumnName) && !SheetHeaders.Contains(srule.Rule.ColumnName))
+                                        SheetHeaders.Add(srule.Rule.ColumnName);
+                            }
                 }
+                else if (SelectedSheet != null)
+                    UpdateSheetHeaders();
             } else
                 SheetHeaders.Clear();
 
@@ -355,6 +358,9 @@ namespace ExelConverterLite.ViewModel
         {
             if (SelectedOperator != null)
             {
+                foreach (var r in SelectedOperator.MappingRules)
+                    r.FkOperatorId = (int)SelectedOperator.Id;
+
                 var storedRules = SelectedOperator.MappingRuleSavedData.Select(d => ExelConvertionRule.DeserializeFromBytes(d.Value)).ToArray();
                 //_appSettingsDataAccess.GetRulesByOperator(SelectedOperator);
                 int[] storedIds = SelectedOperator.MappingRuleSavedData.Select(r => r.Key).ToArray();
@@ -362,12 +368,16 @@ namespace ExelConverterLite.ViewModel
                 #region Remove old rules
 
                 var itemsToDelete = storedIds.Where(r => !SelectedOperator.MappingRules.Any(mr => mr.Id == r)).ToArray();
-                _appSettingsDataAccess.RemoveOpertaorRule(itemsToDelete);
+                if (itemsToDelete.Length > 0)
+                    _appSettingsDataAccess.RemoveOpertaorRule(itemsToDelete);
 
                 #endregion
                 #region Save new rules
 
-                _appSettingsDataAccess.AddOperatorRules(SelectedOperator.MappingRules.Where(mr => mr.Id == 0).ToArray());
+
+                var itemsToInsert = SelectedOperator.MappingRules.Where(mr => mr.Id == 0).ToArray();
+                if (itemsToInsert.Length > 0)
+                     _appSettingsDataAccess.AddOperatorRules(itemsToInsert);
 
                 #endregion
                 #region Update rules
@@ -377,7 +387,7 @@ namespace ExelConverterLite.ViewModel
                 foreach (var currentRule in
                                 SelectedOperator
                                 .MappingRules
-                                .Where(mr => mr.Id > 0)
+                                .Where(mr => mr.Id > 0 && !itemsToInsert.Contains(mr))
                                 .AsParallel()
                                 .Select(r => new
                                 {
@@ -784,20 +794,20 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
-        public RelayCommand LoadDocumentCommand { get; private set; }
-        private void LoadDocument()
-        {
-            try
-            {
-                DocumentRows = new ObservableCollection<OutputRow>(SelectedOperator.MappingRule.Convert(SelectedSheet).Take(SettingsProvider.CurrentSettings.PreloadedRowsCount).ToArray());
-            }
-            catch
-            {
-                DocumentRows = new ObservableCollection<OutputRow>();
-                System.Windows.MessageBox.Show("Произошла ошибка, проверьте еще раз\nправило и попробуйте снова...","Ошибка", 
-                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-            }
-        }
+        //public RelayCommand LoadDocumentCommand { get; private set; }
+        //private void LoadDocument()
+        //{
+        //    try
+        //    {
+        //        DocumentRows = new ObservableCollection<OutputRow>(SelectedOperator.MappingRule.Convert(SelectedSheet).Take(SettingsProvider.CurrentSettings.PreloadedRowsCount).ToArray());
+        //    }
+        //    catch
+        //    {
+        //        DocumentRows = new ObservableCollection<OutputRow>();
+        //        System.Windows.MessageBox.Show("Произошла ошибка, проверьте еще раз\nправило и попробуйте снова...","Ошибка", 
+        //            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        //    }
+        //}
 
         public RelayCommand EditOperatorCommand { get; private set; }
         private void EditOperator()
@@ -1187,7 +1197,7 @@ namespace ExelConverterLite.ViewModel
                     RaisePropertyChanged("IsDocumentLoaded");
                     UpdateMappingsTableCommand.RaiseCanExecuteChanged();
                     ClearMappingsTableCommand.RaiseCanExecuteChanged();
-                    LoadDocumentCommand.RaiseCanExecuteChanged();
+                    //LoadDocumentCommand.RaiseCanExecuteChanged();
                     ToCsvCommand.RaiseCanExecuteChanged();
                     ReExportFileCommand.RaiseCanExecuteChanged();
                 }
@@ -1205,7 +1215,7 @@ namespace ExelConverterLite.ViewModel
                     _isViewModelModelValid = value;
                     RaisePropertyChanged("IsViewModelValid");
                     UpdateOperatorCommand.RaiseCanExecuteChanged();
-                    LoadDocumentCommand.RaiseCanExecuteChanged();
+                    //LoadDocumentCommand.RaiseCanExecuteChanged();
                     ToCsvCommand.RaiseCanExecuteChanged();
                     ReExportFileCommand.RaiseCanExecuteChanged();
                 }
@@ -1241,19 +1251,19 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
-        private ObservableCollection<OutputRow> _documentRows;
-        public ObservableCollection<OutputRow> DocumentRows
-        {
-            get { return _documentRows ?? (_documentRows = new ObservableCollection<OutputRow>()); }
-            set
-            {
-                if (_documentRows != value)
-                {
-                    _documentRows = value;
-                    RaisePropertyChanged("DocumentRows");
-                }
-            }
-        }
+        //private ObservableCollection<OutputRow> _documentRows;
+        //public ObservableCollection<OutputRow> DocumentRows
+        //{
+        //    get { return _documentRows ?? (_documentRows = new ObservableCollection<OutputRow>()); }
+        //    set
+        //    {
+        //        if (_documentRows != value)
+        //        {
+        //            _documentRows = value;
+        //            RaisePropertyChanged("DocumentRows");
+        //        }
+        //    }
+        //}
 
         private ObservableCollection<Operator> _operators;
         public ObservableCollection<Operator> Operators
