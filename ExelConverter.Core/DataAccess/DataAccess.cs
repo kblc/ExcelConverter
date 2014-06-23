@@ -307,10 +307,10 @@ namespace ExelConverter.Core.DataAccess
 
                 using (var dc = exelconverterEntities2.New())
                 {
-                    result = dc
+                    var res = dc
                             .parsers
-                            .Where(p => ids.Length == 0 || ids.Contains(p.id))
                             .AsEnumerable()
+                            .Where(p => pIds.Length == 0 || pIds.Contains(p.id))
                             .Select(parser =>
                             {
                                 Parser p = Parser.Deserialize(parser.xml, typeof(Parser)) as Parser;
@@ -318,8 +318,10 @@ namespace ExelConverter.Core.DataAccess
                                     p.Id = parser.id;
                                 return p;
                             })
-                            .Where(p => p != null)
-                            .ToArray<Parser>();
+                            .Where(p => p != null);
+
+                    if (res.Count() > 0)
+                        result = res.ToArray<Parser>();
                 }
             }
             catch(Exception ex)
