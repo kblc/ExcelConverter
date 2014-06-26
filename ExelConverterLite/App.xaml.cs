@@ -25,36 +25,6 @@ namespace ExelConverterLite
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            //string testErr = string.Empty;
-            //try
-            //{
-            //    HttpDataClient test = new HttpDataClient(true);
-            //    test.Login(@"http://alpha.outdoor-online.com.ua/", "ad", "ad");
-
-            //    //test.WebLogin();
-
-            //    test.UserPassword = test.UserPassword+"2";
-
-            //    test.AddFillRectangle(new ExelConverter.Core.DataObjects.FillArea() { FKOperatorID = 1, Height = 100, ID = 0, Type = "test_type", Width = 100, X1 = 0, X2 = 100, Y1 = 0, Y2 = 100 });
-
-            //    string map, pdf;
-            //    test.GetResourcesList(
-            //        72,
-            //        new System.Collections.Generic.List<ExelConverter.Core.DataWriter.ReExportData>(new ExelConverter.Core.DataWriter.ReExportData[] { new ExelConverter.Core.DataWriter.ReExportData("123123") })
-            //        , out map
-            //        , out pdf);
-
-            //    test.RemoveFillRectangle(100);
-
-            //    test.UploadFileToQueue(new HttpDataAccessQueueParameters() { FilePath = @"D:\test.csv", Activate = false, CoordinatesApproved = false, OperatorID = 1, Timeout = 100, UseQueue = true });
-
-            //    test.WebLogout();
-            //}
-            //catch (Exception ex)
-            //{
-            //    testErr = ex.GetExceptionText();
-            //}
-
             Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             ExelConverter.Core.Settings.SettingsProvider.Login = new LoginClass();
@@ -69,6 +39,8 @@ namespace ExelConverterLite
                 SettingsProvider.Initialize(new DataAccess());
                 SettingsProvider.IniializeSettings();
                 MainWindow mv = new MainWindow();
+
+                Locator.Import.DatabaseName = ExelConverterLite.Properties.Settings.Default.LastConnected;
 
                 Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
                 Current.MainWindow = mv;

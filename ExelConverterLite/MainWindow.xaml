@@ -9,13 +9,12 @@
         Width="700"
         MinHeight="600"
         MinWidth="900"
-        Title="ExcelConverterLite"
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding MainWindow, Source={StaticResource Locator}}"
+        Title="{Binding Path=Import.DatabaseName, Source={StaticResource Locator}, StringFormat=ExcelConverterLite ({0})}"
         Icon="icon.ico"
         Background="#CFCFCF" Closed="Window_Closed_1" >
-    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

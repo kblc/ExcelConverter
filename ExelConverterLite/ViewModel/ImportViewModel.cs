@@ -201,6 +201,20 @@ namespace ExelConverterLite.ViewModel
             ShowLoadImageWindowCommand = new RelayCommand<string>(ShowLoadImageWindow);
         }
 
+        private string databaseName = "Unknown";
+        public string DatabaseName
+        {
+            get { return databaseName; }
+            set 
+            {
+                if (value == databaseName)
+                    return;
+                databaseName = value;
+                RaisePropertyChanged("DatabaseName");
+            }
+        }
+
+
         public RelayCommand RefreshOperatorListCommand { get; private set; }
         private void RefreshOperatorList()
         {
@@ -308,7 +322,7 @@ namespace ExelConverterLite.ViewModel
         {
             if (SelectedSheet != null)
             {
-                Sharp = SelectedSheet.AsDataTable(SettingsProvider.CurrentSettings.PreloadedRowsCount);
+                Sharp = SelectedSheet.AsDataTable();
                 if (SelectedSheet.Rows.Count > 0)
                 {
                     if (SelectedSheet != null)

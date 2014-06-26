@@ -17,8 +17,6 @@ namespace ExelConverter.Core.Settings
     public interface ILogIn
     {
         bool LogIn();
-        //string Login { get; }
-        //string Password { get; }
         bool IsLogined { get; }
     }
 
