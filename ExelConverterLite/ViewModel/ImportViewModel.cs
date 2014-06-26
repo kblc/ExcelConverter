@@ -844,9 +844,25 @@ namespace ExelConverterLite.ViewModel
                     var initialRow = 0;
                     var sheet = SelectedSheet;
                     initialRow = sheet.Rows.IndexOf(sheet.MainHeader) + sheet.MainHeaderRowCount;
-                    for (var i = initialRow; i < sheet.Rows.Count; i++)
+
+                    if (sheet != null)
+                    foreach (var i in 
+                        sheet
+                        .Rows
+                        .AsParallel()
+                        .Select(r => sheet.Rows.IndexOf(r))
+                        .AsParallel()
+                        .Where(i => 
+                            i >= initialRow 
+                            && !sheet.SheetHeaders.Subheaders.Select(s => s.RowNumber).Contains(i)
+                            && !sheet.SheetHeaders.Headers.Select(s => s.RowNumber).Contains(i) 
+                            )
+                        .OrderBy(i => i)
+                        .ToArray()
+                        )
+                    //for (var i = initialRow; i < sheet.Rows.Count; i++)
                     {
-                        var cellResultContent = String.Empty;
+                        var cellResultContent = string.Empty;
 
                         cellResultContent = data.Blocks.Run(sheet, i, data);
                         if (cellResultContent != null)

@@ -247,7 +247,6 @@
                     Parser="{Binding ElementName=HostLixtBox, Path=SelectedItem.Parser}"
                     Urls="{Binding ElementName=HostLixtBox, Path=SelectedItem.Urls}"
                     Margin="3,5"
-                    MinHeight="250"
                     x:Name="ParsersGenerateRuleControl"
                     IsEnabled="{Binding ElementName=HostLixtBox, Path=SelectedItems.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                     Visibility="{Binding ElementName=ParsersGenerateRuleControl, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
