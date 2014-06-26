@@ -16,16 +16,16 @@
         <!--<p:ParseFindRuleConditionList x:Key="ParseFindRuleConditionList"/>-->
     </UserControl.Resources>
     <Grid 
-        Background="LightGreen" 
-        x:Name="GridMain"
-        IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
+            Background="LightGreen" 
+            x:Name="GridMain"
+            IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <WrapPanel Margin="4">
             <WrapPanel.Resources>
                 <Style TargetType="{x:Type Label}">
@@ -36,70 +36,70 @@
             <DockPanel Margin="8,0">
                 <Label Content="Генерирование правила для парсера:" VerticalAlignment="Center"/>
                 <TextBox 
-                Text="{Binding Path=Parser.Url}" 
-                IsReadOnly="{Binding Path=CanEditUrl, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
-                MinWidth="200"
-                Margin="4,2"/>
+                    Text="{Binding Path=Parser.Url}" 
+                    IsReadOnly="{Binding Path=CanEditUrl, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
+                    MinWidth="200"
+                    Margin="4,2"/>
             </DockPanel>
 
             <DockPanel Margin="8,0">
                 <Label Content="Метка:" Padding="0" VerticalAlignment="Center" Margin="0,2"/>
                 <ComboBox 
-                ItemsSource="{Binding Parser.Labels}" 
-                SelectedIndex="0"
-                x:Name="AddRuleLabelComboBox"
-                MinWidth="150"
-                Margin="4,2"/>
+                    ItemsSource="{Binding Parser.Labels}" 
+                    SelectedIndex="0"
+                    x:Name="AddRuleLabelComboBox"
+                    MinWidth="150"
+                    Margin="4,2"/>
             </DockPanel>
 
             <DockPanel Margin="8,0">
                 <Label Content="Тип подключения:" Padding="0" VerticalAlignment="Center" Margin="0,2"/>
                 <ComboBox
-                    ItemsSource="{StaticResource ParseRuleConnectionTypeList}"
-                    SelectedValue="{Binding Path=NewParseRule.Connection}"
-                    x:Name="ParseRuleConnectionTypeComboBox"
-                    MinWidth="150"
-                    Margin="4,2"
-                />
+                        ItemsSource="{StaticResource ParseRuleConnectionTypeList}"
+                        SelectedValue="{Binding Path=NewParseRule.Connection}"
+                        x:Name="ParseRuleConnectionTypeComboBox"
+                        MinWidth="150"
+                        Margin="4,2"
+                    />
             </DockPanel>
 
             <DockPanel Margin="8,0">
                 <Label Content="Минимальный размер:" Padding="0" VerticalAlignment="Center" Margin="0,2"/>
                 <TextBox
-                    MinWidth="50"
-                    Margin="4,2"
-                    Text="{Binding Path=NewParseRule.MinImageWidth}"
-                />
+                        MinWidth="50"
+                        Margin="4,2"
+                        Text="{Binding Path=NewParseRule.MinImageWidth}"
+                    />
                 <Label Content="х" Padding="0" VerticalAlignment="Center" Margin="0,2"/>
                 <TextBox
-                    MinWidth="50"
-                    Margin="4,2"
-                    Text="{Binding Path=NewParseRule.MinImageHeight}"
-                />
+                        MinWidth="50"
+                        Margin="4,2"
+                        Text="{Binding Path=NewParseRule.MinImageHeight}"
+                    />
             </DockPanel>
-            
+
             <CheckBox VerticalAlignment="Center" IsChecked="{Binding Path=NewParseRule.CheckImageSize}" Margin="8,0">
                 <Label Padding="0" VerticalAlignment="Center">
                     <TextBlock Text="Обязательно проверять размер при генерации правила" TextWrapping="WrapWithOverflow"/>
                 </Label>
             </CheckBox>
-            
+
             <DockPanel Margin="8,0">
                 <Label Content="Количество потоков:" VerticalAlignment="Center"/>
                 <TextBox 
-                Text="{Binding Path=ThreadCount}" 
-                MinWidth="50"
-                Margin="4,2"/>
+                    Text="{Binding Path=ThreadCount}" 
+                    MinWidth="50"
+                    Margin="4,2"/>
             </DockPanel>
 
             <!--<Label Content="{Binding Path=Parser.Url}"/>
-            <Label Content="'."/>-->
+                <Label Content="'."/>-->
         </WrapPanel>
 
         <TabControl x:Name="UrlsToAddTabControl"
-                    SelectedIndex="0"
-                    Margin="4"
-                    Grid.Row="1">
+                        SelectedIndex="0"
+                        Margin="4"
+                        Grid.Row="1">
             <TabItem Header="Список URL для определения">
                 <Grid Margin="4,4">
                     <Grid.RowDefinitions>
@@ -109,19 +109,21 @@
                     </Grid.RowDefinitions>
                     <Label Grid.Row="0" Padding="0" Margin="0,4">
                         <TextBlock Text="Для автоматического формирования правила парсинга необходимо добавить минимум 4 однотипных ссылки на страницы, где расположены изображения, а так же выбрать метку, для которой формируются данные изображения."
-                                   TextWrapping="WrapWithOverflow"/>
+                                   TextWrapping="WrapWithOverflow"
+                                   FontSize="9"/>
                     </Label>
                     <!--<StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label Content="Метка: " Padding="0" VerticalAlignment="Center" Margin="0,2"/>
-                        <ComboBox ItemsSource="{Binding Parser.Labels}" SelectedIndex="0" MinWidth="200" x:Name="AddRuleLabelComboBox"/>
-                    </StackPanel>-->
+                            <Label Content="Метка: " Padding="0" VerticalAlignment="Center" Margin="0,2"/>
+                            <ComboBox ItemsSource="{Binding Parser.Labels}" SelectedIndex="0" MinWidth="200" x:Name="AddRuleLabelComboBox"/>
+                        </StackPanel>-->
                     <DataGrid 
-                            Grid.Row="2"
-                            ItemsSource="{Binding Path=Urls}"
-                            AutoGenerateColumns="False"
-                            CanUserAddRows="True"
-                            CanUserDeleteRows="True"
-                            Margin="0,4">
+                                Grid.Row="2"
+                                ItemsSource="{Binding Path=Urls}"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="True"
+                                CanUserDeleteRows="True"
+                                MinHeight="70"
+                                Margin="0,4">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="URL" Binding="{Binding Path=Value}"/>
                         </DataGrid.Columns>
@@ -156,11 +158,11 @@
                         </Label>
                     </WrapPanel>
                     <ListBox 
-                            Grid.Row="1"
-                            x:Name="AddNewRuleSelectionListBox"
-                            ScrollViewer.VerticalScrollBarVisibility="Visible"
-                            SelectionChanged="AddNewRuleSelectionListBox_SelectionChanged"
-                            ItemsSource="{Binding Path=UrlsToAddList}">
+                                Grid.Row="1"
+                                x:Name="AddNewRuleSelectionListBox"
+                                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                SelectionChanged="AddNewRuleSelectionListBox_SelectionChanged"
+                                ItemsSource="{Binding Path=UrlsToAddList}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -171,16 +173,16 @@
 
                                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                                         <Button Content="x" Grid.Column="0" Padding="1,-6,0,-2" Margin="0" 
-                                            Command="{Binding Path=DeleteUrlWithImagesCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
-                                            CommandParameter="{Binding Path=Value}"/>
+                                                Command="{Binding Path=DeleteUrlWithImagesCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding Path=Value}"/>
                                         <Label Content="{Binding Path=Value}" Padding="0"/>
                                     </StackPanel>
-                                    
-                                    
+
+
                                     <ListBox Grid.Row="1" 
-                                                 ItemsSource="{Binding ParseResult}" 
-                                                 SelectionChanged="ListBox_SelectionChanged"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                                     ItemsSource="{Binding ParseResult}" 
+                                                     SelectionChanged="ListBox_SelectionChanged"
+                                                     ScrollViewer.HorizontalScrollBarVisibility="Auto">
                                         <ListBox.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <WrapPanel IsItemsHost="True" />
@@ -209,10 +211,10 @@
                                                         <Label Content="{Binding Path=Image.Height}"/>
                                                     </StackPanel>
                                                     <Image 
-                                                            Grid.Row="2"
-                                                            Source="{Binding Path=Image, Converter={StaticResource ImageFromUrlConverter}}"
-                                                            MaxHeight="80"
-                                                            MaxWidth="80"/>
+                                                                Grid.Row="2"
+                                                                Source="{Binding Path=Image, Converter={StaticResource ImageFromUrlConverter}}"
+                                                                MaxHeight="80"
+                                                                MaxWidth="80"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -228,7 +230,7 @@
                     </ListBox>
 
                     <Image Grid.Row="1" Grid.Column="1" MaxWidth="200" MaxHeight="200" 
-                            Source="{Binding Path=LastSelected, Converter={StaticResource ImageFromUrlConverter}}"/>
+                                Source="{Binding Path=LastSelected, Converter={StaticResource ImageFromUrlConverter}}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Правило">
@@ -257,9 +259,9 @@
                             </Label>
                         </WrapPanel>
 
-                    
+
                         <Grid Grid.Row="2">
-                        
+
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
@@ -288,18 +290,18 @@
                                 </DockPanel>
                             </Label>
                         </Grid>
-                   
+
                         <Button 
-                            Content="Добавить это правило к текущему парсеру" 
-                            Grid.Row="3" 
-                            HorizontalAlignment="Center"
-                            Margin="0,4" 
-                            Command="{Binding Path=AddNewRuleCommand}"/>
+                                Content="Добавить это правило к текущему парсеру" 
+                                Grid.Row="3" 
+                                HorizontalAlignment="Center"
+                                Margin="0,4" 
+                                Command="{Binding Path=AddNewRuleCommand}"/>
                     </Grid>
                 </GroupBox>
             </TabItem>
         </TabControl>
-        
+
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,4">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}">
@@ -310,22 +312,22 @@
             <Label Content="{Binding Path=LoadedPercent}" Padding="0" VerticalAlignment="Center"/>
             <Label Content="%" Padding="0" VerticalAlignment="Center"/>
             <Button 
-                Content="Назад"
-                Width="60"
-                IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
-                Command="{Binding PrevStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
+                    Content="Назад"
+                    Width="60"
+                    IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
+                    Command="{Binding PrevStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
             <Button 
-                Content="Далее" 
-                Width="60"
-                IsDefault="True"
-                IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=2}"
-                Command="{Binding NextStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
+                    Content="Далее" 
+                    Width="60"
+                    IsDefault="True"
+                    IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=2}"
+                    Command="{Binding NextStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
             <Button 
-                Content="Отмена" 
-                Width="60"
-                IsCancel="True"
-                Visibility="{Binding Path=CanCancel, Converter={StaticResource BooleanToVisibilityConverter}}"
-                Command="{Binding CancelCommand}"/>
+                    Content="Отмена" 
+                    Width="60"
+                    IsCancel="True"
+                    Visibility="{Binding Path=CanCancel, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding CancelCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>
