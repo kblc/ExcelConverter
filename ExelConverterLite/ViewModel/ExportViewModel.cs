@@ -322,10 +322,11 @@ namespace ExelConverterLite.ViewModel
                 try
                 {
                     ExelConverter.Core.DataAccess.HttpDataClient.Default.UploadFileToQueue(prm);
+                    MessageBox.Show("Файл добавлен в очередь", "Очередь", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch(Exception ex)
                 {
-                    Log.Add(string.Format("ExportViewModel.ExportToQueue() :: exception: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
+                    Log.Add(ex, "ExportViewModel.ExportToQueue()");
                     MessageBox.Show(string.Format("Произошла ошибка при отправке файла для постановки в очередь:{0}{1}", Environment.NewLine, ex.Message), "Ошибка при отправке файла", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
