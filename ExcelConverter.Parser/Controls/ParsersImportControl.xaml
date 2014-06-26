@@ -79,11 +79,12 @@
                 <Grid
                     Margin="0,1,0,0"
                     Width="{Binding ElementName=UrlsExpander, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-28}">
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
+                    <Label Content="{Binding Path=Urls.Count, StringFormat=Найденные ссылки ({0}):}" Padding="0" VerticalAlignment="Center"/>
+                    <!--<StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
                         <Label Content="Найденные ссылки (" Padding="0"/>
                         <Label Content="{Binding Path=Urls.Count}" Padding="0"/>
                         <Label Content="):" Padding="0"/>
-                    </StackPanel >
+                    </StackPanel >-->
                     <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                         <DockPanel Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Label Content="Потоки:" Padding="0"/>
