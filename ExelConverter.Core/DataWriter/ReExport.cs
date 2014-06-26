@@ -94,7 +94,11 @@ namespace ExelConverter.Core.DataWriter
                         #endregion
                         #region Get Links
                         Log.Add(logSession, string.Format("Try to get links..."));
-                        List<ReExportData> idsToGet = new List<ReExportData>(rowsToExport.Select(i => new ReExportData(i.Code)).Cast<ReExportData>());
+                        List<ReExportData> idsToGet = new List<ReExportData>(
+                            rowsToExport
+                            .Select(i => new ReExportData(i.Code.Trim()))
+                            .Cast<ReExportData>()
+                            );
 
                         string outerMap;
                         string outerPdf;
@@ -190,10 +194,10 @@ namespace ExelConverter.Core.DataWriter
                                                 var codeInExcel = codeCell.StringValue;
                                                 if (!string.IsNullOrWhiteSpace(codeInExcel))
                                                 {
-                                                    var normalCode = rowsToExport.FirstOrDefault(itm => itm.OriginalCode == codeInExcel);
+                                                    var normalCode = rowsToExport.FirstOrDefault(itm => itm.OriginalCode.Trim() == codeInExcel.Trim());
                                                     if (normalCode != null)
                                                     {
-                                                        var linksForCode = idsToGet.FirstOrDefault(itm => itm.Code == normalCode.Code);
+                                                        var linksForCode = idsToGet.FirstOrDefault(itm => itm.Code == normalCode.Code.Trim());
                                                         if (linksForCode != null)
                                                         {
                                                             if (!string.IsNullOrWhiteSpace(linksForCode.LinkPhoto))

@@ -775,14 +775,17 @@ namespace ExelConverterLite.ViewModel
                             SelectedSheet == null 
                             ? DocumentSheets.FirstOrDefault()
                             : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
-                        Sharp = SelectedSheet.AsDataTable();
+                        //Sharp = SelectedSheet.AsDataTable();
                         //UpdateMainHeaderRow();
-                        UpdateSheetHeaderRow();
+                        //UpdateSheetHeaderRow();
                     };
                     //Берем уже первые предзагруженные строки
                     DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
-                    SelectedSheet = DocumentSheets.FirstOrDefault();
-                    UpdateMainHeaderRow();
+                    SelectedSheet =
+                            SelectedSheet == null
+                            ? DocumentSheets.FirstOrDefault()
+                            : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
+                    //UpdateMainHeaderRow();
                 
                     document.FullLoad();
                 }
