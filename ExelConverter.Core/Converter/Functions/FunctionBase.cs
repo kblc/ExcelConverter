@@ -36,6 +36,7 @@ namespace ExelConverter.Core.Converter.Functions
     [XmlInclude(typeof(AddTextFunction))]
     [XmlInclude(typeof(GetColorFunction))]
     [XmlInclude(typeof(GetHyperlinkFunction))]
+    [XmlInclude(typeof(GetFormatedValueFunction))]
     [XmlInclude(typeof(FindNumFunction))]
     [XmlInclude(typeof(StringReverseFunction))]
     [XmlInclude(typeof(ReplaceStringFunction))]
@@ -253,6 +254,7 @@ namespace ExelConverter.Core.Converter.Functions
                 new AddTextFunction(),
                 new GetColorFunction(),
                 new GetHyperlinkFunction(),
+                new GetFormatedValueFunction(),
                 new FindNumFunction(),
                 new StringReverseFunction(),
                 new ReplaceStringFunction()

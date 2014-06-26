@@ -39,7 +39,7 @@ namespace ExelConverter.Core.Converter.Functions
 
         public override string Function(Dictionary<string, object> param)
         {
-            var str = GetStringValue(param);
+            var str = GetStringValue(param) ?? string.Empty;
 
             var startPos = Math.Max(int.Parse((string)Parameters.Where(p=>p.Name=="Начало").Single().Value), 1) - 1;
             var len = Math.Max(int.Parse((string)Parameters.Where(p => p.Name == "Длинна").Single().Value), (int)0);

@@ -154,6 +154,8 @@ namespace ExelConverter.Core.ExelDataReader
                                 return res / 4;
                             }
                             ).FirstOrDefault();
+
+                        c.FormatedValue = cell.StringValue;
                         if (link != null)
                         {
                             c.HyperLink = link.Address;
@@ -166,6 +168,7 @@ namespace ExelConverter.Core.ExelDataReader
                                 c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
                             }
                         }
+
                         if (cell.IsMerged)
                         {
                             c.IsMerged = true;

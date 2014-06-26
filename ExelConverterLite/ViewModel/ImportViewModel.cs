@@ -878,8 +878,9 @@ namespace ExelConverterLite.ViewModel
                         }
                     }
                }
-                catch
+                catch(Exception ex)
                 {
+                    Log.Add(ex, string.Format("ImportViewModel.UpdateMappingsTable('{0}')", parameter));
                     ClearMappingsTable(parameter);
                     System.Windows.MessageBox.Show("Произошла ошибка, проверьте еще раз правило,\nкорректность загрузки сетки и попробуйте снова...", "Ошибка",
                         System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);

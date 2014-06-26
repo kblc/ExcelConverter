@@ -15,6 +15,8 @@ namespace ExelConverter.Core.ExelDataReader
             IsMerged = false;
         }
 
+        public string FormatedValue { get; set; }
+
         public string Value { get; set; }
 
         public System.Drawing.Color Color { get; set; }

@@ -90,6 +90,8 @@ namespace ExelConverter.Core.Settings
             FunctionDescriptions.Add("Реверс строки", @"Функция переврачивает строку");
 
             FunctionDescriptions.Add("Замена подстроки в строке", @"Функция заменяет один набор символов на другой");
+
+            FunctionDescriptions.Add(GetFormatedValueFunction.FunctionName, @"Функция извлекает форматированное значение из выбранной ячейки");
         }
 
         public static ILogIn Login { get; set; }

@@ -106,6 +106,7 @@
     <Compile Include="Converter\Functions\FindStringFunction.cs" />
     <Compile Include="Converter\Functions\FunctionBase.cs" />
     <Compile Include="Converter\Functions\GetColorFunction.cs" />
+    <Compile Include="Converter\Functions\GetFormatedValueFunction.cs" />
     <Compile Include="Converter\Functions\GetHyperlinkFunction.cs" />
     <Compile Include="Converter\Functions\GetLeftCharFunction.cs" />
     <Compile Include="Converter\Functions\GetRightCharFunction.cs" />
