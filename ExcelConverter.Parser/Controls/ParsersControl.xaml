@@ -28,6 +28,7 @@
                 <local:ParsersImportControl
                     x:Name="ParsersImportControl"
                     Parsers="{Binding Path=Parsers, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    AllowClearUrlsAfterImport="False"
                     AllowFileImport="True"
                     AllowFileExport="True"
                     ThreadCount="3"/>
