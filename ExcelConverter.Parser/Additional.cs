@@ -1163,67 +1163,86 @@ namespace ExcelConverter.Parser
             if (document == null)
                 throw new ArgumentNullException("В функции GetAllImagesUrlsFromUrl() не может отсутствовать обязательный параметр document");
 
-            var allLinks = document
-                    .DocumentNode
-                    .Descendants("img")
-                    .Where(n => 
-                        n.Attributes.Contains("src") && 
-                        Helper.IsWellFormedUriString(n.Attributes["src"].Value, UriKind.RelativeOrAbsolute))
-                    .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(n.Attributes["src"].Value, document, url) })
-                    .ToArray();
+            bool wasException = false;
+            var logSession = Helpers.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()");
+            try
+            { 
+                var allLinks = document
+                        .DocumentNode
+                        .Descendants("img")
+                        .Where(n => 
+                            n.Attributes.Contains("src") && 
+                            Helper.IsWellFormedUriString(n.Attributes["src"].Value, UriKind.RelativeOrAbsolute))
+                        .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(n.Attributes["src"].Value, document, url) })
+                        .ToArray();
             
-            //add some links (<a href="img_source"/>)
+                //add some links (<a href="img_source"/>)
 
-            var allALinks = document
-                    .DocumentNode
-                    .Descendants("a")
-                    .Where(n => n.Attributes.Contains("href"))
-                    .Where(n =>
+                var allALinks = document
+                        .DocumentNode
+                        .Descendants("a")
+                        .Where(n => n.Attributes.Contains("href"))
+                        .Where(n =>
+                        {
+                            string href = n.Attributes["href"].Value;
+                            string[] likes = new string[] { "*.jp*g", "*.bmp", "*.gif" };
+                            return likes.Any(i => Helper.StringLikes(href, i)) && Helper.IsWellFormedUriString(href, UriKind.RelativeOrAbsolute);
+                        })
+                        .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(n.Attributes["href"].Value, document, url) })
+                        .ToArray();
+
+                if (allALinks.Length > 0)
+                    allLinks = allLinks.Union(allALinks).ToArray();
+
+                string regExString = "(https?:)?//?[^\'\"<>]+?\\.(jpg|jpeg|gif|png|bmp)";// @"/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$";
+
+                if (document.DocumentNode != null)
+                {
+                    if (document.DocumentNode.FirstChild != null && !string.IsNullOrWhiteSpace(document.DocumentNode.InnerHtml))
+                        foreach (Match m in Regex.Matches(document.DocumentNode.InnerHtml, regExString)) //"(\\S+?)\\.(jpg|png|gif|jpeg|bmp)"
+                        {
+                            string value = m.Value;
+                            while (value.IndexOf("(") >= 0)
+                                value = value.Substring(value.IndexOf("(")+1);
+
+                            if (Helper.IsWellFormedUriString(value, UriKind.RelativeOrAbsolute))
+                                try
+                                {
+                                    Uri newUri = Helper.GetFullSourceLink(value, document, url);
+                                    if (!allLinks.Any(l => l.Url.AbsoluteUri == newUri.AbsoluteUri))
+                                        allLinks = allLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
+                                }
+                                catch(Exception)
+                                {
+
+                                }
+                        }
+
+                    if (allLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
                     {
-                        string href = n.Attributes["href"].Value;
-                        string[] likes = new string[] { "*.jp*g", "*.bmp", "*.gif" };
-                        return likes.Any(i => Helper.StringLikes(href, i)) && Helper.IsWellFormedUriString(href, UriKind.RelativeOrAbsolute);
-                    })
-                    .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(n.Attributes["href"].Value, document, url) })
-                    .ToArray();
-
-            if (allALinks.Length > 0)
-                allLinks = allLinks.Union(allALinks).ToArray();
-
-            string regExString = "(https?:)?//?[^\'\"<>]+?\\.(jpg|jpeg|gif|png|bmp)";// @"/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$";
-
-            foreach (Match m in Regex.Matches(document.DocumentNode.InnerHtml, regExString)) //"(\\S+?)\\.(jpg|png|gif|jpeg|bmp)"
-            {
-                string value = m.Value;
-                while (value.IndexOf("(") >= 0)
-                    value = value.Substring(value.IndexOf("(")+1);
-
-                if (Helper.IsWellFormedUriString(value, UriKind.RelativeOrAbsolute))
-                    try
-                    {
-                        Uri newUri = Helper.GetFullSourceLink(value, document, url);
-                        if (!allLinks.Any(l => l.Url.AbsoluteUri == newUri.AbsoluteUri))
-                            allLinks = allLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
+                        allLinks = allLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } }).ToArray();
                     }
-                    catch(Exception)
-                    {
+                }
 
-                    }
+                List<SomeNodeElement> distinctedLinks = new List<SomeNodeElement>(allLinks);
+                for (int i = distinctedLinks.Count - 1; i >= 0; i--)
+                {
+                    int lnToDel = distinctedLinks.Count(i2 => i2.Url.AbsoluteUri == distinctedLinks[i].Url.AbsoluteUri && i2 != distinctedLinks[i]);
+                    if (lnToDel > 0)
+                        distinctedLinks.RemoveAt(i);
+                }
+                return distinctedLinks.ToArray();
             }
-
-            if (allLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
+            catch(Exception ex)
             {
-                allLinks = allLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } }).ToArray();
+                wasException = true;
+                Log.Add(logSession, ex);
+                throw ex;
             }
-
-            List<SomeNodeElement> distinctedLinks = new List<SomeNodeElement>(allLinks);
-            for (int i = distinctedLinks.Count - 1; i >= 0; i--)
+            finally
             {
-                int lnToDel = distinctedLinks.Count(i2 => i2.Url.AbsoluteUri == distinctedLinks[i].Url.AbsoluteUri && i2 != distinctedLinks[i]);
-                if (lnToDel > 0)
-                    distinctedLinks.RemoveAt(i);
+                Log.SessionEnd(logSession, wasException);
             }
-            return distinctedLinks.ToArray();
         }
         internal static SomeNodeElement[] GetAllImagesUrlsWithMinSize(SomeNodeElement[] items, System.Drawing.Size minSize)
         {

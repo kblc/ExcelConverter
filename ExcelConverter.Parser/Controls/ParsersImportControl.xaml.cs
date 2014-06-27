@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Helpers;
 
 namespace ExcelConverter.Parser.Controls
 {
@@ -123,7 +124,54 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
-        public ParserCollection Parsers { get; set; }
+        private ParserCollection parsers = null;
+        public ParserCollection Parsers
+        {
+            get { return parsers; }
+            set
+            {
+                if (parsers == value)
+                    return;
+
+                if (parsers != null)
+                {
+                    foreach(var p in parsers.Parsers)
+                        p.PropertyChanged -= parser_PropertyChanged;
+                    parsers.Parsers.CollectionChanged -= Parsers_CollectionChanged;
+                }
+                parsers = value;
+                if (parsers != null)
+                { 
+                    foreach (var p in parsers.Parsers)
+                        p.PropertyChanged += parser_PropertyChanged;
+                    parsers.Parsers.CollectionChanged += Parsers_CollectionChanged;
+                    ReCalcParser();
+                }
+            }
+        }
+
+        private void RulesCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+                foreach (var p in e.OldItems.Cast<ParseRule>())
+                    p.PropertyChanged -= r_PropertyChanged;
+            if (e.NewItems != null)
+                foreach (var p in e.NewItems.Cast<ParseRule>())
+                    p.PropertyChanged += r_PropertyChanged;
+            ReCalcParser();
+        }
+
+        private void Parsers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+                foreach (var p in e.OldItems.Cast<Parser>())
+                    p.PropertyChanged -= parser_PropertyChanged;
+
+            if (e.NewItems != null)
+                foreach (var p in e.NewItems.Cast<Parser>())
+                    p.PropertyChanged += parser_PropertyChanged;
+            ReCalcParser();
+        }
 
         private void parser_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -138,8 +186,36 @@ namespace ExcelConverter.Parser.Controls
             Labels.Clear();
             if (Parser != null && Parsers != null)
             {
-                SimilarParser = Parsers.Parsers.Where(p => Helper.StringLikes(p.Url, parser.Url) || Helper.StringLikes(parser.Url, p.Url)).FirstOrDefault();
+                var newSimilarparser = Parsers.Parsers.Where(p => Helper.StringLikes(p.Url, parser.Url) || Helper.StringLikes(parser.Url, p.Url)).FirstOrDefault();
+                if (newSimilarparser != SimilarParser)
+                {
+                    if (SimilarParser != null)
+                    { 
+                        foreach (var r in SimilarParser.Rules)
+                            r.PropertyChanged -= r_PropertyChanged;
+                        SimilarParser.Rules.CollectionChanged -= RulesCollection_CollectionChanged;
+                    }
+
+                    SimilarParser = newSimilarparser;
+
+                    if (SimilarParser != null)
+                    {
+                        foreach (var r in SimilarParser.Rules)
+                            r.PropertyChanged += r_PropertyChanged;
+                        SimilarParser.Rules.CollectionChanged += RulesCollection_CollectionChanged;
+                    }
+                } else
+                {
+                    RaisePropertyChanged("SimilarParser");
+                    RaisePropertyChanged("SimilarParserExists");
+                    RaisePropertyChanged("SimilarParserRules");
+                }
             }
+        }
+
+        private void r_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ReCalcParser();
         }
 
         private ObservableCollection<string> labels = null;
@@ -747,40 +823,40 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
+        private void ParsersGenerateRuleControl_Cancel(object sender, RuleRoutedEventArgs e)
+        {
+            SelectImportRuleTabCommand.Execute(null);
+        }
         private void ParsersGenerateRuleControl_Done(object sender, RuleRoutedEventArgs e)
         {
+            IsBusy = true;
             try
             {
-                IsBusy = true;
+                if (e.Rule != null)
+                { 
+                    var parserExisted = (Parsers.Parsers.Where(p => p.Url == e.Parser.Url).FirstOrDefault());
 
-                var parserExisted = (Parsers.Parsers.Where(p => p.Url == e.Parser.Url).FirstOrDefault());
-
-                if (parserExisted == null)
-                {
-                    parserExisted = new Parser() { Url = e.Parser.Url };
-                    Parsers.Parsers.Add(parserExisted);
-                }
-
-                foreach (var r in parserExisted.Rules.Where(r => r.Label == e.Rule.Label).ToArray())
-                    parserExisted.Rules.Remove(r);
-
-                parserExisted.Rules.Add(
-                    new ParseRule()
+                    if (parserExisted == null)
                     {
-                        Label = e.Rule.Label,
-                        Parameter = e.Rule.Parameter,
-                        Condition = e.Rule.Condition,
-                        Connection = e.Rule.Connection,
-                        MinImageSize = e.Rule.MinImageSize,
-                        CheckImageSize = e.Rule.CheckImageSize
-                    });
+                        parserExisted = new Parser() { Url = e.Parser.Url };
+                        Parsers.Parsers.Add(parserExisted);
+                    }
 
-                if (AllowClearUrlsAfterImport)
-                    foreach (var url in Urls.Where(i => Helper.IsWellFormedUriString(i.Value, UriKind.Absolute) && Helper.StringLikes(new Uri(i.Value).Host, e.Parser.Url)).ToArray())
-                        Urls.Remove(url);
+                    foreach (var r in parserExisted.Rules.Where(r => r.Label == e.Rule.Label).ToArray())
+                        parserExisted.Rules.Remove(r);
+
+                    ParseRule newRule = new ParseRule();
+                    e.Rule.CopyObject(newRule);
+                    parserExisted.Rules.Add(newRule);
+
+                    if (AllowClearUrlsAfterImport)
+                        foreach (var url in Urls.Where(i => Helper.IsWellFormedUriString(i.Value, UriKind.Absolute) && Helper.StringLikes(new Uri(i.Value).Host, e.Parser.Url)).ToArray())
+                            Urls.Remove(url);
+                }
             }
             finally
             {
+                SelectImportRuleTabCommand.Execute(null);
                 IsBusy = false;
             }
         }
@@ -855,5 +931,6 @@ namespace ExcelConverter.Parser.Controls
             (sender as Button).ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
             (sender as Button).ContextMenu.IsOpen = true;
         }
+
     }
 }

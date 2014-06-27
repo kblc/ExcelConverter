@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Helpers;
 
 namespace ExcelConverter.Parser.Controls
 {
@@ -196,9 +197,15 @@ namespace ExcelConverter.Parser.Controls
             {
                 return doneCommand ?? (doneCommand = new DelegateCommand((o) =>
                 {
-                    Parser saveParser = Parser;
+                    Parser savedParser = Parser;
+                    ParseRule savedRule = (o as ParseRule);
+                    if (savedRule == null)
+                    {
+                        savedRule = new ParseRule();
+                        NewParseRule.CopyObject(savedRule);
+                    }
                     UpdateStep(0, false, true);
-                    RaiseEvent(new RuleRoutedEventArgs(DoneEvent) { Rule = NewParseRule, Parser = saveParser });
+                    RaiseEvent(new RuleRoutedEventArgs(DoneEvent) { Rule = savedRule, Parser = savedParser });
                 }));
             }
         }
@@ -210,12 +217,15 @@ namespace ExcelConverter.Parser.Controls
             {
                 return addNewRuleCommand ?? (addNewRuleCommand = new DelegateCommand((o) =>
                 {
-                    foreach (var item in Parser.Rules.Where(i => i.Label == NewParseRule.Label).ToArray())
+                    ParseRule savedRule = new ParseRule();
+                    NewParseRule.CopyObject(savedRule);
+
+                    foreach (var item in Parser.Rules.Where(i => i.Label == savedRule.Label).ToArray())
                         Parser.Rules.Remove(item);
-                    Parser.Rules.Add(NewParseRule);
+                    Parser.Rules.Add(savedRule);
 
                     if (DoneCommand != null)
-                        DoneCommand.Execute(NewParseRule);
+                        DoneCommand.Execute(savedRule);
                 }));
             }
         }
@@ -270,6 +280,7 @@ namespace ExcelConverter.Parser.Controls
             if (clear)
                 UrlsToAddList.Clear();
 
+            #region step 1
             if (step == 1 && action)
             {
                 object lockAdd = new Object();
@@ -347,28 +358,9 @@ namespace ExcelConverter.Parser.Controls
                 while (bw.IsBusy)
                     Helper.DoEvents();
                 bw = null;
-
-                //List<UrlResultWrapper> urlResultWrapper = new List<UrlResultWrapper>();
-
-                //Urls.AsParallel()
-                //    .WithDegreeOfParallelism(insideThreadCount)
-                //    .Where(item => item != null && !string.IsNullOrWhiteSpace(item.Value) && Helper.IsWellFormedUriString(item.Value, UriKind.Absolute))
-                //    .ForAll(
-                //        (sw) => 
-                //        {
-                //            var item = new UrlResultWrapper() { Value = sw.Value };
-                //            foreach (ParseImageResult res in Helper.GetAllImagesFromUrl(item.Value, threadCount, true))
-                //                item.ParseResult.Add(res);
-                //            if (item.ParseResult.Count > 0)
-                //                lock (lockAdd)
-                //                {
-                //                    urlResultWrapper.Add(item);
-                //                }
-                //        });
-
-                //foreach (var item in urlResultWrapper)
-                //    UrlsToAddList.Add(item);
             }
+            #endregion
+            #region step 2
             else if (step == 2 && action)
             {
                 HtmlNodeWithUrl[] nodes =
@@ -389,13 +381,9 @@ namespace ExcelConverter.Parser.Controls
                     .ToArray();
 
                 ParseRule newRule = Helper.GetRule(nodes, AddRuleLabelComboBox.Text, NewParseRule.MinImageSize);
-
-                NewParseRule.Condition = newRule.Condition;
-                NewParseRule.Label = newRule.Label;
-                NewParseRule.Parameter = newRule.Parameter;
-                NewParseRule.MinImageSize = newRule.MinImageSize;
-                NewParseRule.CheckImageSize = newRule.CheckImageSize;
+                newRule.CopyObject(NewParseRule, new string[] { "Connection" });
             }
+            #endregion
 
             for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
                 (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == step) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
