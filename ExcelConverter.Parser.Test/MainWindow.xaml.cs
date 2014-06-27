@@ -5,6 +5,9 @@ namespace ExcelConverter.Parser.Test
 {
     [Serializable]
     [System.Xml.Serialization.XmlRoot("ParserCollection")]
+    [System.Xml.Serialization.XmlInclude(typeof(ParserCollection))]
+    [System.Xml.Serialization.XmlInclude(typeof(DBParserCollection))]
+    [System.Xml.Serialization.XmlInclude(typeof(MyDBParserCollection))]
     public class MyDBParserCollection : ExcelConverter.Parser.DBParserCollection { }
 
     public partial class MainWindow : Window

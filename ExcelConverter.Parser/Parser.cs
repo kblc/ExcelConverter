@@ -11,6 +11,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
+
+using Helpers;
+using Helpers.Serialization;
 
 namespace ExcelConverter.Parser
 {
@@ -315,6 +319,8 @@ namespace ExcelConverter.Parser
 
     [Serializable]
     [System.Xml.Serialization.XmlRoot("ParserCollection")]
+    [System.Xml.Serialization.XmlInclude(typeof(ParserCollection))]
+    [System.Xml.Serialization.XmlInclude(typeof(DBParserCollection))]
     public abstract class DBParserCollection : ParserCollection
     {
         public DBParserCollection() : base()
@@ -515,7 +521,9 @@ namespace ExcelConverter.Parser
     }
 
     [Serializable]
-    public class ParserCollection : INotifyPropertyChanged
+    [System.Xml.Serialization.XmlRoot("ParserCollection")]
+    [System.Xml.Serialization.XmlInclude(typeof(ParserCollection))]
+    public class ParserCollection : INotifyPropertyChanged, Helpers.Serialization.ISerializable
     {
         private const string LabelPhoto = "Фото";
         private const string LabelSchema = "Схема";
@@ -604,58 +612,25 @@ namespace ExcelConverter.Parser
 
         public string Serialize()
         {
-            var stringRule = string.Empty;
-            using (var stream = new MemoryStream())
-            {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, this);
-                var bytes = stream.ToArray();
-                stringRule = System.Convert.ToBase64String(bytes);
-            }
-            return stringRule;
+            return this.SerializeToBase64(true);
         }
 
         public string SerializeXML()
         {
-            string result = string.Empty;
+            return Helpers.Serialization.Extensions.SerializeToXML(this, false);
+        }
 
-            System.Xml.Serialization.XmlSerializer s = new System.Xml.Serialization.XmlSerializer(this.GetType());
-            using (MemoryStream stream = new MemoryStream())
-            {
-                s.Serialize(stream, this);
-                stream.Seek(0, SeekOrigin.Begin);
-                result = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
-            }
+        public static ParserCollection Deserilize(string obj)
+        {
+            ParserCollection result;
+            typeof(ParserCollection).DeserializeFromBase64(obj, true, out result);
             return result;
         }
 
-        public static object Deserilize(string obj, Type type)
+        public static ParserCollection DeserilizeXML(string obj)
         {
-            object result = null;
-            using (var stream = new MemoryStream(System.Convert.FromBase64String(obj)))
-            {
-                var formatter = new BinaryFormatter();
-                result = formatter.Deserialize(stream);
-
-                if (result is ParserCollection)
-                    foreach (var p in (result as ParserCollection).Parsers)
-                        p.Init();
-            }
-            return result;
-        }
-
-        public static object DeserilizeXML(string obj, Type type)
-        {
-            object result = null;
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(obj)))
-            {
-                System.Xml.Serialization.XmlSerializer s = new System.Xml.Serialization.XmlSerializer(type);
-                result = s.Deserialize(stream);
-
-                if (result is ParserCollection)
-                    foreach (var p in (result as ParserCollection).Parsers)
-                        p.Init();
-            }
+            ParserCollection result;
+            typeof(ParserCollection).DeserializeFromXML(obj, out result);
             return result;
         }
 
@@ -673,11 +648,17 @@ namespace ExcelConverter.Parser
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        public void OnDeserialized()
+        {
+            foreach (var p in Parsers)
+                p.Init();
+        }
     }
 
     [Serializable]
     //[System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public class Parser : INotifyPropertyChanged
+    public class Parser : INotifyPropertyChanged, Helpers.Serialization.ISerializable
     {
         [NonSerializedAttribute]
         [System.Xml.Serialization.XmlIgnore]
@@ -844,7 +825,7 @@ namespace ExcelConverter.Parser
                 foreach (var rule in e.OldItems.Cast<ParseRule>())
                     rule.PropertyChanged -= Rule_PropertyChanged;
             }
-            RaisePropertyChanged("Rules");
+            //RaisePropertyChanged("Rules");
             //}
         }
 
@@ -870,9 +851,9 @@ namespace ExcelConverter.Parser
             }
         }
 
-        private ObservableCollection<ParseRule> rules = new ObservableCollection<ParseRule>();
+        private ObservableCollectionEx<ParseRule> rules = new ObservableCollectionEx<ParseRule>();
         [field: NonSerializedAttribute()]
-        public ObservableCollection<ParseRule> Rules
+        public ObservableCollectionEx<ParseRule> Rules
         {
             get
             {
@@ -955,16 +936,7 @@ namespace ExcelConverter.Parser
 
         public string SerializeXML()
         {
-            string result = string.Empty;
-
-            System.Xml.Serialization.XmlSerializer s = new System.Xml.Serialization.XmlSerializer(this.GetType());
-            using (MemoryStream stream = new MemoryStream())
-            {
-                s.Serialize(stream, this);
-                stream.Seek(0, SeekOrigin.Begin);
-                result = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
-            }
-            return result;
+            return this.SerializeToXML();
         }
 
         public static object Deserialize(string obj, Type type)
@@ -981,17 +953,10 @@ namespace ExcelConverter.Parser
             return result;
         }
 
-        public static object DeserializeXML(string obj, Type type)
+        public static Parser DeserializeXML(string obj, Type type)
         {
-            object result = null;
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(obj)))
-            {
-                System.Xml.Serialization.XmlSerializer s = new System.Xml.Serialization.XmlSerializer(type);
-                result = s.Deserialize(stream);
-
-                if (result is Parser)
-                    (result as Parser).Init();
-            }
+            Parser result;
+            typeof(Parser).DeserializeFromXML(obj, out result);
             return result;
         }
 
@@ -1010,5 +975,10 @@ namespace ExcelConverter.Parser
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        public void OnDeserialized()
+        {
+            Init();
+        }
     }
 }

@@ -314,7 +314,7 @@ namespace ExelConverter.Core.DataAccess
                             .AsEnumerable()
                             .Select(parser =>
                             {
-                                Parser p = Parser.Deserialize(parser.xml, typeof(Parser)) as Parser;
+                                Parser p = Parser.DeserializeXML(parser.xml, typeof(Parser)) as Parser;
                                 if (p != null)
                                     p.Id = parser.id;
                                 return p;
@@ -377,7 +377,7 @@ namespace ExelConverter.Core.DataAccess
                                 {
                                     id = p.Id,
                                     url = p.Url,
-                                    xml = p.Serialize()
+                                    xml = p.SerializeXML()
                                 })
                             .ToArray();
                     result = parsersToInsert.Select(p => p.id).ToArray();
@@ -410,7 +410,7 @@ namespace ExelConverter.Core.DataAccess
                             if (pToUpdate != null)
                             {
                                 p.url = pToUpdate.Url;
-                                p.xml = pToUpdate.Serialize();
+                                p.xml = pToUpdate.SerializeXML();
                             }
                         }
                         dc.SaveChanges();

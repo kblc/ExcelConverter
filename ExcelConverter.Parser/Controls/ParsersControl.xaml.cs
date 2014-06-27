@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Helpers.Serialization;
 
 namespace ExcelConverter.Parser.Controls
 {
@@ -204,9 +205,9 @@ namespace ExcelConverter.Parser.Controls
             {
                 string text = System.IO.File.ReadAllText(filePath);
 
-                var parsers = (ParserCollection)((System.IO.Path.GetExtension(filePath).ToLower() == ".xml")
-                    ? ParserCollection.DeserilizeXML(text, Parsers.GetType())
-                    : ParserCollection.Deserilize(text, Parsers.GetType()));
+                var parsers = (System.IO.Path.GetExtension(filePath).ToLower() == ".xml")
+                    ? ParserCollection.DeserilizeXML(text)
+                    : ParserCollection.Deserilize(text);
 
                 Parsers.Parsers.Clear();
                 foreach (var parser in parsers.Parsers)
