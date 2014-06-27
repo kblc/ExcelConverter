@@ -409,6 +409,34 @@ namespace ExcelConverter.Parser.Controls
             ParseUrlsCommand.Execute(label);
         }
 
+        private DelegateCommand selectGenerateRuleTabCommand = null;
+        public ICommand SelectGenerateRuleTabCommand
+        {
+            get
+            {
+                return selectGenerateRuleTabCommand ?? (selectGenerateRuleTabCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        TabControl.SelectedIndex = 1;
+                    }
+                ));
+            }
+        }
+
+        private DelegateCommand selectImportRuleTabCommand = null;
+        public ICommand SelectImportRuleTabCommand
+        {
+            get
+            {
+                return selectImportRuleTabCommand ?? (selectImportRuleTabCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        TabControl.SelectedIndex = 0;
+                    }
+                ));
+            }
+        }
+
         private DelegateCommand selectFileCommand = null;
         public ICommand SelectFileCommand
         {
