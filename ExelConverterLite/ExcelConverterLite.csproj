@@ -344,6 +344,7 @@
     <PostBuildEvent>del "$(TargetDir)*.pdb"
 del "$(TargetDir)CefSharp.xml"
 del "$(TargetDir)HtmlAgilityPack.xml"
+del "$(TargetDir)Helpers*.xml"
 del "$(TargetDir)GalaSoft.MvvmLight.Extras.WPF4.xml"
 del "$(TargetDir)GalaSoft.MvvmLight.WPF4.xml"
 del "$(TargetDir)EntityFramework.xml"
