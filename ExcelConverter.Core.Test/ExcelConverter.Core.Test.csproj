@@ -41,9 +41,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+    <Reference Include="Helpers">
+      <HintPath>..\..\Helpers\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="System" />

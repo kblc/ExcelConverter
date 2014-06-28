@@ -55,9 +55,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
+    <Reference Include="Helpers, Version=1.0.5.10, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+      <HintPath>..\..\Helpers\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack\HtmlAgilityPack.dll</HintPath>

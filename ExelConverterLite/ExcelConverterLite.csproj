@@ -67,9 +67,9 @@
       <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net40\GalaSoft.MvvmLight.WPF4.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
+    <Reference Include="Helpers, Version=1.0.5.10, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+      <HintPath>..\..\Helpers\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
     <Reference Include="Helpers.Controls">
       <HintPath>..\..\Helpers\Helpers.Controls\bin\x86\Release\Helpers.Controls.dll</HintPath>

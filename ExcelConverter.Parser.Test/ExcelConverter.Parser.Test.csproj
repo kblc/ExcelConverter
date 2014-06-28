@@ -34,9 +34,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
+    <Reference Include="Helpers">
+      <HintPath>..\..\Helpers\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
