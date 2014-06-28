@@ -71,6 +71,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="Helpers.Controls">
+      <HintPath>..\..\Helpers\Helpers.Controls\bin\x86\Release\Helpers.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Helpers.WPF">
+      <HintPath>..\..\Helpers\Helpers.WPF\bin\x86\Release\Helpers.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>

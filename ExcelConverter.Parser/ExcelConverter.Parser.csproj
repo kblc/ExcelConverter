@@ -54,6 +54,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="Helpers.Controls">
+      <HintPath>..\..\Helpers\Helpers.Controls\bin\x86\Release\Helpers.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Helpers.WPF">
+      <HintPath>..\..\Helpers\Helpers.WPF\bin\x86\Release\Helpers.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack\HtmlAgilityPack.dll</HintPath>
     </Reference>

@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Helpers;
+using Helpers.WPF;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Threading;

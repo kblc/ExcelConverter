@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 
 using Helpers;
+using Helpers.WPF;
 using Helpers.Serialization;
 
 namespace ExcelConverter.Parser
