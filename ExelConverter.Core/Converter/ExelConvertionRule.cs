@@ -20,7 +20,10 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using Helpers;
+using Helpers.Serialization;
+using Helpers.WPF;
 using ExelConverter.Core.Converter.Functions;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter
 {
@@ -56,7 +59,10 @@ namespace ExelConverter.Core.Converter
     }
 
     [Serializable]
-    public class ExelConvertionRule : INotifyPropertyChanged, ICopyFrom<ExelConvertionRule>
+    [XmlRoot("Rule")]
+    [XmlInclude(typeof(FieldConvertionData))]
+    [XmlInclude(typeof(SearchTag))]
+    public class ExelConvertionRule : INotifyPropertyChanged, Helpers.Serialization.ISerializable, ICopyFrom<ExelConvertionRule>
     {
         [NonSerialized]
         public const string DefaultName = "По умолчанию";
@@ -72,11 +78,12 @@ namespace ExelConverter.Core.Converter
 
         [NonSerialized]
         private bool isMapParsingDataLoaded = false;
-        [field: NonSerialized]
+        [XmlIgnore]
         public bool IsMapParsingDataLoaded { get { return isMapParsingDataLoaded; } }
 
         [NonSerialized]
         private ObservableCollection<ImageParsingData> _mapParsingData;
+        [XmlIgnore]
         public ObservableCollection<ImageParsingData> MapParsingData
         {
             get 
@@ -97,11 +104,12 @@ namespace ExelConverter.Core.Converter
 
         [NonSerialized]
         private bool isPhotoParsingDataLoaded = false;
-        [field: NonSerialized]
+        [XmlIgnore]
         public bool IsPhotoParsingDataLoaded { get { return isPhotoParsingDataLoaded; } }
 
         [NonSerialized]
         private ObservableCollection<ImageParsingData> _photoParsingData;
+        [XmlIgnore]
         public ObservableCollection<ImageParsingData> PhotoParsingData
         {
             get
@@ -120,75 +128,99 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        [NonSerialized]
-        private ImageParsingData _selectedPhotoParsingData;
-        public ImageParsingData SelectedPhotoParsingData
-        {
-            get { return _selectedPhotoParsingData ?? (_selectedPhotoParsingData = PhotoParsingData.FirstOrDefault()); }
-            set
-            {
-                if (_selectedPhotoParsingData != value)
-                {
-                    _selectedPhotoParsingData = value;
-                    RaisePropertyChanged("SelectedPhotoParsingData");
-                }
-            }
-        }
-
-        [NonSerialized]
-        private ImageParsingData _selectedMapParsingData;
-        public ImageParsingData SelectedMapParsingData
-        {
-            get { return _selectedPhotoParsingData ?? (_selectedPhotoParsingData = MapParsingData.FirstOrDefault()); }
-            set
-            {
-                if (_selectedMapParsingData != value)
-                {
-                    _selectedMapParsingData = value;
-                    RaisePropertyChanged("SelectedMapParsingData");
-                }
-            }
-        }
-
-        //[NonSerialized]
         private ObservableCollection<FieldConvertionData> _convertionData;
+
+        [XmlArray("Convertions")]
+        [XmlArrayItem(ElementName = "Convertion", Type = typeof(FieldConvertionData))]
         public ObservableCollection<FieldConvertionData> ConvertionData 
         {
             get
             {
-                return _convertionData ??
-                    (
-                        _convertionData = new ObservableCollection<FieldConvertionData>
-                        {
-                            new FieldConvertionData{FieldName = "Код", PropertyId="Code", Owner = this},
-                            new FieldConvertionData{FieldName = "Код DOORS", PropertyId="CodeDoors", Owner = this},
-                            new FieldConvertionData{FieldName = "Тип", PropertyId="Type", Owner = this, IsCheckable = true },
-                            new FieldConvertionData{FieldName = "Сторона", PropertyId="Side", Owner = this},
-                            new FieldConvertionData{FieldName = "Размер", PropertyId="Size", Owner = this},
-                            new FieldConvertionData{FieldName = "Освещение", PropertyId="Light", Owner = this},
-                            new FieldConvertionData{FieldName = "Ограничения", PropertyId="Restricted", Owner = this},
-                            new FieldConvertionData{FieldName = "Город", PropertyId="City", Owner = this, IsCheckable = true},
-                            new FieldConvertionData{FieldName = "Район", PropertyId="Region", Owner = this},
-                            new FieldConvertionData{FieldName = "Адрес", PropertyId="Address", Owner = this},
-                            new FieldConvertionData{FieldName = "Описание", PropertyId="Description", Owner = this},
-                            new FieldConvertionData{FieldName = "Цена", PropertyId="Price", Owner = this},
-                            new FieldConvertionData{FieldName = "Фото", PropertyId="Photo_img", Owner = this},
-                            new FieldConvertionData{FieldName = "Фото расп.", PropertyId="Location_img", Owner = this}
-                        }
-                );
+                if (_convertionData == null)
+                {
+                    _convertionData = new ObservableCollection<FieldConvertionData>();
+                    foreach (var cd in
+                        new FieldConvertionData[] 
+                            {
+                                new FieldConvertionData{FieldName = "Код", PropertyId="Code", Owner = this},
+                                new FieldConvertionData{FieldName = "Код DOORS", PropertyId="CodeDoors", Owner = this},
+                                new FieldConvertionData{FieldName = "Тип", PropertyId="Type", Owner = this, IsCheckable = true },
+                                new FieldConvertionData{FieldName = "Сторона", PropertyId="Side", Owner = this},
+                                new FieldConvertionData{FieldName = "Размер", PropertyId="Size", Owner = this},
+                                new FieldConvertionData{FieldName = "Освещение", PropertyId="Light", Owner = this},
+                                new FieldConvertionData{FieldName = "Ограничения", PropertyId="Restricted", Owner = this},
+                                new FieldConvertionData{FieldName = "Город", PropertyId="City", Owner = this, IsCheckable = true},
+                                new FieldConvertionData{FieldName = "Район", PropertyId="Region", Owner = this},
+                                new FieldConvertionData{FieldName = "Адрес", PropertyId="Address", Owner = this},
+                                new FieldConvertionData{FieldName = "Описание", PropertyId="Description", Owner = this},
+                                new FieldConvertionData{FieldName = "Цена", PropertyId="Price", Owner = this},
+                                new FieldConvertionData{FieldName = "Фото", PropertyId="Photo_img", Owner = this},
+                                new FieldConvertionData{FieldName = "Фото расп.", PropertyId="Location_img", Owner = this}
+                            }
+                        )
+                        _convertionData.Add(cd);
+                    _convertionData.CollectionChanged += _convertionData_CollectionChanged;
+                }
+                return _convertionData;
             }
-            //set
-            //{
-            //    if (_convertionData != value)
-            //    {
-            //        _convertionData = value;
-            //        RaisePropertyChanged("ConvertionData");
-            //    }
-            //}
+            set
+            {
+                if (value == ConvertionData)
+                    return;
+
+                if (value != null)
+                    foreach(var cd in value)
+                        ConvertionData.Add(cd);
+            }
+        }
+
+        [NonSerialized]
+        private bool supressChangeEvent = false;
+        private void _convertionData_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (supressChangeEvent)
+                return;
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                supressChangeEvent = true;
+                try
+                {
+                    foreach (var cd in 
+                            e.NewItems
+                            .Cast<FieldConvertionData>()
+                            .Select(nw => new { NewValue = nw, OldValue = ConvertionData.FirstOrDefault(cd => cd.PropertyId == nw.PropertyId && cd != nw) })
+                            .Where(i => i.OldValue != null)
+                            .ToArray())
+                        {
+                            var oldInd = ConvertionData.IndexOf(cd.OldValue);
+                            ConvertionData.Remove(cd.OldValue);
+                            //ConvertionData.Insert(oldInd, cd.NewValue);
+                            cd.NewValue.Owner = this;
+                        }
+                }
+                finally
+                {
+                    supressChangeEvent = false;
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                supressChangeEvent = true;
+                try
+                {
+                    foreach (var cd in e.OldItems.Cast<FieldConvertionData>())
+                        ConvertionData.Add(cd);
+                }
+                finally
+                {
+                    supressChangeEvent = false;
+                }
+            }
         }
 
         private int _id;
-        [field: NonSerializedAttribute()]
+        [XmlAttribute("Id")]
         public int Id
         {
             get { return _id; }
@@ -196,7 +228,7 @@ namespace ExelConverter.Core.Converter
         }
 
         private int _fkOperatorId;
-        [field: NonSerializedAttribute()]
+        [XmlAttribute("Operator")]
         public int FkOperatorId
         {
             get { return _fkOperatorId; }
@@ -204,7 +236,7 @@ namespace ExelConverter.Core.Converter
         }
 
         private string _name;
-        [field: NonSerializedAttribute()]
+        [XmlAttribute("Name")]
         public string Name 
         {
             get { return _name; }
@@ -219,6 +251,9 @@ namespace ExelConverter.Core.Converter
         }
 
         private ObservableCollection<SearchTag> _mainHeaderSearchTags = new ObservableCollection<SearchTag>();
+
+        [XmlArray(ElementName = "MainHeaderSearchTags")]
+        [XmlArrayItem(ElementName="Tag", Type=typeof(SearchTag))]
         public ObservableCollection<SearchTag> MainHeaderSearchTags
         {
             get
@@ -241,6 +276,9 @@ namespace ExelConverter.Core.Converter
         }
 
         private ObservableCollection<SearchTag> _sheetHeadersSearchTags = new ObservableCollection<SearchTag>();
+
+        [XmlArray(ElementName = "SheetHeadersSearchTags")]
+        [XmlArrayItem(ElementName = "Tag", Type = typeof(SearchTag))]
         public ObservableCollection<SearchTag> SheetHeadersSearchTags
         {
             get { return _sheetHeadersSearchTags; }
@@ -590,6 +628,11 @@ namespace ExelConverter.Core.Converter
             return byteRule;
         }
 
+        public byte[] SerializeToCompressedBytes()
+        {
+            return this.SerializeToXML(true).CompressToBytes();
+        }
+
         public string SerializeXML()
         {
             string result = string.Empty;
@@ -601,6 +644,13 @@ namespace ExelConverter.Core.Converter
                 stream.Seek(0, SeekOrigin.Begin);
                 result = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
             }
+            return result;
+        }
+
+        public static ExelConvertionRule DeserializeFromCompressedBytes(byte[] image)
+        {
+            ExelConvertionRule result;
+            typeof(ExelConvertionRule).DeserializeFromXML(image.DecompressFromBytes(), out result);
             return result;
         }
 
@@ -713,8 +763,6 @@ namespace ExelConverter.Core.Converter
             //FindMainHeaderByTags = source.FindMainHeaderByTags;
             Name = source.Name;
             FkOperatorId = source.FkOperatorId;
-            _selectedPhotoParsingData = null;
-            _selectedMapParsingData = null;
 
             UpdateMappingTablesValues();
 
@@ -725,12 +773,19 @@ namespace ExelConverter.Core.Converter
         {
             return Name;
         }
+
+        public void OnDeserialized()
+        {
+            UpdateAfterDeserialize(this);
+        }
     }
 
     [Serializable]
+    [XmlRoot("Tag")]
     public class SearchTag : INotifyPropertyChanged, ICopyFrom<SearchTag>
     {
         private string _tag;
+        [XmlAttribute("Value")]
         public string Tag
         {
             get { return _tag; }
@@ -744,7 +799,7 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        [field: NonSerializedAttribute()] //ADDED
+        [field: NonSerializedAttribute()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void RaisePropertyChanged(string propertyName)

@@ -41,28 +41,85 @@ namespace ExelConverter.Core.Converter.Functions
     [XmlInclude(typeof(StringReverseFunction))]
     [XmlInclude(typeof(ReplaceStringFunction))]
     [XmlInclude(typeof(FunctionBase))]
+    [XmlInclude(typeof(Parameter))]
+    [XmlInclude(typeof(FunctionParameters))]
+    [XmlRoot("Function")]
     public abstract class FunctionBase : INotifyPropertyChanged
     {
-        public FunctionBase()
-        {
-            
-        }
+        public FunctionBase() { }
 
         private ObservableCollection<Parameter> _parameters;
+        [XmlArray("Parameters")]
         public ObservableCollection<Parameter> Parameters
         {
-            get { return _parameters; }
+            get
+            { 
+                if (_parameters == null)
+                {
+                    _parameters = new ObservableCollection<Parameter>();
+                    _parameters.CollectionChanged += _parameters_CollectionChanged;
+                }
+                return _parameters;
+            }
             set
             {
-                if (_parameters != value)
+                if (Parameters == value)
+                    return;
+
+                Parameters.Clear();
+                if (value != null)
+                    foreach (var b in value)
+                        Parameters.Add(b);
+
+                RaisePropertyChanged("Parameters");
+            }
+        }
+
+        [NonSerialized]
+        private bool supressChangeEvent = false;
+        private void _parameters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (supressChangeEvent)
+                return;
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                supressChangeEvent = true;
+                try
                 {
-                    _parameters = value;
-                    RaisePropertyChanged("Parameters");
+                    foreach (var cd in
+                            e.NewItems
+                            .Cast<Parameter>()
+                            .Select(nw => new { NewValue = nw, OldValue = Parameters.FirstOrDefault(cd => cd.Name == nw.Name && cd != nw) })
+                            .Where(i => i.OldValue != null)
+                            .ToArray())
+                    {
+                        var oldInd = Parameters.IndexOf(cd.OldValue);
+                        Parameters.Remove(cd.OldValue);
+                    }
+                }
+                finally
+                {
+                    supressChangeEvent = false;
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                supressChangeEvent = true;
+                try
+                {
+                    foreach (var cd in e.OldItems.Cast<Parameter>())
+                        Parameters.Add(cd);
+                }
+                finally
+                {
+                    supressChangeEvent = false;
                 }
             }
         }
 
         private string _name;
+        [XmlIgnore]
         public string Name
         {
             get { return _name; }
@@ -72,16 +129,19 @@ namespace ExelConverter.Core.Converter.Functions
                 {
                     _name = value;
                     RaisePropertyChanged("Name");
+                    RaisePropertyChanged("Description");
                 }
             }
         }
 
+        [XmlIgnore]
         public string Description
         {
             get { return Settings.SettingsProvider.FunctionDescriptions[Name]; }
         }
 
         private bool _absoluteCoincidence;
+        [XmlAttribute("AbsoluteCoincidence")]
         public bool AbsoluteCoincidence
         {
             get { return _absoluteCoincidence; }
@@ -96,6 +156,7 @@ namespace ExelConverter.Core.Converter.Functions
         }
 
         private string _stringFormat;
+        [XmlIgnore]        
         public string StringFormat
         {
             get { return _stringFormat; }
@@ -109,29 +170,21 @@ namespace ExelConverter.Core.Converter.Functions
             }
         }
 
-        [System.Xml.Serialization.XmlIgnoreAttribute]
         [NonSerialized]
         private ObservableCollection<FunctionParameters> _allowedParameters;
-        [System.Xml.Serialization.XmlIgnoreAttribute]
+        [XmlIgnore]
         public ObservableCollection<FunctionParameters> AllowedParameters
         {
             get 
             {
                 return _allowedParameters ?? (_allowedParameters = GetAllowedParameters());
             }
-            //set
-            //{
-            //    if (_allowedParameters != value)
-            //    {
-            //        _allowedParameters = value;
-            //        RaisePropertyChanged("AllowedParameters");
-            //    }
-            //}
         }
 
         protected abstract ObservableCollection<FunctionParameters> GetAllowedParameters();
 
         private FunctionParameters? _selectedParameter;
+        [XmlIgnore]
         public FunctionParameters? SelectedParameter
         {
             get { return _selectedParameter; }
@@ -141,11 +194,28 @@ namespace ExelConverter.Core.Converter.Functions
                 {
                     _selectedParameter = value;
                     RaisePropertyChanged("SelectedParameter");
+                    RaisePropertyChanged("SelectedParameterString");
                 }
             }
         }
 
+        [XmlAttribute("GetValuesBy")]
+        public string SelectedParameterString
+        {
+            get { return SelectedParameter == null ? string.Empty : SelectedParameter.ToString(); }
+            set 
+            {
+                foreach(var i in typeof(FunctionParameters).GetEnumValues())
+                    if (i.ToString() == value)
+                    {
+                        SelectedParameter = (FunctionParameters)i;
+                        break;
+                    }
+            }
+        }
+
         private int _columnNumber;
+        [XmlAttribute("ColumnNumber")]
         public int ColumnNumber
         {
             get { return _columnNumber; }
@@ -160,6 +230,7 @@ namespace ExelConverter.Core.Converter.Functions
         }
 
         private string _columnName;
+        [XmlAttribute("ColumnName")]
         public string ColumnName
         {
             get
@@ -237,7 +308,6 @@ namespace ExelConverter.Core.Converter.Functions
             throw new NotImplementedException();
         }
 
-
         public static ObservableCollection<FunctionBase> GetSupportedFunctions()
         {
             return new ObservableCollection<FunctionBase>
@@ -259,11 +329,6 @@ namespace ExelConverter.Core.Converter.Functions
                 new StringReverseFunction(),
                 new ReplaceStringFunction()
             };
-        }
-
-        public void UpdateSupportedFunctions()
-        {
-
         }
 
         [field: NonSerialized]

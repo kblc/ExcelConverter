@@ -8,12 +8,15 @@ using ExelConverter.Core.Converter.Functions;
 using ExelConverter.Core.ExelDataReader;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlRoot("ExpectedValue")]
     public class ExpextedValue : ICopyFrom<ExpextedValue>
     {
+        [XmlAttribute("Value")]
         public string Value { get; set; }
 
         public ExpextedValue CopyFrom(ExpextedValue source)
@@ -24,34 +27,26 @@ namespace ExelConverter.Core.Converter.CommonTypes
     }
 
     [Serializable]
+    [XmlRoot("Condition")]
+    [XmlInclude(typeof(ExpextedValue))]
+    [XmlInclude(typeof(FunctionBase))]
     public class FunctionBlockStartRule : INotifyPropertyChanged, ICopyFrom<FunctionBlockStartRule>
     {
-        public FunctionBlockStartRule()
-        {
-            //ExpectedValues = new ObservableCollection<ExpextedValue>();
-            //SupportedFunctions = FunctionBase.GetSupportedFunctions();
-            //Rule = SupportedFunctions.FirstOrDefault();
-            //Id = Guid.NewGuid();
-        }
+        public FunctionBlockStartRule() { }
 
         private Guid id = Guid.Empty;
+        [XmlIgnore]
         public Guid Id 
         {
             get
             {
                 return id == Guid.Empty ? (id = Guid.NewGuid()) : id;
             }
-            set
-            {
-                id = value;
-                RaisePropertyChanged("Id");
-            }
         }
        
-        [System.Xml.Serialization.XmlIgnoreAttribute]
         [NonSerialized]
         private ObservableCollection<FunctionBase> _supportedFunctions;
-        [System.Xml.Serialization.XmlIgnoreAttribute]
+        [XmlIgnore]
         public ObservableCollection<FunctionBase> SupportedFunctions
         {
             get 
@@ -76,9 +71,6 @@ namespace ExelConverter.Core.Converter.CommonTypes
             get
             {
                 return _rule ?? (_rule = SupportedFunctions.FirstOrDefault());
-                    //(_rule == null)
-                    //? SupportedFunctions.FirstOrDefault()
-                    //: SupportedFunctions.Where(item => item.Name == _rule.Name).FirstOrDefault();
             }
             set
             {
@@ -96,20 +88,26 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private ObservableCollection<ExpextedValue> _expectedValues;
+        [XmlArray("ExpectedValues")]
         public ObservableCollection<ExpextedValue> ExpectedValues
         {
             get { return _expectedValues ?? (_expectedValues = new ObservableCollection<ExpextedValue>()); }
             set
             {
-                if (_expectedValues != value)
-                {
-                    _expectedValues = value;
-                    RaisePropertyChanged("ExpectedValues");
-                }
+                if (ExpectedValues == value)
+                    return;
+
+                ExpectedValues.Clear();
+                if (value != null)
+                    foreach (var b in value)
+                        ExpectedValues.Add(b);
+
+                RaisePropertyChanged("ExpectedValues");
             }
         }
 
         private bool _absoluteCoincidence;
+        [XmlAttribute("AbsoluteCoincidence")]
         public bool AbsoluteCoincidence
         {
             get { return _absoluteCoincidence; }

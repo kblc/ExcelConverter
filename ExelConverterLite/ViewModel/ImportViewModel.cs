@@ -30,7 +30,9 @@ using ExelConverter.Core.ImagesParser;
 using ExelConverterLite.Utilities;
 using System.Windows.Forms;
 using Helpers;
+using Helpers.Serialization;
 using System.Threading;
+using System.Xml.Serialization;
 
 
 namespace ExelConverterLite.ViewModel
@@ -188,11 +190,11 @@ namespace ExelConverterLite.ViewModel
                         {
                             return SelectedSheet != null && SelectedOperator != null && SelectedOperator.MappingRules != null;
                         });
-            SaveRuleCommand = new RelayCommand(SaveRule, () => SelectedOperator != null && SelectedOperator.MappingRule != null);
-            LoadRuleCommand = new RelayCommand(LoadRule);
+            SaveRuleCommand = new RelayCommand(() => SaveRulesToFile(true), () => SelectedOperator != null && SelectedOperator.MappingRule != null);
+            LoadRuleCommand = new RelayCommand(() => LoadRulesFromFile(true));
 
-            SaveAllRulesCommand = new RelayCommand(SaveAllRules, () => SelectedOperator != null && SelectedOperator.MappingRule != null);
-            LoadAllRulesCommand = new RelayCommand(LoadAllRules);
+            SaveAllRulesCommand = new RelayCommand(() => SaveRulesToFile(false), () => SelectedOperator != null && SelectedOperator.MappingRule != null);
+            LoadAllRulesCommand = new RelayCommand(() => LoadRulesFromFile(false));
 
             RefreshOperatorListCommand = new RelayCommand(RefreshOperatorList);
             RefreshMappingTablesCommnad = new RelayCommand(RefreshMappingTables);
@@ -235,29 +237,33 @@ namespace ExelConverterLite.ViewModel
             if (SelectedOperator != null)
             {
                 RealUpdateOperatorAndRulesFromDatabase();
-
-                if (SelectedSheet == null || SelectedSheet.Rows.Count == 0)
-                {
-                    SheetHeaders.Clear();
-                    foreach (var rule in SelectedOperator.MappingRules)
-                        foreach (var data in rule.ConvertionData)
-                            foreach (var block in data.Blocks.Blocks)
-                            {
-                                foreach (var func in block.UsedFunctions)
-                                    if (func.Function != null && !string.IsNullOrWhiteSpace(func.Function.ColumnName) && !SheetHeaders.Contains(func.Function.ColumnName))
-                                        SheetHeaders.Add(func.Function.ColumnName);
-
-                                foreach (var srule in block.StartRules)
-                                    if (srule.Rule != null && !string.IsNullOrWhiteSpace(srule.Rule.ColumnName) && !SheetHeaders.Contains(srule.Rule.ColumnName))
-                                        SheetHeaders.Add(srule.Rule.ColumnName);
-                            }
-                }
-                else if (SelectedSheet != null)
-                    UpdateSheetHeaders();
+                UpdateAllowedColumns();
             } else
                 SheetHeaders.Clear();
 
             //RaisePropertyChanged("SelectedOperator");
+        }
+
+        private void UpdateAllowedColumns()
+        {
+            if (SelectedSheet == null || SelectedSheet.Rows.Count == 0)
+            {
+                SheetHeaders.Clear();
+                foreach (var rule in SelectedOperator.MappingRules)
+                    foreach (var data in rule.ConvertionData)
+                        foreach (var block in data.Blocks.Blocks)
+                        {
+                            foreach (var func in block.UsedFunctions)
+                                if (func.Function != null && !string.IsNullOrWhiteSpace(func.Function.ColumnName) && !SheetHeaders.Contains(func.Function.ColumnName))
+                                    SheetHeaders.Add(func.Function.ColumnName);
+
+                            foreach (var srule in block.StartRules)
+                                if (srule.Rule != null && !string.IsNullOrWhiteSpace(srule.Rule.ColumnName) && !SheetHeaders.Contains(srule.Rule.ColumnName))
+                                    SheetHeaders.Add(srule.Rule.ColumnName);
+                        }
+            }
+            else if (SelectedSheet != null)
+                UpdateSheetHeaders();
         }
 
         private void UpdateSelectedField()
@@ -351,7 +357,10 @@ namespace ExelConverterLite.ViewModel
 
         public void RealUpdateOperatorAndRulesFromDatabase()
         {
-            SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(_appSettingsDataAccess.GetRulesByOperator(SelectedOperator));
+            SelectedOperator.MappingRules = new ObservableCollection<ExelConvertionRule>(
+                _appSettingsDataAccess.GetRulesByOperator(SelectedOperator)
+                .OrderBy(r => (r.Name == ExelConvertionRule.DefaultName ? "0" : "1") + r.Name)
+                );
             if (SelectedOperator.MappingRules.Count == 0)
             {
                 var mappingRule = new ExelConvertionRule
@@ -573,121 +582,118 @@ namespace ExelConverterLite.ViewModel
         }
 
         public RelayCommand SaveRuleCommand { get; private set; }
-        private void SaveRule()
-        {
-            var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog.Filter = "Rule files (*.rule)|*.rule|XML rule files (*.xml)|*.xml|All files (*.*)|*.*";
-            saveFileDialog.DefaultExt = "rule";
-            saveFileDialog.AddExtension = true;
-            saveFileDialog.RestoreDirectory = true;
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                try
-                {
-                    if (System.IO.Path.GetExtension(saveFileDialog.FileName).ToLower() == ".xml")
-                    {
-                        System.Xml.Serialization.XmlSerializer s = new System.Xml.Serialization.XmlSerializer(typeof(ExelConvertionRule));
-                        using (TextWriter writer = new StreamWriter(saveFileDialog.FileName))
-                        {
-                            s.Serialize(writer, SelectedOperator.MappingRule);
-                            writer.Close();
-                        }
-                    }
-                    else
-                    {
-                        string text = SelectedOperator.MappingRule.Serialize();
-                        System.IO.File.WriteAllText(saveFileDialog.FileName, text);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Add(string.Format("SaveRule() :: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
-                    MessageBox.Show(string.Format("Произошла ошибка при сохранении правила:{0}{1}", Environment.NewLine, ex.Message), "Ошибка при загрузке правила", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-        }
-
-        public RelayCommand LoadRuleCommand { get; private set; }
-        private void LoadRule()
-        {
-            var openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = "Rule files (*.rule)|*.rule|All files (*.*)|*.*";
-            openFileDialog.RestoreDirectory = true;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-                try
-                {
-                    string text = System.IO.File.ReadAllText(openFileDialog.FileName);
-                    var ruleDeserialized = ExelConvertionRule.DeserializeFromB64String(text);
-                    var rule = ruleDeserialized;// (new ExelConvertionRule()).CopyFrom(ruleDeserialized);
-                    rule.FkOperatorId = (int)SelectedOperator.Id;
-                    rule.Id = 0;
-                    rule.Name = SelectedOperator.MappingRule.Name;
-                    var index = SelectedOperator.MappingRules.IndexOf(SelectedOperator.MappingRule);
-                    SelectedOperator.MappingRules.RemoveAt(index);
-                    SelectedOperator.MappingRules.Insert(index, rule);
-                    SelectedOperator.MappingRule = rule;
-                }
-                catch (Exception ex)
-                {
-                    Log.Add(string.Format("LoadRule() :: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
-                    MessageBox.Show(string.Format("Произошла ошибка при загрузке правила:{0}{1}",Environment.NewLine, ex.Message),"Ошибка при загрузке правила",MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-        }
-
         public RelayCommand SaveAllRulesCommand { get; private set; }
-        private void SaveAllRules()
+        private void SaveRulesToFile(bool single)
         {
-            var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog.Filter = "Rules files (*.rules)|*.rules|All files (*.*)|*.*";
-            saveFileDialog.DefaultExt = "rules";
-            saveFileDialog.AddExtension = true;
-            saveFileDialog.RestoreDirectory = true;
+            var deleteBadChars = new Func<string,string>((s) =>
+            {
+                string res = s;
+                foreach(var c in System.IO.Path.GetInvalidFileNameChars())
+                    res = res.Replace(c.ToString(),"");
+                return res;
+            });            
+
+            var saveFileDialog = new System.Windows.Forms.SaveFileDialog()
+            {
+                Filter = "XML rules files (*.xml)|*.xml|Rules files (*.rules)|*.rules|All files (*.*)|*.*",
+                FileName = deleteBadChars(SelectedOperator.Name + ((single) ? " - " + SelectedOperator.MappingRule.Name : string.Empty)),
+                DefaultExt = "xml",
+                AddExtension = true,
+                RestoreDirectory = true
+            }; 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 try
                 {
-                    string text = string.Empty;
-                    foreach (var rule in SelectedOperator.MappingRules)
-                        text += (string.IsNullOrWhiteSpace(text) ? string.Empty : Environment.NewLine) + rule.Serialize();  
-                    System.IO.File.WriteAllText(saveFileDialog.FileName, text);
+                    if (single)
+                        SaveRulesToFile(new ExelConvertionRule[] { SelectedOperator.MappingRule }, saveFileDialog.FileName);
+                    else
+                        SaveRulesToFile(SelectedOperator.MappingRules.ToArray(), saveFileDialog.FileName);
                 }
                 catch (Exception ex)
                 {
-                    Log.Add(string.Format("SaveRules() :: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
+                    Log.Add(ex, "ImportViewModel.SaveRulesToFile()");
                     MessageBox.Show(string.Format("Произошла ошибка при сохранении правил:{0}{1}", Environment.NewLine, ex.Message), "Ошибка при загрузке правил", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
         }
 
+        private void SaveRulesToFile(ExelConvertionRule[] rules, string fileName)
+        {
+            bool IsXML = (System.IO.Path.GetExtension(fileName).ToLower() == ".xml");
+            string text = (new List<ExelConvertionRule>(rules)).SerializeToXML(!IsXML);
+            if (IsXML)
+                System.IO.File.WriteAllText(fileName, text); 
+            else
+                System.IO.File.WriteAllBytes(fileName, text.CompressToBytes());
+        }
+
+        public RelayCommand LoadRuleCommand { get; private set; }
         public RelayCommand LoadAllRulesCommand { get; private set; }
-        private void LoadAllRules()
+        private void LoadRulesFromFile(bool single)
         {
             var openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = "Rules files (*.rules)|*.rules|All files (*.*)|*.*";
+            openFileDialog.Filter = "XML rules files (*.xml)|*.xml|Rules files (*.rules)|*.rules|All files (*.*)|*.*";
             openFileDialog.RestoreDirectory = true;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
                 try
                 {
-                    string[] lines = System.IO.File.ReadAllLines(openFileDialog.FileName);
-                    foreach (var text in lines)
+                    var storedRules = LoadRulesFromFile(openFileDialog.FileName);
+                    if (storedRules.Length == 0)
+                        throw new Exception("Файл поврежден");
+
+                    bool startLoad = true;
+
+                    if (single && storedRules.Length != 1 || !single)
+                        startLoad = MessageBox.Show(string.Format("В выбранно файле найдено правил: {0}. Импортировать все?", storedRules.Length),"Загрузка правил",MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
+
+                    if (startLoad)
                     {
-                        var ruleDeserialized = ExelConvertionRule.DeserializeFromB64String(text);
-                        var rule = ruleDeserialized;// new ExelConvertionRule().CopyFrom(ruleDeserialized);
-                        rule.FkOperatorId = (int)SelectedOperator.Id;
-                        rule.Id = 0;
-                        var replacedRule = SelectedOperator.MappingRules.Where(i => i.Name == rule.Name).FirstOrDefault();
-                        var index = replacedRule == null ? -1 : SelectedOperator.MappingRules.IndexOf(replacedRule);
-                        if (index >= 0)
+                        foreach (var rule in
+                            storedRules
+                            .Select(r => new { NewRule = r, OldRule = SelectedOperator.MappingRules.FirstOrDefault(i => i.Name == r.Name && r != i) })
+                            .ToArray()
+                            )
                         {
-                            SelectedOperator.MappingRules.RemoveAt(index);
-                            SelectedOperator.MappingRules.Insert(index, rule);
+                            if (single && storedRules.Length == 1)
+                                rule.NewRule.Name = SelectedOperator.MappingRule.Name;
+
+                            rule.NewRule.FkOperatorId = (int)SelectedOperator.Id;
+                            rule.NewRule.Id = 0;
+                            rule.NewRule.OnDeserialized();
+
+                            if (rule.OldRule != null)
+                            {
+                                var index = SelectedOperator.MappingRules.IndexOf(rule.OldRule);
+                                SelectedOperator.MappingRules.RemoveAt(index);
+                                SelectedOperator.MappingRules.Insert(index, rule.NewRule);
+                            }                             
+                            else
+                                SelectedOperator.MappingRules.Add(rule.NewRule);
                         }
+
+                        if (single && storedRules.Length == 1)
+                            SelectedOperator.MappingRule = storedRules[0];
                         else
-                            SelectedOperator.MappingRules.Add(rule);
+                            SelectedOperator.MappingRule = SelectedOperator.MappingRules.FirstOrDefault();
+                        UpdateAllowedColumns();
                     }
-                    SelectedOperator.MappingRule = SelectedOperator.MappingRules.FirstOrDefault();
                 }
                 catch (Exception ex)
                 {
-                    Log.Add(string.Format("LoadAllRules() :: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
+                    Log.Add(ex, "ImportViewModel.LoadRulesFromFile()");
                     MessageBox.Show(string.Format("Произошла ошибка при загрузке правил:{0}{1}", Environment.NewLine, ex.Message), "Ошибка при загрузке правил", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+        }
+
+        private static ExelConvertionRule[] LoadRulesFromFile(string fileName)
+        {
+            bool IsXML = (System.IO.Path.GetExtension(fileName).ToLower() == ".xml");
+            string text = (IsXML) 
+                ? System.IO.File.ReadAllText(fileName)
+                : System.IO.File.ReadAllBytes(fileName).DecompressFromBytes();
+
+            List<ExelConvertionRule> storedRules;
+            typeof(List<ExelConvertionRule>).DeserializeFromXML(text, out storedRules);
+            return storedRules.ToArray();
         }
 
         private RelayCommand<DataRowView> addTagToHeaderCommand = null;
@@ -1488,6 +1494,9 @@ namespace ExelConverterLite.ViewModel
                     SelectedOperator.MappingRule.PropertyChanged -= MappingRule_PropertyChanged;
                     SelectedOperator.MappingRule.PropertyChanged += MappingRule_PropertyChanged;
                 }
+
+                if (SelectedOperator.MappingRule != null)
+                    SelectedField = SelectedOperator.MappingRule.ConvertionData.FirstOrDefault();
             }
         }
 

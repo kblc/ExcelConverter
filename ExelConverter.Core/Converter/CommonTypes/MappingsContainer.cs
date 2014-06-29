@@ -10,18 +10,19 @@ using System.Collections.Specialized;
 using System.Windows.Input;
 using System.Windows.Controls;
 using ExelConverter.Core.DataObjects;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlRoot("MappingContainer")]
     public class MappingsContainer : ObservableCollection<Mapping>, INotifyPropertyChanged, ICopyFrom<MappingsContainer>
     {
-        
         public MappingsContainer() : base() { }
 
         protected override void InsertItem(int index, Mapping item)
         {
-            item.AllowedValues = AllowedValues;
+            //item.AllowedValues = AllowedValues;
             item.Owner = this;
             base.InsertItem(index, item);       
         }
@@ -30,24 +31,25 @@ namespace ExelConverter.Core.Converter.CommonTypes
         public FieldConvertionData Owner { get; set; }
 
         private ObservableCollection<string> _allowedValues;
+        [XmlIgnore]
         public ObservableCollection<string> AllowedValues
         {
             get { return _allowedValues ?? (_allowedValues = new ObservableCollection<string>()); }
             set
             {
-                if (_allowedValues != value)
-                {
-                    _allowedValues = value;
+                if (_allowedValues == value)
+                    return;
 
-                    foreach (var item in this)
-                        item.AllowedValues = _allowedValues;
-
-                    RaisePropertyChanged("AllowedValues");
-                }
+                _allowedValues.Clear();
+                if (value != null)
+                    foreach (var v in value)
+                        _allowedValues.Add(v);
+                RaisePropertyChanged("AllowedValues");
             }
         }
 
         private bool _absoluteCoincidence;
+        [XmlAttribute("AbsoluteCoincidence")]
         public bool AbsoluteCoincidence
         {
             get { return _absoluteCoincidence; }

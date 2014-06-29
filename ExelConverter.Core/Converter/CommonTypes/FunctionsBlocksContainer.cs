@@ -6,25 +6,33 @@ using System.Linq;
 using System.Text;
 
 using ExelConverter.Core.ExelDataReader;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlInclude(typeof(FunctionsBlock))]
+    [XmlRoot("FunctionalContainer")]
     public class FunctionsBlocksContainer : INotifyPropertyChanged, ICopyFrom<FunctionsBlocksContainer>
     {
         public FunctionsBlocksContainer() { }
 
         private ObservableCollection<FunctionsBlock> _blocks;
+        [XmlArray("FunctionalBlocks")]
         public ObservableCollection<FunctionsBlock> Blocks
         {
             get { return _blocks ?? (_blocks = new ObservableCollection<FunctionsBlock>()); }
             set
             {
-                if (_blocks != value)
-                {
-                    _blocks = value;
-                    RaisePropertyChanged("Blocks");
-                }
+                if (Blocks == value)
+                    return;
+
+                Blocks.Clear();
+                if (value != null)
+                    foreach (var b in value)
+                        Blocks.Add(b);
+
+                RaisePropertyChanged("Blocks");
             }
         }
 

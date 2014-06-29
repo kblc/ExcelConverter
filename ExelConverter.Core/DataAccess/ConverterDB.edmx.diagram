@@ -5,7 +5,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="564ca8508e9c4d398f1b0aa1405511a4" Name="Diagram1">
-        <EntityTypeShape EntityType="exelconverterModel.convertion_rules" Width="1.5" PointX="1.875" PointY="2.875" />
+        <EntityTypeShape EntityType="exelconverterModel.convertion_rules" Width="2.125" PointX="1.25" PointY="2.875" />
         <EntityTypeShape EntityType="exelconverterModel.locks" Width="1.5" PointX="3.75" PointY="2.875" />
         <EntityTypeShape EntityType="exelconverterModel.parsers" Width="1.5" PointX="5.75" PointY="2.875" />
         <EntityTypeShape EntityType="exelconverterModel.operator_export_rule" Width="1.5" PointX="7.5" PointY="2.875" />

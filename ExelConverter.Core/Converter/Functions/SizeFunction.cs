@@ -18,7 +18,7 @@ namespace ExelConverter.Core.Converter.Functions
             Name = "Поиск размера";
             SelectedParameter = FunctionParameters.CellName;
             Parameters = new System.Collections.ObjectModel.ObservableCollection<CommonTypes.Parameter>();
-            StringFormat = Name + "()";
+            //StringFormat = Name + "()";
         }
 
         protected override ObservableCollection<FunctionParameters> GetAllowedParameters()

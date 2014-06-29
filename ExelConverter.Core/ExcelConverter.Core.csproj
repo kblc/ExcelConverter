@@ -59,6 +59,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Helpers\Helpers\bin\x86\Release\Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="Helpers.WPF, Version=1.0.1.0, Culture=neutral, PublicKeyToken=4363817a581d5ef0, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Helpers\Helpers.WPF\bin\x86\Release\Helpers.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack\HtmlAgilityPack.dll</HintPath>
     </Reference>

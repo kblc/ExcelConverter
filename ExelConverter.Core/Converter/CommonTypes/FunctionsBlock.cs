@@ -14,30 +14,25 @@ using System.Xml.Serialization;
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlRoot("FunctionContainer")]
     public class FunctionContainer : ICopyFrom<FunctionContainer>
     {
-        public FunctionContainer()
-        {
-            //SupportedFunctions = FunctionBase.GetSupportedFunctions();
-            //Function = SupportedFunctions.FirstOrDefault();
-            //Id = Guid.NewGuid();
-        }
+        public FunctionContainer() { }
 
+        [NonSerialized]
         private Guid id = Guid.Empty;
+        [XmlIgnore]
         public Guid Id
         {
             get
             {
                 return id == Guid.Empty ? id = Guid.NewGuid() : id;
             }
-            set
-            {
-                id = value;
-            }
         }
 
         private FunctionBase _function;
 
+        [XmlElement("Function")]
         [BindableAttribute(true)]
         public FunctionBase Function 
         {
@@ -59,10 +54,9 @@ namespace ExelConverter.Core.Converter.CommonTypes
             }
         }
 
-        [System.Xml.Serialization.XmlIgnoreAttribute]
         [NonSerialized]
         private ObservableCollection<FunctionBase> _supportedFunctions;
-        [System.Xml.Serialization.XmlIgnoreAttribute]
+        [XmlIgnore]
         public ObservableCollection<FunctionBase> SupportedFunctions
         {
             get
@@ -89,17 +83,12 @@ namespace ExelConverter.Core.Converter.CommonTypes
     }
 
     [Serializable]
+    [XmlRoot("FunctionalBlock")]
+    [XmlInclude(typeof(FunctionBlockStartRule))]
+    [XmlInclude(typeof(FunctionContainer))]
     public class FunctionsBlock : INotifyPropertyChanged, ICopyFrom<FunctionsBlock>
     {
-        public FunctionsBlock()
-        {
-            //UsedFunctions = new ObservableCollection<FunctionContainer>();
-            //StartRules = new ObservableCollection<FunctionBlockStartRule>();
-            //Id = Guid.NewGuid();
-            //DeleteFunctionCommand = new FunctionBlockCommand(DeleteFunction);
-            //DeleteStartRuleCommand = new FunctionBlockCommand(DeleteStartRule);
-        }
-
+        public FunctionsBlock() { }
 
         [NonSerialized]
         [System.Xml.Serialization.XmlIgnoreAttribute]
@@ -135,20 +124,17 @@ namespace ExelConverter.Core.Converter.CommonTypes
 
         [NonSerialized]
         private Guid id = Guid.Empty;
+        [XmlIgnore]
         public Guid Id 
         {
             get
             {
-                return id == Guid.Empty ? (id = Guid.NewGuid() ): id;
-            }
-            set
-            {
-                id = value;
-                RaisePropertyChanged("Id");
+                return id == Guid.Empty ? (id = Guid.NewGuid()) : id;
             }
         }
 
         private bool _returnAfterExecute;
+        [XmlAttribute("ReturnAfterExecute")]
         public bool ReturnAfterExecute
         {
             get { return _returnAfterExecute; }
@@ -185,6 +171,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private bool _isAllStartRulesNeeded;
+        [XmlAttribute("CheckAllConditions")]
         public bool IsAllStartRulesNeeded
         {
             get { return _isAllStartRulesNeeded; }
@@ -199,30 +186,40 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private ObservableCollection<FunctionBlockStartRule> _startRules = null;
+        [XmlArray("Conditions")]
         public ObservableCollection<FunctionBlockStartRule> StartRules
         {
             get { return _startRules ?? (_startRules = new ObservableCollection<FunctionBlockStartRule>()); }
             set
             {
-                if (_startRules != value)
-                {
-                    _startRules = value;
-                    RaisePropertyChanged("StartRules");
-                }
+                if (StartRules == value)
+                    return;
+
+                StartRules.Clear();
+                if (value != null)
+                    foreach (var b in value)
+                        StartRules.Add(b);
+
+                RaisePropertyChanged("StartRules");
             }
         }
 
         private ObservableCollection<FunctionContainer> _usedFunctions = null;
+        [XmlArray("Functions")]
         public ObservableCollection<FunctionContainer> UsedFunctions
         {
             get { return _usedFunctions ?? (_usedFunctions = new ObservableCollection<FunctionContainer>()); }
             set
             {
-                if (_usedFunctions != value)
-                {
-                    _usedFunctions = value;
-                    RaisePropertyChanged("UsedFunctions");
-                }
+                if (UsedFunctions == value)
+                    return;
+
+                UsedFunctions.Clear();
+                if (value != null)
+                    foreach (var b in value)
+                        UsedFunctions.Add(b);
+
+                RaisePropertyChanged("UsedFunctions");
             }
         }
 
@@ -395,7 +392,6 @@ namespace ExelConverter.Core.Converter.CommonTypes
     [Serializable]
     public class FunctionBlockCommand : ICommand 
     {
-
         private Action<Guid> _action;
 
         public FunctionBlockCommand(Action<Guid> action)

@@ -18,5 +18,6 @@ namespace ExelConverter.Core.DataAccess
         public int fk_operator_id { get; set; }
         public string convertion_rule { get; set; }
         public byte[] convertion_rule_image { get; set; }
+        public byte[] convertion_rule_image_cprs { get; set; }
     }
 }

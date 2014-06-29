@@ -15,7 +15,7 @@ namespace ExelConverter.Core.Converter.Functions
         public DefaultValueFunction()
         {
             Name = "По Умолчанию";
-            StringFormat = Name + "()";
+            //StringFormat = Name + "()";
             SelectedParameter = null;
             Parameters = new ObservableCollection<Parameter>()
             {

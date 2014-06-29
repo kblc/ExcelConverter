@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using ExelConverter.Core.Settings;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.DataObjects
 {
@@ -73,6 +74,8 @@ namespace ExelConverter.Core.DataObjects
         }
 
         private ObservableCollection<ExelConvertionRule> _mappingRules;
+        [XmlArray(ElementName = "Rule")]
+        [XmlArrayItem(ElementName = "Rule", Type = typeof(ExelConvertionRule))]
         public ObservableCollection<ExelConvertionRule> MappingRules 
         {
             get 

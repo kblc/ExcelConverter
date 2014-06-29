@@ -595,11 +595,14 @@ namespace ExelConverter.Core.DataAccess
         {
             ExelConvertionRule rule = null;
 
-            if (rule == null && !string.IsNullOrWhiteSpace(rl.convertion_rule))
-                rule = ExelConvertionRule.DeserializeFromB64String(rl.convertion_rule);
+            if (rl.convertion_rule_image_cprs != null && rl.convertion_rule_image_cprs.Length > 0)
+                rule = ExelConvertionRule.DeserializeFromCompressedBytes(rl.convertion_rule_image_cprs);
 
             if (rl.convertion_rule_image != null && rl.convertion_rule_image.Length > 0)
                 rule = ExelConvertionRule.DeserializeFromBytes(rl.convertion_rule_image);
+
+            if (rule == null && !string.IsNullOrWhiteSpace(rl.convertion_rule))
+                rule = ExelConvertionRule.DeserializeFromB64String(rl.convertion_rule);
 
             if (rule == null)
                 rule = new ExelConvertionRule() { Name = ExelConvertionRule.DefaultName };
@@ -629,6 +632,7 @@ namespace ExelConverter.Core.DataAccess
                                 needSave = true;
                                 rl.convertion_rule = string.Empty;// do not save old rule // serializedRule;
                                 rl.convertion_rule_image = rule.SerializeToBytes();
+                                rl.convertion_rule_image_cprs = rule.SerializeToCompressedBytes();
                             //}
                         }
                     }
@@ -680,6 +684,7 @@ namespace ExelConverter.Core.DataAccess
                                         {
                                             convertion_rule = string.Empty, // do not save old rule variant //r.Serialize(),
                                             convertion_rule_image = r.SerializeToBytes(),
+                                            convertion_rule_image_cprs = r.SerializeToCompressedBytes(),
                                             fk_operator_id = r.FkOperatorId
                                         }
                                 )

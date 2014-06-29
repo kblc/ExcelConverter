@@ -19,6 +19,7 @@
           <Property Name="fk_operator_id" Type="int" Nullable="false" />
           <Property Name="convertion_rule" Type="longtext" Nullable="false" />
           <Property Name="convertion_rule_image" Type="blob" />
+          <Property Name="convertion_rule_image_cprs" Type="blob" />
         </EntityType>
         <EntityType Name="locks">
           <Key>
@@ -61,6 +62,7 @@
           <Property Type="Int32" Name="fk_operator_id" Nullable="false" />
           <Property Type="String" Name="convertion_rule" Nullable="false" MaxLength="1073741823" FixedLength="false" Unicode="false" />
           <Property Type="Binary" Name="convertion_rule_image" MaxLength="Max" FixedLength="false" />
+          <Property Type="Binary" Name="convertion_rule_image_cprs" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="locks">
           <Key>
@@ -94,6 +96,7 @@
           <EntitySetMapping Name="convertion_rules">
             <EntityTypeMapping TypeName="exelconverterModel.convertion_rules">
               <MappingFragment StoreEntitySet="convertion_rules">
+                <ScalarProperty Name="convertion_rule_image_cprs" ColumnName="convertion_rule_image_cprs" />
                 <ScalarProperty Name="convertion_rule_image" ColumnName="convertion_rule_image" />
                 <ScalarProperty Name="convertion_rule" ColumnName="convertion_rule" />
                 <ScalarProperty Name="fk_operator_id" ColumnName="fk_operator_id" />

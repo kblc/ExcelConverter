@@ -4,26 +4,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlRoot("Parameter")]
     public class Parameter : INotifyPropertyChanged, IDataErrorInfo
     {
-
         public Parameter()
         {
             Value = string.Empty;
         }
 
-        [System.Xml.Serialization.XmlIgnoreAttribute]
+        [XmlIgnore]
         public Type ExpectedValueType { get; set; }
 
+        [XmlAttribute("ExpectedValueType")]
         public string ExpectedValueTypeString { get { return ExpectedValueType != null ? ExpectedValueType.ToString() : string.Empty; } }
 
+        [XmlAttribute("ParsingExpected")]
         public bool ParsingExpected { get; set; }
 
         private string _name;
+        [XmlAttribute("Name")]
         public string Name
         {
             get { return _name; }
@@ -35,6 +39,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private object _value;
+        [XmlIgnore]
         public object Value 
         {
             get { return _value; }
@@ -43,30 +48,43 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 _value = value;
                 RaisePropertyChanged("Value");
                 RaisePropertyChanged("Error");
+                RaisePropertyChanged("StringValue");
             }
         }
 
-        [NonSerialized]
-        private PropertyChangedEventHandler _propertyChanged;
-        public event PropertyChangedEventHandler PropertyChanged
+        [XmlAttribute("Value")]
+        public string StringValue
         {
-            add { _propertyChanged += value; }
-            remove { _propertyChanged -= value; }
+            get
+            {
+                return Value == null ? string.Empty : Value.ToString();
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    Value = null; else
+                    Value = Convert.ChangeType(value, ExpectedValueType ?? typeof(string));
+            }
         }
+
+        [field: NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void RaisePropertyChanged(string propertyName)
         {
-            if (_propertyChanged != null)
+            if (PropertyChanged != null)
             {
-                _propertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
+        [XmlIgnore]
         public string Error
         {
             get { return this["Value"]; }
         }
 
+        [XmlIgnore]
         public string this[string columnName]
         {
             get 
@@ -131,11 +149,8 @@ namespace ExelConverter.Core.Converter.CommonTypes
                             msg = "поле не може быть пустым";
                             return msg;
                         }
-                        try
-                        {
-                            int.Parse(((string)Value));
-                        }
-                        catch 
+                        int o;
+                        if (!int.TryParse((string)Value, out o))
                         {
                             msg = "введённый текст не является числом";
                             return msg;

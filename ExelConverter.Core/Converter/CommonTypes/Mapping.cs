@@ -11,34 +11,43 @@ using System.Windows.Controls;
 
 using ExelConverter.Core.ExelDataReader;
 using System.Data;
+using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlRoot("Mapping")]
     public class Mapping : INotifyPropertyChanged, IDataErrorInfo, ICopyFrom<Mapping>
     {
-        //private bool _newValueHandled = false;
-
         public Mapping() { }
 
-        [System.Xml.Serialization.XmlIgnoreAttribute]
+        [XmlIgnore]
         public MappingsContainer Owner { get; set; }
 
         private ObservableCollection<string> _allowedValues;
+        [XmlIgnore]
         public ObservableCollection<string> AllowedValues
         {
-            get { return _allowedValues ?? (_allowedValues = new ObservableCollection<string>()); }
-            set
+            get
             {
-                if (_allowedValues != value)
-                {
-                    _allowedValues = value;
-                    RaisePropertyChanged("AllowedValues");
-                }
+                return Owner.AllowedValues;
+                //return _allowedValues ?? (_allowedValues = new ObservableCollection<string>());
             }
+            //set
+            //{
+            //    if (_allowedValues == value)
+            //        return;
+
+            //    _allowedValues.Clear();
+            //    if (value != null)
+            //        foreach (var v in value)
+            //            _allowedValues.Add(v);
+            //    RaisePropertyChanged("AllowedValues");
+            //}
         }
 
         private string _from = string.Empty;
+        [XmlAttribute("From")]
         public string From
         {
             get { return _from; }
@@ -53,6 +62,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private bool _isChecked;
+        [XmlAttribute("IsChecked")]
         public bool IsChecked
         {
             get { return _isChecked; }
@@ -68,6 +78,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private string _to = string.Empty;
+        [XmlAttribute("To")]
         public string To
         {
             get { return _to; }
@@ -133,11 +144,13 @@ namespace ExelConverter.Core.Converter.CommonTypes
             }
         }
 
+        [XmlIgnore]
         public string Error
         {
             get { return this["To"]; }
         }
 
+        [XmlIgnore]
         public string this[string columnName]
         {
             get 
@@ -163,29 +176,6 @@ namespace ExelConverter.Core.Converter.CommonTypes
             To = source.To;
             IsChecked = source.IsChecked;
             return this;
-        }
-    }
-
-    [Serializable]
-    public class MappingCommand : ICommand
-    {
-
-        private Action<object> _action;
-        public MappingCommand(Action<object> action)
-        {
-            _action = action;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public event EventHandler CanExecuteChanged;
-
-        public void Execute(object parameter)
-        {
-            _action(parameter);
         }
     }
 }

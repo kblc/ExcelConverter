@@ -15,7 +15,7 @@ namespace ExelConverter.Core.Converter.Functions
         public CombimeColumnsFunction()
         {
             Name = "Склеить столбцы";
-            StringFormat = Name + "()";
+            //StringFormat = Name + "()";
             SelectedParameter = FunctionParameters.Sheet;
             Parameters = new ObservableCollection<Parameter>
             {

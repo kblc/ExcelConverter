@@ -10,22 +10,31 @@ using System.Threading.Tasks;
 using ExelConverter.Core.ExelDataReader;
 using ExelConverter.Core.Converter.Functions;
 using ExelConverter.Core.Converter.CommonTypes;
+using System.Xml.Serialization;
+
+using Helpers;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
     [Serializable]
+    [XmlRoot("Convertion")]
+    [XmlInclude(typeof(FunctionsBlocksContainer))]
+    [XmlInclude(typeof(MappingsContainer))]
     public class FieldConvertionData : INotifyPropertyChanged, ICopyFrom<FieldConvertionData>
     {
         public FieldConvertionData() { }
 
+        [XmlAttribute("SystemName")]
         public string PropertyId { get; set; }
 
         [System.Xml.Serialization.XmlIgnoreAttribute]
         public ExelConvertionRule Owner { get; set; }
 
+        [XmlAttribute("IsCheckable")]
         public bool IsCheckable { get; set; }
 
         private string _separatorName;
+        [XmlIgnore]
         public string SeparatorName
         {
             get { return _separatorName; }
@@ -40,6 +49,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private string _fieldName;
+        [XmlAttribute("Name")]
         public string FieldName
         {
             get
@@ -57,6 +67,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private string _stringFunction;
+        [XmlIgnore]
         public string StringFunction
         {
             get { return _stringFunction; }
@@ -71,6 +82,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private bool _mappingNeeded;
+        [XmlAttribute("MappingNeeded")]
         public bool MappingNeeded
         {
             get { return _mappingNeeded; }
@@ -85,20 +97,25 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private FunctionsBlocksContainer _blocks;
+
+        [XmlElement(ElementName = "FunctionalContainer")]
         public FunctionsBlocksContainer Blocks
         {
             get { return _blocks ?? (_blocks = new FunctionsBlocksContainer()); }
             set
             {
-                if(_blocks != value)
-                {
-                    _blocks = value;
-                    RaisePropertyChanged("Blocks");
-                }
+                if (Blocks == value)
+                    return;
+
+                if (value != null)
+                    value.CopyObject(Blocks);
+
+                RaisePropertyChanged("Blocks");
             }
         }
 
         private bool _absoluteCoincidence;
+        [XmlIgnore]
         public bool AbsoluteCoincidence
         {
             get { return _absoluteCoincidence; }
@@ -112,41 +129,12 @@ namespace ExelConverter.Core.Converter.CommonTypes
             }
         }
 
-        //public void UpdateFunctions(ObservableCollection<FunctionBase> functions)
-        //{
-        //    foreach (var func in functions)
-        //    {
-        //        if (!SupportedFunctions.Any(f => f.Name == func.Name))
-        //        {
-        //            SupportedFunctions.Add(func);   
-        //        }
-        //    }
-        //}
-
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        [NonSerialized]
-        private ObservableCollection<FunctionBase> _supportedFunctions;
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public ObservableCollection<FunctionBase> SupportedFunctions
-        {
-            get 
-            {
-                return _supportedFunctions ?? (_supportedFunctions = FunctionBase.GetSupportedFunctions());
-            }
-        }
-
         private MappingsContainer _mappingsTable = null;
+        [XmlArray("MappingContainer")]
+        [XmlArrayItem("Mapping", Type = typeof(Mapping))]
         public MappingsContainer MappingsTable
         {
             get { return _mappingsTable ?? (_mappingsTable = new MappingsContainer() { Owner = this }); }
-            set
-            {
-                if (_mappingsTable != value)
-                {
-                    _mappingsTable = value;
-                    RaisePropertyChanged("MappingsTable");
-                }
-            }
         }
 
         #region INotifyPropertyChanged
