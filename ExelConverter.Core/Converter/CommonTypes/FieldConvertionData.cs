@@ -13,16 +13,51 @@ using ExelConverter.Core.Converter.CommonTypes;
 using System.Xml.Serialization;
 
 using Helpers;
+using System.Reflection;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
+    public enum FieldConvertionType
+    {
+        [Description("Код")]
+        Code,
+        [Description("Код DOORS")]
+        CodeDoors,
+        [Description("Тип")]
+        Type,
+        [Description("Сторона")]
+        Side,
+        [Description("Размер")]
+        Size,
+        [Description("Освещение")]
+        Light,
+        [Description("Ограничения")]
+        Restricted,
+        [Description("Город")]
+        City,
+        [Description("Район")]
+        Region,
+        [Description("Адрес")]
+        Address,
+        [Description("Описание")]
+        Description,
+        [Description("Цена")]
+        Price,
+        [Description("Фото")]
+        Photo_img,
+        [Description("Фото расп.")]
+        Location_img
+    };
+
     [Serializable]
     [XmlRoot("Convertion")]
     [XmlInclude(typeof(FunctionsBlocksContainer))]
     [XmlInclude(typeof(MappingsContainer))]
     public class FieldConvertionData : INotifyPropertyChanged, ICopyFrom<FieldConvertionData>
     {
-        public FieldConvertionData() { }
+        public FieldConvertionData()
+        {
+        }
 
         [XmlAttribute("SystemName")]
         public string PropertyId { get; set; }
@@ -50,21 +85,34 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private string _fieldName;
-        [XmlAttribute("Name")]
+        [XmlIgnore]
         public string FieldName
         {
             get
             {
-                return _fieldName; 
+                string fieldName = string.Empty;
+                foreach(var v in typeof(FieldConvertionType).GetEnumValues())
+                    if (v.ToString().Like(PropertyId))
+                    {
+                        fieldName = GetEnumDescription(v as Enum);
+                        break;
+                    }
+
+                return fieldName; 
             }
-            set
-            {
-                if (_fieldName != value)
-                {
-                    _fieldName = value;
-                    RaisePropertyChanged("FieldName");
-                }
-            }
+        }
+
+        private static string GetEnumDescription(Enum value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            DescriptionAttribute[] attributes =
+                (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+            if (attributes != null && attributes.Length > 0)
+                return attributes[0].Description;
+            else
+                return value.ToString();
         }
 
         private string _stringFunction;
@@ -158,7 +206,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
             PropertyId = source.PropertyId;
             IsCheckable = source.IsCheckable;
             SeparatorName = source.SeparatorName;
-            FieldName = source.FieldName;
+            //FieldName = source.FieldName;
             StringFunction = source.StringFunction;
             MappingNeeded = source.MappingNeeded;
             AbsoluteCoincidence = source.AbsoluteCoincidence;

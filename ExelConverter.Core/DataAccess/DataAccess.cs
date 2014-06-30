@@ -522,24 +522,32 @@ namespace ExelConverter.Core.DataAccess
 
         public ExelConvertionRule[] GetRulesByOperator(Operator op)
         {
-            //var dc = exelconverterEntities2.Default;
-            using (var dc = exelconverterEntities2.New())
+            bool wasException = false;
+            var logSesson = Log.SessionStart("DataAccess.GetRulesByOperator()", true);
+            try
+            { 
+                using (var dc = exelconverterEntities2.New())
+                {
+                    ExelConvertionRule[] result = 
+                        dc
+                        .convertion_rules
+                        .Where(cr => cr.fk_operator_id == op.Id)
+                        .AsEnumerable()
+                        .AsParallel()
+                        .Select(cr => GetRuleFromRow(cr))
+                        .ToArray();
+                    return result;
+                }
+            }
+            catch (Exception ex)
             {
-                ExelConvertionRule[] result = 
-                    dc
-                    .convertion_rules
-                    .Where(cr => cr.fk_operator_id == op.Id)
-                    .AsEnumerable()
-                    .AsParallel()
-                    .Select(cr => 
-                        {
-                            ExelConvertionRule r = GetRuleFromRow(cr);
-                            r.Id = cr.id;
-                            r.FkOperatorId = cr.fk_operator_id;
-                            return r;
-                        })
-                    .ToArray();
-                return result;
+                wasException = true;
+                Log.Add(logSesson, ex);
+                throw ex;
+            }
+            finally
+            {
+                Log.SessionEnd(logSesson, wasException);
             }
         }
 
@@ -551,7 +559,6 @@ namespace ExelConverter.Core.DataAccess
             var logSesson = Log.SessionStart("DataAccess.GetRules()", true);
             try
             { 
-                //var dc = exelconverterEntities2.Default;
                 using (var dc = exelconverterEntities2.New())
                 {
                     ids = ids == null ? new int[] { } : ids;
@@ -562,15 +569,8 @@ namespace ExelConverter.Core.DataAccess
                         .convertion_rules
                         .Where(cr => isIdsEmpty || ids.Contains(cr.id))
                         .AsEnumerable()
-                        .Select(cr =>
-                        {
-                            ExelConvertionRule r = GetRuleFromRow(cr);
-                            r.Id = cr.id;
-                            r.FkOperatorId = cr.fk_operator_id;
-                            return r;
-                        })
+                        .Select(cr => GetRuleFromRow(cr))
                         .ToArray();
-                
                 }
             }
             catch(Exception ex)
@@ -607,7 +607,23 @@ namespace ExelConverter.Core.DataAccess
             if (rule == null)
                 rule = new ExelConvertionRule() { Name = ExelConvertionRule.DefaultName };
 
+            rule.Id = rl.id;
+            rule.FkOperatorId = rl.fk_operator_id;
+
             return rule;
+        }
+
+        private convertion_rules SetRuleToRow(convertion_rules rl, ExelConvertionRule rule)
+        {
+            if (rl == null)
+                rl = new convertion_rules();
+
+            rl.convertion_rule = string.Empty;// do not save old rule // serializedRule;
+            rl.convertion_rule_image = null;// do not save old rule //rule.SerializeToBytes();
+            rl.convertion_rule_image_cprs = rule.SerializeToCompressedBytes();
+            rl.fk_operator_id = rule.FkOperatorId;
+
+            return rl;
         }
 
         public void UpdateOperatorRules(Converter.ExelConvertionRule[] rules)
@@ -630,9 +646,7 @@ namespace ExelConverter.Core.DataAccess
                             //if (!checkAfterUpdate || oldRule.Serialize().Trim() != (serializedRule = rule.Serialize()).Trim() && oldRule.SerializeXML().Trim() != rule.SerializeXML().Trim())
                             //{
                                 needSave = true;
-                                rl.convertion_rule = string.Empty;// do not save old rule // serializedRule;
-                                rl.convertion_rule_image = rule.SerializeToBytes();
-                                rl.convertion_rule_image_cprs = rule.SerializeToCompressedBytes();
+                                SetRuleToRow(rl, rule);
                             //}
                         }
                     }
@@ -678,17 +692,9 @@ namespace ExelConverter.Core.DataAccess
                     using (var dc = exelconverterEntities2.New())
                     {
                         convertion_rules[] convRules =
-                            rules.Select(
-                                r =>
-                                    new convertion_rules
-                                        {
-                                            convertion_rule = string.Empty, // do not save old rule variant //r.Serialize(),
-                                            convertion_rule_image = r.SerializeToBytes(),
-                                            convertion_rule_image_cprs = r.SerializeToCompressedBytes(),
-                                            fk_operator_id = r.FkOperatorId
-                                        }
-                                )
-                             .ToArray();
+                            rules
+                            .Select(r => SetRuleToRow(null, r))
+                            .ToArray();
 
                         foreach (var rule in convRules)
                             dc.convertion_rules.Add(rule);

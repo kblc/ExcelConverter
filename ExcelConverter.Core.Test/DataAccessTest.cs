@@ -3,7 +3,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ExelConverter.Core.DataAccess;
 using MySql.Data.MySqlClient;
 using Helpers;
+using Helpers.Serialization;
 using System.Collections.Generic;
+using ExelConverter.Core.Converter;
+using System.IO;
+using System.Diagnostics;
 
 namespace ExcelConverter.Core.Test
 {
@@ -926,6 +930,78 @@ namespace ExcelConverter.Core.Test
         }
 
         #endregion
+
+        [TestMethod]
+        [DeploymentItem(@"ExcelConverter.Core.Test\DataAccessTestData.xml")]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML",
+                   "|DataDirectory|\\DataAccessTestData.xml",
+                   "TestConnectionToDBRow",
+                    DataAccessMethod.Sequential)]
+        public void DataAccessTest_Get_FULL_Rules()
+        {
+            string server = testContextInstance.DataRow["Server"].ToString();
+            string login = testContextInstance.DataRow["Login"].ToString();
+            string password = testContextInstance.DataRow["Password"].ToString();
+            bool shouldPass = bool.Parse(testContextInstance.DataRow["ShouldPass"].ToString());
+            string exception = string.Empty;
+            string connectionMain = string.Empty;
+            string connectionApp = string.Empty;
+
+            if (!server.Contains("alpha"))
+                return;
+
+            HttpDataClient test = new HttpDataClient();
+
+            var result = new ExelConverter.Core.Converter.ExelConvertionRule[] { };
+
+            bool passed = false;
+            try
+            {
+                test.Login(server, login, password);
+
+                connectionMain = test.ConnectionStringMain;
+                connectionApp = test.ConnectionStringApp;
+
+                alphaEntities.ProviderConnectionString = connectionMain;
+                exelconverterEntities2.ProviderConnectionString = connectionApp;
+
+                DataAccess da = new DataAccess();
+                ExelConverter.Core.Settings.SettingsProvider.Initialize(da);
+
+                var operators = da.GetOperators();
+                for (int i = 0; i < operators.Length; i++)
+                {
+                    List<ExelConvertionRule> rules = new List<ExelConvertionRule>(da.GetRules(new int[] { (int)operators[i].Id }));
+                    da.UpdateOperatorRules(rules.ToArray());
+
+                    //string text = rules.SerializeToXML(false);
+
+                    //Uri uri = new Uri(server);
+
+                    //string fileName = string.Format("{0}.{1}.{2}.xml", uri.Host, operators[i].Id, operators[i].Name);
+
+                    //foreach (var c in System.IO.Path.GetInvalidFileNameChars())
+                    //    fileName = fileName.Replace(c.ToString(), "");
+
+                    //fileName = System.IO.Path.Combine(Helpers.Log.CurrentPath, fileName);
+
+                    //using (StreamWriter w = File.AppendText(fileName))
+                    //    w.Write(text);
+
+                    Console.WriteLine("({0}) operator: ({1}){2}, progress: {3}/{4}", server, operators[i].Id, operators[i].Name, i, operators.Length);
+                    Trace.WriteLine(string.Format("({0}) operator: ({1}){2}, progress: {3}/{4}", server, operators[i].Id, operators[i].Name, i, operators.Length));
+                }
+                passed = true;
+            }
+            catch (Exception ex) 
+            { 
+                exception = ex.GetExceptionText();
+            }
+
+            string errMsg = string.Format("server:{1}{0}login:{2}{0}password:{3}{0}connectionMain:{4}{0}connectionApp:{5}{0}shouldpass:{6}{0}passed:{7}{0}exception:{8}", Environment.NewLine, server, login, password, connectionMain, connectionApp, shouldPass, passed, exception);
+
+            Assert.AreEqual(passed, shouldPass, errMsg);
+        }
     }
 
 

@@ -78,11 +78,11 @@ namespace ExelConverter.Core.Converter.CommonTypes
             }
         }
 
-        private string _to = string.Empty;
+        private string _to;
         [XmlAttribute("To")]
         public string To
         {
-            get { return _to; }
+            get { return _to ?? (_to = string.Empty); }
             set
             {
                 if (!string.IsNullOrWhiteSpace(value) && _to != value)

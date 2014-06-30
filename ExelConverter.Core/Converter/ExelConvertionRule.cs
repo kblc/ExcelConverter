@@ -142,20 +142,20 @@ namespace ExelConverter.Core.Converter
                     foreach (var cd in
                         new FieldConvertionData[] 
                             {
-                                new FieldConvertionData{FieldName = "Код", PropertyId="Code", Owner = this},
-                                new FieldConvertionData{FieldName = "Код DOORS", PropertyId="CodeDoors", Owner = this},
-                                new FieldConvertionData{FieldName = "Тип", PropertyId="Type", Owner = this, IsCheckable = true },
-                                new FieldConvertionData{FieldName = "Сторона", PropertyId="Side", Owner = this},
-                                new FieldConvertionData{FieldName = "Размер", PropertyId="Size", Owner = this},
-                                new FieldConvertionData{FieldName = "Освещение", PropertyId="Light", Owner = this},
-                                new FieldConvertionData{FieldName = "Ограничения", PropertyId="Restricted", Owner = this},
-                                new FieldConvertionData{FieldName = "Город", PropertyId="City", Owner = this, IsCheckable = true},
-                                new FieldConvertionData{FieldName = "Район", PropertyId="Region", Owner = this},
-                                new FieldConvertionData{FieldName = "Адрес", PropertyId="Address", Owner = this},
-                                new FieldConvertionData{FieldName = "Описание", PropertyId="Description", Owner = this},
-                                new FieldConvertionData{FieldName = "Цена", PropertyId="Price", Owner = this},
-                                new FieldConvertionData{FieldName = "Фото", PropertyId="Photo_img", Owner = this},
-                                new FieldConvertionData{FieldName = "Фото расп.", PropertyId="Location_img", Owner = this}
+                                new FieldConvertionData{PropertyId="Code", Owner = this},
+                                new FieldConvertionData{PropertyId="CodeDoors", Owner = this},
+                                new FieldConvertionData{PropertyId="Type", Owner = this, IsCheckable = true },
+                                new FieldConvertionData{PropertyId="Side", Owner = this},
+                                new FieldConvertionData{PropertyId="Size", Owner = this},
+                                new FieldConvertionData{PropertyId="Light", Owner = this},
+                                new FieldConvertionData{PropertyId="Restricted", Owner = this},
+                                new FieldConvertionData{PropertyId="City", Owner = this, IsCheckable = true},
+                                new FieldConvertionData{PropertyId="Region", Owner = this},
+                                new FieldConvertionData{PropertyId="Address", Owner = this},
+                                new FieldConvertionData{PropertyId="Description", Owner = this},
+                                new FieldConvertionData{PropertyId="Price", Owner = this},
+                                new FieldConvertionData{PropertyId="Photo_img", Owner = this},
+                                new FieldConvertionData{PropertyId="Location_img", Owner = this}
                             }
                         )
                         _convertionData.Add(cd);
@@ -220,7 +220,7 @@ namespace ExelConverter.Core.Converter
         }
 
         private int _id;
-        [XmlAttribute("Id")]
+        [XmlIgnore]
         public int Id
         {
             get { return _id; }
@@ -228,7 +228,7 @@ namespace ExelConverter.Core.Converter
         }
 
         private int _fkOperatorId;
-        [XmlAttribute("Operator")]
+        [XmlIgnore]
         public int FkOperatorId
         {
             get { return _fkOperatorId; }
@@ -250,7 +250,7 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        private ObservableCollection<SearchTag> _mainHeaderSearchTags = new ObservableCollection<SearchTag>();
+        private ObservableCollection<SearchTag> _mainHeaderSearchTags = null;
 
         [XmlArray(ElementName = "MainHeaderSearchTags")]
         [XmlArrayItem(ElementName="Tag", Type=typeof(SearchTag))]
@@ -258,7 +258,7 @@ namespace ExelConverter.Core.Converter
         {
             get
             {
-                return _mainHeaderSearchTags; 
+                return _mainHeaderSearchTags ?? (_mainHeaderSearchTags = new ObservableCollection<SearchTag>()); 
             }
             set
             {
@@ -275,13 +275,13 @@ namespace ExelConverter.Core.Converter
             }
         }
 
-        private ObservableCollection<SearchTag> _sheetHeadersSearchTags = new ObservableCollection<SearchTag>();
+        private ObservableCollection<SearchTag> _sheetHeadersSearchTags = null;
 
         [XmlArray(ElementName = "SheetHeadersSearchTags")]
         [XmlArrayItem(ElementName = "Tag", Type = typeof(SearchTag))]
         public ObservableCollection<SearchTag> SheetHeadersSearchTags
         {
-            get { return _sheetHeadersSearchTags; }
+            get { return _sheetHeadersSearchTags ?? (_sheetHeadersSearchTags = new ObservableCollection<SearchTag>()); }
             set
             {
                 if (_sheetHeadersSearchTags == value)
@@ -697,7 +697,7 @@ namespace ExelConverter.Core.Converter
                     foreach (var block in convData.Blocks.Blocks)
                         block.UpdateFunctionsList();
 
-            rule._mainHeaderSearchTags.CollectionChanged += (s, e) =>
+            rule.MainHeaderSearchTags.CollectionChanged += (s, e) =>
             {
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
                 {
@@ -710,7 +710,7 @@ namespace ExelConverter.Core.Converter
                 rule.RaisePropertyChanged("MainHeaderSearchTagsItems");
             };
 
-            rule._sheetHeadersSearchTags.CollectionChanged += (s, e) =>
+            rule.SheetHeadersSearchTags.CollectionChanged += (s, e) =>
             {
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
                 {
