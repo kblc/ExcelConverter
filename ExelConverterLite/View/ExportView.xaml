@@ -5,10 +5,13 @@
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
         xmlns:queue="clr-namespace:ExelConverter.Core.DataAccess;assembly=ExelConverter.Core"
         xmlns:Controls="clr-namespace:ExcelConverter.Parser.Controls;assembly=ExcelConverter.Parser"
+        xmlns:helpers="clr-namespace:Helpers.WPF.Converters;assembly=Helpers.WPF"
         Title="Экспорт" MinHeight="500" MinWidth="400" FontSize="13" FontFamily="Calibri"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-        
         DataContext="{Binding Export, Source={StaticResource Locator}}">
+    <Window.Resources>
+        <helpers:ApplyConverter x:Key="ApplyConverter"/>
+    </Window.Resources>
     <Grid>
         <TabControl SelectedIndex="0">
             <TabItem Header="Сетка">
@@ -135,7 +138,7 @@
                                   SelectedValuePath="Collection"
                                   Width="100"
                                   Margin="4,2"
-                                  SelectedIndex="0"/>
+                                  SelectedIndex="{Binding Path=UrlCollection.Count, Mode=OneTime, Converter={StaticResource ApplyConverter}, ConverterParameter=-1;0}"/>
                     </DockPanel>
                     <Controls:ParsersControl 
                         Grid.Row="1"

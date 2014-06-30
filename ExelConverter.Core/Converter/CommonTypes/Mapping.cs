@@ -62,7 +62,8 @@ namespace ExelConverter.Core.Converter.CommonTypes
         }
 
         private bool _isChecked;
-        [XmlAttribute("IsChecked")]
+        //[XmlAttribute("IsChecked")]
+        [XmlIgnore]
         public bool IsChecked
         {
             get { return _isChecked; }

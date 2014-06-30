@@ -349,6 +349,7 @@ namespace ExelConverterLite.ViewModel
                                 row.Photo_img = ReplaceUrlFromData(photo_img, DBParsers.Labels[0], collection);
                                 row.Location_img = ReplaceUrlFromData(location_img, DBParsers.Labels[1], collection);
                             }
+                            RaisePropertyChanged("RowsToExport");
                         }
                     }));
             }
