@@ -1374,7 +1374,7 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
-        private ObservableCollection<ExelSheet> _documentSheets;
+        private ObservableCollection<ExelSheet> _documentSheets = new ObservableCollection<ExelSheet>();
         public ObservableCollection<ExelSheet> DocumentSheets
         {
             get { return _documentSheets; }

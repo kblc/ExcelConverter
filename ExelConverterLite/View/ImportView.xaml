@@ -9,6 +9,7 @@
              xmlns:u="clr-namespace:ExelConverterLite.Utilities"
              xmlns:wf="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
              xmlns:wfc="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+             xmlns:helpers="clr-namespace:Helpers.WPF.Converters;assembly=Helpers.WPF"
              mc:Ignorable="d" 
              DataContext="{Binding Import, Source={StaticResource Locator}}" >
     <!--Height="800"-->
@@ -30,6 +31,7 @@
             <c:AllowedValuesValueConverter x:Key="MappingTableAllowedValuesConverter"/>
             <c:MappingTableSelectedItemValueConverter x:Key="MappingTableSelectedValueConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <helpers:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid >
@@ -77,7 +79,7 @@
                 <ComboBox 
                         ItemsSource="{Binding Path=SelectedOperator.MappingRules}"
                         Margin="2"
-                        SelectedItem="{Binding Path=SelectedOperator.MappingRule}"
+                        SelectedItem="{Binding Path=SelectedOperator.MappingRule, Mode=TwoWay}"
                         Grid.Row="1"
                         Grid.Column="1">
                     <ComboBox.ItemTemplate>
@@ -140,6 +142,7 @@
                 <ComboBox
                       ItemsSource="{Binding DocumentSheets}" Margin="2"
                       SelectedItem="{Binding SelectedSheet}"
+                      IsEnabled="{Binding DocumentSheets.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                       Grid.Row="2" Grid.Column="1"/>
                 <Button
                     Grid.Row="2" 

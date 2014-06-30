@@ -60,7 +60,9 @@ namespace ExelConverter.Core.DataObjects
         {
             get
             {
-                return _mappingRule ?? (_mappingRule = MappingRules.FirstOrDefault()); 
+                if (_mappingRule == null || !MappingRules.Contains(_mappingRule))
+                    _mappingRule = MappingRules.FirstOrDefault();
+                return _mappingRule; 
             }
             set
             {
@@ -84,6 +86,7 @@ namespace ExelConverter.Core.DataObjects
                 {
                     _mappingRules = new ObservableCollection<ExelConvertionRule>();
                     _mappingRules.Add(new ExelConvertionRule { Name = ExelConvertionRule.DefaultName });
+                    _mappingRules.CollectionChanged += (s, e) => { RaisePropertyChanged("MappingRule"); };
                 }
                 return _mappingRules;
             }
