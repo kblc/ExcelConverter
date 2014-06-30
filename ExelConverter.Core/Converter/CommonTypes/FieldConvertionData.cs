@@ -30,7 +30,8 @@ namespace ExelConverter.Core.Converter.CommonTypes
         [System.Xml.Serialization.XmlIgnoreAttribute]
         public ExelConvertionRule Owner { get; set; }
 
-        [XmlAttribute("IsCheckable")]
+        //[XmlAttribute("IsCheckable")]
+        [XmlIgnore]
         public bool IsCheckable { get; set; }
 
         private string _separatorName;

@@ -53,9 +53,9 @@ namespace ExelConverter.Core.Converter.CommonTypes
             get { return _from; }
             set
             {
-                if (_from != value)
+                if (_from != (value ?? string.Empty))
                 {
-                    _from = value;
+                    _from = value ?? string.Empty;
                     RaisePropertyChanged("From");
                 }
             }
@@ -86,7 +86,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
             {
                 if (!string.IsNullOrWhiteSpace(value) && _to != value)
                 {
-                    _to = value;
+                    _to = (value ?? string.Empty);
                     RaisePropertyChanged("To");
                     RaisePropertyChanged("Error");
                     IsCheckedChanged();
