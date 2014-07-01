@@ -216,7 +216,7 @@ namespace ExcelConverter.Parser.Controls
             }
             catch (Exception ex)
             {
-                if (ex.IsDesignMode())
+                if (!ex.IsDesignMode())
                 { 
                     string exError = Helpers.Log.GetExceptionText(ex, "ParsersControl.LoadParsers()");
                     MessageBox.Show(string.Format("При загрузке произошла ошибка:{0}{1}", Environment.NewLine, exError), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
