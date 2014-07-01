@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Helpers.Serialization;
+using Helpers.WPF;
 
 namespace ExcelConverter.Parser.Controls
 {
@@ -215,8 +216,11 @@ namespace ExcelConverter.Parser.Controls
             }
             catch (Exception ex)
             {
-                string exError = Helpers.Log.GetExceptionText(ex, "ParsersControl.LoadParsers()");
-                MessageBox.Show(string.Format("При загрузке произошла ошибка:{0}{1}", Environment.NewLine, exError), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (ex.IsDesignMode())
+                { 
+                    string exError = Helpers.Log.GetExceptionText(ex, "ParsersControl.LoadParsers()");
+                    MessageBox.Show(string.Format("При загрузке произошла ошибка:{0}{1}", Environment.NewLine, exError), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
