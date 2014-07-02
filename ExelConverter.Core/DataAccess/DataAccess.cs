@@ -595,10 +595,10 @@ namespace ExelConverter.Core.DataAccess
         {
             ExelConvertionRule rule = null;
 
-            if (rl.convertion_rule_image_cprs != null && rl.convertion_rule_image_cprs.Length > 0)
+            if (rule == null && rl.convertion_rule_image_cprs != null && rl.convertion_rule_image_cprs.Length > 0)
                 rule = ExelConvertionRule.DeserializeFromCompressedBytes(rl.convertion_rule_image_cprs);
 
-            if (rl.convertion_rule_image != null && rl.convertion_rule_image.Length > 0)
+            if (rule == null && rl.convertion_rule_image != null && rl.convertion_rule_image.Length > 0)
                 rule = ExelConvertionRule.DeserializeFromBytes(rl.convertion_rule_image);
 
             if (rule == null && !string.IsNullOrWhiteSpace(rl.convertion_rule))
