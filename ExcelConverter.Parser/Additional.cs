@@ -1185,10 +1185,14 @@ namespace ExcelConverter.Parser
                         .Where(n =>
                         {
                             string href = n.Attributes["href"].Value;
-                            string[] likes = new string[] { "*.jp*g", "*.bmp", "*.gif" };
+                            string[] likes = new string[] { "*.jpeg","*.jpg",  "*.bmp", "*.gif" };
                             return likes.Any(i => Helper.StringLikes(href, i)) && Helper.IsWellFormedUriString(href, UriKind.RelativeOrAbsolute);
                         })
-                        .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(n.Attributes["href"].Value, document, url) })
+                        .Select(n => new SomeNodeElement()
+                        { 
+                            Node = n, 
+                            Url = Helper.GetFullSourceLink(n.Attributes["href"].Value, document, url)
+                        })
                         .ToArray();
 
                 if (allALinks.Length > 0)
@@ -1196,31 +1200,47 @@ namespace ExcelConverter.Parser
 
                 string regExString = "(https?:)?//?[^\'\"<>]+?\\.(jpg|jpeg|gif|png|bmp)";// @"/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$";
 
-                if (document.DocumentNode != null)
+                if (document.DocumentNode != null && document.DocumentNode.FirstChild != null && !string.IsNullOrWhiteSpace(document.DocumentNode.InnerHtml))
                 {
-                    if (document.DocumentNode.FirstChild != null && !string.IsNullOrWhiteSpace(document.DocumentNode.InnerHtml))
-                        foreach (Match m in Regex.Matches(document.DocumentNode.InnerHtml, regExString)) //"(\\S+?)\\.(jpg|png|gif|jpeg|bmp)"
-                        {
-                            string value = m.Value;
-                            while (value.IndexOf("(") >= 0)
-                                value = value.Substring(value.IndexOf("(")+1);
+                    var regexpLinks = new SomeNodeElement[] { };
 
-                            if (Helper.IsWellFormedUriString(value, UriKind.RelativeOrAbsolute))
-                                try
-                                {
-                                    Uri newUri = Helper.GetFullSourceLink(value, document, url);
-                                    if (!allLinks.Any(l => l.Url.AbsoluteUri == newUri.AbsoluteUri))
-                                        allLinks = allLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
-                                }
-                                catch(Exception)
-                                {
-
-                                }
-                        }
-
-                    if (allLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
+                    foreach (Match m in Regex.Matches(document.DocumentNode.InnerHtml, regExString)) //"(\\S+?)\\.(jpg|png|gif|jpeg|bmp)"
                     {
-                        allLinks = allLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } }).ToArray();
+                        string value = m.Value;
+                        while (value.IndexOf("(") >= 0)
+                            value = value.Substring(value.IndexOf("(")+1);
+
+                        string http = "http:";
+                        if (value.Like("*" + http + "*"))
+                            value = value.Substring(value.IndexOf(http));
+
+                        string https = "https:";
+                        if (value.Like("*" + https + "*"))
+                            value = value.Substring(value.IndexOf(https));
+
+                        value = value.Replace(@"\/","/");
+
+                        if (Helper.IsWellFormedUriString(value, UriKind.RelativeOrAbsolute))
+                            try
+                            {
+                                Uri newUri = Helper.GetFullSourceLink(value, document, url);
+                                if (!allLinks.Any(l => l.Url.AbsoluteUri == newUri.AbsoluteUri))
+                                    regexpLinks = regexpLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
+                            }
+                            catch(Exception)
+                            {
+
+                            }
+                    }
+
+                    if (regexpLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
+                    {
+                        regexpLinks = regexpLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } }).ToArray();
+                    }
+
+                    if (regexpLinks.Length >= 0 && regexpLinks.Length <= 50)
+                    {
+                        allALinks = allALinks.Union(regexpLinks).ToArray();
                     }
                 }
 

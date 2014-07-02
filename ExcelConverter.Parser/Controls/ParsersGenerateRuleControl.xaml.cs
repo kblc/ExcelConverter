@@ -286,6 +286,8 @@ namespace ExcelConverter.Parser.Controls
                 object lockAdd = new Object();
                 UrlsToAddList.Clear();
 
+                insideThreadCount = ThreadCount;
+
                 ParseRuleConnectionType type = NewParseRule.Connection;
 
                 int minWidth = NewParseRule.MinImageWidth;
@@ -323,8 +325,11 @@ namespace ExcelConverter.Parser.Controls
 
                                         System.Drawing.Size minSize = new System.Drawing.Size() { Width = minWidth, Height = minHeight };
 
-                                        foreach (ParseImageResult res in Helper.GetAllImagesFromUrl(item.Value, minSize, threadCount, sw.prgItem, true, type))
+                                        var result = Helper.GetAllImagesFromUrl(item.Value, minSize, threadCount, sw.prgItem, true, type);
+
+                                        foreach (ParseImageResult res in result)
                                             item.ParseResult.Add(res);
+
                                         if (item.ParseResult.Count > 0)
                                             lock (lockAdd)
                                             {
@@ -336,6 +341,9 @@ namespace ExcelConverter.Parser.Controls
                     };
                 bw.RunWorkerCompleted += (s, e) =>
                     {
+                        if (e.Error != null)
+                            throw e.Error;
+
                         try
                         {
                             List<UrlResultWrapper> urlResultWrapper = e.Result as List<UrlResultWrapper>;
