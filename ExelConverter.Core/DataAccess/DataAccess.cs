@@ -522,16 +522,24 @@ namespace ExelConverter.Core.DataAccess
 
         public ExelConvertionRule[] GetRulesByOperator(Operator op)
         {
+            return GetRulesByOperator(new int[] { (int)op.Id });
+        }
+
+        public ExelConvertionRule[] GetRulesByOperator(int[] ids)
+        {
             bool wasException = false;
             var logSesson = Log.SessionStart("DataAccess.GetRulesByOperator()", true);
             try
-            { 
+            {
                 using (var dc = exelconverterEntities2.New())
                 {
-                    ExelConvertionRule[] result = 
+                    ids = ids == null ? new int[] { } : ids;
+                    bool isIdsEmpty = ids.Count() == 0;
+
+                    ExelConvertionRule[] result =
                         dc
                         .convertion_rules
-                        .Where(cr => cr.fk_operator_id == op.Id)
+                        .Where(cr => isIdsEmpty || ids.Contains(cr.fk_operator_id))
                         .AsEnumerable()
                         .AsParallel()
                         .Select(cr => GetRuleFromRow(cr))
@@ -595,14 +603,14 @@ namespace ExelConverter.Core.DataAccess
         {
             ExelConvertionRule rule = null;
 
-            if (rule == null && rl.convertion_rule_image_cprs != null && rl.convertion_rule_image_cprs.Length > 0)
-                rule = ExelConvertionRule.DeserializeFromCompressedBytes(rl.convertion_rule_image_cprs);
+            if (rule == null && !string.IsNullOrWhiteSpace(rl.convertion_rule))
+                rule = ExelConvertionRule.DeserializeFromB64String(rl.convertion_rule);
 
             if (rule == null && rl.convertion_rule_image != null && rl.convertion_rule_image.Length > 0)
                 rule = ExelConvertionRule.DeserializeFromBytes(rl.convertion_rule_image);
 
-            if (rule == null && !string.IsNullOrWhiteSpace(rl.convertion_rule))
-                rule = ExelConvertionRule.DeserializeFromB64String(rl.convertion_rule);
+            if (rule == null && rl.convertion_rule_image_cprs != null && rl.convertion_rule_image_cprs.Length > 0)
+                rule = ExelConvertionRule.DeserializeFromCompressedBytes(rl.convertion_rule_image_cprs);
 
             if (rule == null)
                 rule = new ExelConvertionRule() { Name = ExelConvertionRule.DefaultName };

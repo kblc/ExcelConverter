@@ -931,7 +931,7 @@ namespace ExcelConverter.Core.Test
 
         #endregion
 
-        //[TestMethod]
+        [TestMethod]
         [DeploymentItem(@"ExcelConverter.Core.Test\DataAccessTestData.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML",
                    "|DataDirectory|\\DataAccessTestData.xml",
@@ -968,37 +968,37 @@ namespace ExcelConverter.Core.Test
                 DataAccess da = new DataAccess();
                 ExelConverter.Core.Settings.SettingsProvider.Initialize(da);
 
-                //var operators = da.GetOperators();
-                //for (int i = 0; i < operators.Length; i++)
-                //{
-                //    List<ExelConvertionRule> rules = new List<ExelConvertionRule>(da.GetRules(new int[] { (int)operators[i].Id }));
-                //    da.UpdateOperatorRules(rules.ToArray());
-
-                //    //string text = rules.SerializeToXML(false);
-
-                //    //Uri uri = new Uri(server);
-
-                //    //string fileName = string.Format("{0}.{1}.{2}.xml", uri.Host, operators[i].Id, operators[i].Name);
-
-                //    //foreach (var c in System.IO.Path.GetInvalidFileNameChars())
-                //    //    fileName = fileName.Replace(c.ToString(), "");
-
-                //    //fileName = System.IO.Path.Combine(Helpers.Log.CurrentPath, fileName);
-
-                //    //using (StreamWriter w = File.AppendText(fileName))
-                //    //    w.Write(text);
-
-                //    Console.WriteLine("({0}) operator: ({1}){2}, progress: {3}/{4}", server, operators[i].Id, operators[i].Name, i+1, operators.Length);
-                //    Trace.WriteLine(string.Format("({0}) operator: ({1}){2}, progress: {3}/{4}", server, operators[i].Id, operators[i].Name, i+1, operators.Length));
-                //}
-
-                //delete old data
-                using (var conn = new MySql.Data.MySqlClient.MySqlConnection(exelconverterEntities2.ProviderConnectionString))
-                using (MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(@"UPDATE convertion_rules SET convertion_rule = '', convertion_rule_image = NULL;", conn))
+                var operators = da.GetOperators();
+                for (int i = 0; i < operators.Length; i++)
                 {
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    List<ExelConvertionRule> rules = new List<ExelConvertionRule>(da.GetRulesByOperator(new int[] { (int)operators[i].Id }));
+                    da.UpdateOperatorRules(rules.ToArray());
+
+                    //string text = rules.SerializeToXML(false);
+
+                    //Uri uri = new Uri(server);
+
+                    //string fileName = string.Format("{0}.{1}.{2}.xml", uri.Host, operators[i].Id, operators[i].Name);
+
+                    //foreach (var c in System.IO.Path.GetInvalidFileNameChars())
+                    //    fileName = fileName.Replace(c.ToString(), "");
+
+                    //fileName = System.IO.Path.Combine(Helpers.Log.CurrentPath, fileName);
+
+                    //using (StreamWriter w = File.AppendText(fileName))
+                    //    w.Write(text);
+
+                    Console.WriteLine("({0}) operator: ({1}){2}, progress: {3}/{4}", server, operators[i].Id, operators[i].Name, i + 1, operators.Length);
+                    Trace.WriteLine(string.Format("({0}) operator: ({1}){2}, progress: {3}/{4}", server, operators[i].Id, operators[i].Name, i + 1, operators.Length));
                 }
+
+                ////delete old data
+                //using (var conn = new MySql.Data.MySqlClient.MySqlConnection(exelconverterEntities2.ProviderConnectionString))
+                //using (MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(@"UPDATE convertion_rules SET convertion_rule = '', convertion_rule_image = NULL;", conn))
+                //{
+                //    conn.Open();
+                //    cmd.ExecuteNonQuery();
+                //}
 
                 passed = true;
             }
