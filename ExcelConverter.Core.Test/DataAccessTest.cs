@@ -931,7 +931,7 @@ namespace ExcelConverter.Core.Test
 
         #endregion
 
-        [TestMethod]
+        //[TestMethod]
         [DeploymentItem(@"ExcelConverter.Core.Test\DataAccessTestData.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML",
                    "|DataDirectory|\\DataAccessTestData.xml",
