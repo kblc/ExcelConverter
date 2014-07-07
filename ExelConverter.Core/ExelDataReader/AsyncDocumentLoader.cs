@@ -92,11 +92,15 @@ namespace ExelConverter.Core.ExelDataReader
             var result = new List<ExelRow>();
             var totalRowsCount = 0;
             var loaded = 0;
+
+            if (count <= 0)
+                count = sheet.Cells.Rows.Count;
+
             totalRowsCount = sheet.Cells.Rows.Count;
 
             var hLinks = sheet.Hyperlinks.Cast<Hyperlink>();
             #region Select max column index for sheet
-            int maxColumnIndex = sheet.Cells.Rows.Cast<Row>().Select(c =>
+            int maxColumnIndex = sheet.Cells.Rows.Cast<Row>().Take(count).Select(c =>
             {
                 if (c.LastCell != null)
                     for (int i = c.LastCell.Column; i >= 0; i--)
@@ -117,7 +121,7 @@ namespace ExelConverter.Core.ExelDataReader
                 .Max();
             #endregion
             #region Read rows
-            foreach (Row row in sheet.Cells.Rows.Cast<Row>().Where(r => count <= 0 || r.Index < count))
+            foreach (Row row in sheet.Cells.Rows.Cast<Row>().Where(r => r.Index < count))
             {
                 var index = row.Index;
 
@@ -127,9 +131,11 @@ namespace ExelConverter.Core.ExelDataReader
                 {
                     var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
 
+                    int lastFilledColumnIndex = Math.Min(currMaxColumnsIndex, maxColumnIndex);
+
                     #region Read data from cells
 
-                    for (var k = 0; k <= Math.Min(currMaxColumnsIndex, maxColumnIndex); k++) //sheet.Cells.Columns.Count
+                    for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
                     {
                         var cell = sheet.Cells[index, k];
                         var c = new ExelCell();
@@ -220,9 +226,9 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #endregion
 
-                    var lastStyle = (maxColumnIndex > 0) ? r.Cells[Math.Min(currMaxColumnsIndex, maxColumnIndex)].CellStyle : new Style();
+                    var lastStyle = (maxColumnIndex > 0) ? r.Cells[lastFilledColumnIndex].CellStyle : new Style();
 
-                    for (int i = 0; i < Math.Abs(maxColumnIndex - currMaxColumnsIndex); i++)
+                    for (int i = r.Cells.Count; i <= lastFilledColumnIndex; i++)
                         r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
 
                     result.Add(r);
