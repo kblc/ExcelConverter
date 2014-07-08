@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Helpers;
+using System.Windows.Threading;
 
 namespace ExcelConverter.Parser.Controls
 {
@@ -92,9 +93,15 @@ namespace ExcelConverter.Parser.Controls
             {
                 result.Url = value == null ? string.Empty : value.Url;
                 if (value != null)
-                    result.Data = value.Data;
+                {
+                    value.CopyObject(result, new string[] { "Url", "Parser" });
+                }
                 else
+                {
+                    result.TimeToLoadContent = 0;
+                    result.TimeToParse = 0;
                     result.Data.Clear();
+                }
                 RaisePropertyChanged("Result");
             }
         }
@@ -624,6 +631,61 @@ namespace ExcelConverter.Parser.Controls
             public byte ThreadCount { get; set; }
         }
 
+
+        private TimeSpan parseTimeElapsed = new TimeSpan(0);
+        public TimeSpan ParseTimeElapsed
+        {
+            get { return parseTimeElapsed; }
+            set { parseTimeElapsed = value; RaisePropertyChanged("ParseTimeElapsed"); } 
+        }
+
+        private DispatcherTimer timer;
+        private Stopwatch stopWatch;
+
+        public void StartTimer()
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += (s, e) => { ParseTimeElapsed = stopWatch.Elapsed; };
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
+            timer.Start();
+        }
+
+        public void StopTimer()
+        {
+            if (timer != null)
+                timer.Stop();
+            timer = null;
+        }
+
+        private bool isParsing = false;
+        public bool IsParsing
+        {
+            get { return isParsing; }
+            private set { isParsing = value; RaisePropertyChanged("IsParsing"); }
+        }
+
+        private DelegateCommand stopParseCommand = null;
+        public ICommand StopParseCommand
+        {
+            get
+            {
+                return stopParseCommand ?? (stopParseCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        if (bwParseLinks != null && bwParseLinks.IsBusy)
+                            bwParseLinks.CancelAsync();
+                    }));
+            }
+        }
+
+        private class ProgressChangeClass
+        {
+            public int Processed = 0;
+            public int Total = 0;
+        }
+
         private BackgroundWorker bwParseLinks = null;
         private DelegateCommand parseUrlsCommand = null;
         public ICommand ParseUrlsCommand
@@ -638,6 +700,7 @@ namespace ExcelConverter.Parser.Controls
                         Urls.AsParallel().ForAll((u) => { u.FinishResult = 0; });
 
                         bwParseLinks = new BackgroundWorker();
+                        bwParseLinks.WorkerSupportsCancellation = true;
                         bwParseLinks.DoWork += (s, e) =>
                             {
                                 ParseLinksParams param = e.Argument as ParseLinksParams;
@@ -647,8 +710,9 @@ namespace ExcelConverter.Parser.Controls
                                     BackgroundWorker bw = s as BackgroundWorker;
                                     float cnt = urls.Length;
                                     float i = 0;
+                                    bw.ReportProgress(0, new ProgressChangeClass() { Processed = (int)i, Total = (int)cnt });
                                     object lockObject = new Object();
-                                    ParseResult[] res = param.Parse(
+                                    e.Result = param.Parse(
                                             urls
                                             , param.ThreadCount
                                             , label == null ? null : new string[] { label }
@@ -657,11 +721,12 @@ namespace ExcelConverter.Parser.Controls
                                                 lock (lockObject)
                                                 {
                                                     i++;
-                                                    bw.ReportProgress((int)((i / cnt) * 100));
+                                                    bw.ReportProgress((int)((i / cnt) * 100), new ProgressChangeClass() { Processed = (int)i, Total = (int)cnt });
                                                 }
                                             })
+                                            , new Func<bool>(() => { return bw.CancellationPending; })
                                         );
-                                    e.Result = res;
+
                                 }
                             };
                         bwParseLinks.RunWorkerCompleted += (s, e) =>
@@ -703,15 +768,21 @@ namespace ExcelConverter.Parser.Controls
                                     bwParseLinks.Dispose();
                                     bwParseLinks = null;
                                     IsBusy = false;
+                                    IsParsing = false;
+                                    StopTimer();
                                 }
                             };
                         bwParseLinks.ProgressChanged += (s, e) =>
                             {
-                                ProgressText = e.ProgressPercentage > 0 && e.ProgressPercentage < 100 ? string.Format("Завершено: {0}%", e.ProgressPercentage) : string.Empty;
+                                ProgressChangeClass c = (ProgressChangeClass)e.UserState;
+
+                                ProgressText = string.Format("Завершено: {0}% ({1}/{2})", e.ProgressPercentage, c.Processed, c.Total);
                             };
                         bwParseLinks.WorkerReportsProgress = true;
                         IsBusy = true;
-                        bwParseLinks.RunWorkerAsync(new ParseLinksParams() { Urls = Urls.Select(u => u.Value).ToArray(), Parse = Parsers.Parse, ThreadCount = this.ThreadCount });
+                        IsParsing = true;
+                        StartTimer();
+                        bwParseLinks.RunWorkerAsync(new ParseLinksParams() { Urls = Urls.Select(u => u.Value).ToArray(), Parse = Parsers.Parse, ThreadCount = AllowFileExport ? this.ThreadCount : byte.MinValue });
                     }
                 ));
             }

@@ -290,7 +290,7 @@ namespace ExelConverterLite.ViewModel
             SelectedField = null;
         }
 
-        public void UpdateMainHeaderRow()
+        public void UpdateMainHeaderRow(bool updateSharp)
         {
             SheetHeaders.Clear();
 
@@ -309,10 +309,11 @@ namespace ExelConverterLite.ViewModel
                 SheetHeaders.Add(((ExelCell)header).Value);
             }
 
-            UpdateSharp();
+            if (updateSharp)
+                UpdateSharp(false);
         }
 
-        public void UpdateSheetHeaderRow()
+        public void UpdateSheetHeaderRow(bool updateSharp)
         {
             SelectedSheet.UpdateHeaders(
                     SelectedOperator.MappingRule.SheetHeadersSearchTags
@@ -321,14 +322,14 @@ namespace ExelConverterLite.ViewModel
                     .Distinct()
                     .ToArray()
                 );
-            UpdateSharp();
+            if (updateSharp)
+                UpdateSharp(false);
         }
 
         private void UpdateSheetHeaders()
         {
             if (SelectedSheet != null)
             {
-                Sharp = SelectedSheet.AsDataTable();
                 if (SelectedSheet.Rows.Count > 0)
                 {
                     if (SelectedSheet != null)
@@ -345,9 +346,10 @@ namespace ExelConverterLite.ViewModel
                                 ?? SelectedOperator.MappingRule
                                 ?? SelectedOperator.MappingRules.FirstOrDefault();
                     }
-                    UpdateMainHeaderRow();
-                    UpdateSheetHeaderRow();
+                    UpdateMainHeaderRow(false);
+                    UpdateSheetHeaderRow(false);
                 }
+                UpdateSharp(true);
             }
             if (SelectedOperator != null && SelectedOperator.MappingRules.Count > 0)
             {
@@ -772,41 +774,41 @@ namespace ExelConverterLite.ViewModel
                 if (filePath != null)
                 {
                     Path = filePath;
+
                     IsDocumentLoaded = false;
                     if (document != null && document.Loader.FileLoader.IsBusy)
                     {
                         document.Loader.FileLoader.CancelAsync();
                     }
                     
-                    LoadingProgress = 0;
+                    LoadingProgress = 5;
                     document = new ExelDocument(Path, ExelConverterLite.Properties.Settings.Default.Import_DeleteEmptyRows);
                     document.Loader.FileLoader.ProgressChanged += (s, e) =>
                     {
-                        LoadingProgress = e.ProgressPercentage;
+                        LoadingProgress = 10 + (int)((float)e.ProgressPercentage * 0.8);
                     };
 
                     document.Loader.FileLoader.RunWorkerCompleted += (s, e) =>
                     {
-                        LoadingProgress = 100;
-                        IsDocumentLoaded = true;
-                        
                         DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
-                        SelectedSheet = 
-                            SelectedSheet == null 
+                        SelectedSheet =
+                            SelectedSheet == null
                             ? DocumentSheets.FirstOrDefault()
                             : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
-                        //Sharp = SelectedSheet.AsDataTable();
-                        //UpdateMainHeaderRow();
-                        //UpdateSheetHeaderRow();
+
+                        IsDocumentLoaded = true;
+                        LoadingProgress = 100;
                     };
+
+                    LoadingProgress = 10;
+
                     //Берем уже первые предзагруженные строки
                     DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
                     SelectedSheet =
                             SelectedSheet == null
                             ? DocumentSheets.FirstOrDefault()
                             : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
-                    //UpdateMainHeaderRow();
-                
+
                     document.FullLoad();
                 }
             }
@@ -1103,8 +1105,8 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand UpdateFoundedHeadersCommand { get; private set; }
         private void UpdateFoundedHeaders()
         {
-            UpdateMainHeaderRow();
-            UpdateSheetHeaderRow();
+            UpdateMainHeaderRow(true);
+            UpdateSheetHeaderRow(true);
         }
 
         public RelayCommand<object> AddRuleCommand { get; private set; }
@@ -1399,9 +1401,9 @@ namespace ExelConverterLite.ViewModel
                 {
                     SheetChanging();
                     _selectedSheet = value;
-                    RaisePropertyChanged("SelectedSheet");
                     UpdateSheetHeaders();
                     UpdateFoundedHeadersCommand.RaiseCanExecuteChanged();
+                    RaisePropertyChanged("SelectedSheet");
                 }
             }
         }
@@ -1504,15 +1506,43 @@ namespace ExelConverterLite.ViewModel
         {
             if (e.PropertyName.Like("MainHeaderSearchTags*") && Sharp != null)
             {
-                UpdateMainHeaderRow();
+                UpdateMainHeaderRow(true);
             }
             if (e.PropertyName.Like("SheetHeadersSearchTags*") && Sharp != null)
             {
-                UpdateSheetHeaderRow();
+                UpdateSheetHeaderRow(true);
             }
         }
 
-        private void UpdateSharp()
+
+
+        private bool isSharpLoading = false;
+        public bool IsSharpLoading
+        {
+            get
+            {
+                return isSharpLoading;
+            }
+            private set
+            {
+                if (isSharpLoading != value)
+                {
+                    isSharpLoading = value;
+                    RaisePropertyChanged("IsSharpLoading");
+                }
+            }
+        }
+
+        private class UpdateSharpParams
+        {
+            public int[] Headers = new int[] { };
+            public int[] SubHeaders = new int[] { };
+            public int[] MainHeaders = new int[] { };
+            public ExelSheet Sheet = null;
+            public DataTable CurrentData = null;
+        }
+
+        private void UpdateSharp(bool reInit)
         {
             int[] headers = SelectedSheet.SheetHeaders.Headers.Select(s => s.RowNumber).ToArray();
             int[] subHeaders = SelectedSheet.SheetHeaders.Subheaders.Select(s => s.RowNumber).ToArray(); 
@@ -1520,23 +1550,59 @@ namespace ExelConverterLite.ViewModel
             for(int i = 0; i<SelectedSheet.MainHeaderRowCount; i++)
                 main[i] = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + i;
 
-            var mainStart = main.OrderBy(i => i).FirstOrDefault();
+            var UpdateSharpWorker = new BackgroundWorker();
+            UpdateSharpWorker.WorkerSupportsCancellation = false;
+            UpdateSharpWorker.WorkerReportsProgress = false;
+            UpdateSharpWorker.DoWork += (s, e) =>
+                {
+                    UpdateSharpParams prm = (UpdateSharpParams)e.Argument;
+                    DataTable sharp = prm.CurrentData == null ? prm.Sheet.AsDataTable() : prm.CurrentData;
+                    
+                    var mainStart = prm.MainHeaders.OrderBy(i => i).FirstOrDefault();
 
-            for (int i = 0; i < Sharp.Rows.Count; i++)
+                    for (int i = 0; i < sharp.Rows.Count; i++)
+                    {
+                        string rowType = string.Empty;
+                        if (i < mainStart)
+                            rowType = "D";
+                        else if (prm.MainHeaders.Contains(i))
+                            rowType = "M";
+                        else if (prm.Headers.Contains(i))
+                            rowType = "H";
+                        else if (prm.SubHeaders.Contains(i))
+                            rowType = "S";
+
+                        if (sharp.Rows[i]["type"].ToString() != rowType)
+                            sharp.Rows[i]["type"] = rowType;
+                    }
+
+                    e.Result = sharp;
+                };
+            UpdateSharpWorker.RunWorkerCompleted += (s, e) =>
+                {
+                    try
+                    { 
+                        Sharp = (DataTable)e.Result;
+                    }
+                    finally
+                    { 
+                        IsSharpLoading = false;
+                    }
+                };
+
+            UpdateSharpParams prms = new UpdateSharpParams() 
             {
-                string rowType = string.Empty;
-                if (i < mainStart)
-                    rowType = "D";
-                else if (main.Contains(i))
-                    rowType = "M";
-                else if (headers.Contains(i))
-                    rowType = "H";
-                else if (subHeaders.Contains(i))
-                    rowType = "S";
+                Headers = headers,
+                SubHeaders = subHeaders,
+                MainHeaders = main,
+                Sheet = SelectedSheet,
+                CurrentData = (reInit) ? null : Sharp
+            };
 
-                if (Sharp.Rows[i]["type"].ToString() != rowType)
-                    Sharp.Rows[i]["type"] = rowType;
-            }
+            Sharp = null;
+            IsSharpLoading = true;
+
+            UpdateSharpWorker.RunWorkerAsync(prms);
         }
 
         private string _searchName;

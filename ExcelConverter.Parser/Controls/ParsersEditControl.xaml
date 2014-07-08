@@ -107,6 +107,34 @@
                             </Label>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
+
+                    <DataGridCheckBoxColumn Binding="{Binding CollectIMGTags}" Width="150">
+                        <DataGridCheckBoxColumn.Header>
+                            <Label Padding="0">
+                                <Label.Content>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="Загружать картинки (IMG)" TextAlignment="Center"/>
+                                </Label.Content>
+                            </Label>
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridCheckBoxColumn Binding="{Binding CollectLINKTags}" Width="150">
+                        <DataGridCheckBoxColumn.Header>
+                            <Label Padding="0">
+                                <Label.Content>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="Загружать ссылки (A)" TextAlignment="Center"/>
+                                </Label.Content>
+                            </Label>
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridCheckBoxColumn Binding="{Binding CollectMETATags}" Width="150">
+                        <DataGridCheckBoxColumn.Header>
+                            <Label Padding="0">
+                                <Label.Content>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="Загружать метаданные (META)" TextAlignment="Center"/>
+                                </Label.Content>
+                            </Label>
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

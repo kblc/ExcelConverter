@@ -10,6 +10,7 @@
              xmlns:wf="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
              xmlns:wfc="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
              xmlns:helpers="clr-namespace:Helpers.WPF.Converters;assembly=Helpers.WPF"
+             xmlns:helpersC="clr-namespace:Helpers.Controls;assembly=Helpers.Controls"
              mc:Ignorable="d" 
              DataContext="{Binding Import, Source={StaticResource Locator}}" >
     <!--Height="800"-->
@@ -32,6 +33,7 @@
             <c:MappingTableSelectedItemValueConverter x:Key="MappingTableSelectedValueConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <helpers:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
+            <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid >
@@ -470,42 +472,51 @@
                                 <TextBlock Text=")"/>
                             </WrapPanel>
                         </TabItem.Header>
-                        <DataGrid x:Name="MainDataGrid" 
+                        <Grid>
+                            <DataGrid x:Name="MainDataGrid" 
                                   VerticalScrollBarVisibility="Auto" 
                                   CanUserAddRows="False" 
                                   CanUserReorderColumns="False"
                                   CanUserSortColumns="False" 
                                   SelectionMode="Extended"
                                   HorizontalScrollBarVisibility="Auto"
-                                  ItemsSource="{Binding Path=Sharp.DefaultView}"
-                                  RowStyle="{StaticResource HighlightRow}">
-                            <DataGrid.ContextMenu>
-                                <ContextMenu >
-                                    <MenuItem Header="Добавить как тег для поиска столбцов" 
+                                  ItemsSource="{Binding Path=Sharp}"
+                                  Visibility="{Binding IsSharpLoading, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
+                                  RowStyle="{StaticResource HighlightRow}"
+                                  >
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu >
+                                        <MenuItem Header="Добавить как тег для поиска столбцов" 
                                               Command="{Binding AddTagToMainHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"
                                               />
-                                    <MenuItem Header="Удалить как тег для поиска столбцов" 
+                                        <MenuItem Header="Удалить как тег для поиска столбцов" 
                                               Command="{Binding DelTagFromMainHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"/>
-                                    <Separator/>
-                                    <MenuItem Header="Добавить как тег для заголовка" 
+                                        <Separator/>
+                                        <MenuItem Header="Добавить как тег для заголовка" 
                                               Command="{Binding AddTagToHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"
                                               />
-                                    <MenuItem Header="Удалить как тег для заголовка" 
+                                        <MenuItem Header="Удалить как тег для заголовка" 
                                               Command="{Binding DelTagFromHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"/>
-                                    <Separator/>
-                                    <MenuItem Header="Запретить использовать как тег для заголовка" 
+                                        <Separator/>
+                                        <MenuItem Header="Запретить использовать как тег для заголовка" 
                                               Command="{Binding ExcludeTagFromHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"/>
-                                    <MenuItem Header="Разрешить использовать как тег для заголовка" 
+                                        <MenuItem Header="Разрешить использовать как тег для заголовка" 
                                               Command="{Binding IncludeTagToHeaderCommand}"
                                               CommandParameter="{Binding ElementName=MainDataGrid, Path=CurrentCell}"/>
-                                </ContextMenu>
-                            </DataGrid.ContextMenu>
-                        </DataGrid>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                            </DataGrid>
+                            <StackPanel Orientation="Horizontal" Height="40" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        Visibility="{Binding IsSharpLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <helpersC:WaitProgress PercentageVisible="False"/>
+                                <TextBlock Text="Идёт загрузка..." VerticalAlignment="Center" Margin="4,0"/>
+                            </StackPanel>
+                        </Grid>
                     </TabItem>
                     <TabItem Header="Заголовки" Height="22" VerticalAlignment="Top">
                         <!--IsSelected="{Binding Path=IsMouseOver, Source={RelativeSource Self}}"-->

@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:p="clr-namespace:ExcelConverter.Parser"
              xmlns:local="clr-namespace:ExcelConverter.Parser.Controls"
+             xmlns:helpers="clr-namespace:Helpers.WPF.Converters;assembly=Helpers.WPF"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="600"
@@ -13,10 +14,11 @@
     <Grid x:Name="GridMain">
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <p:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
-            <p:ApplyConverter x:Key="ApplyConverter"/>
+            <helpers:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
+            <helpers:ApplyConverter x:Key="ApplyConverter"/>
             <p:FinishedBackgroundConverter x:Key="FinishedBackgroundConverter"/>
-            <p:IsEqualsConverter x:Key="IsEqualsConverter"/>
+            <helpers:IsEqualsConverter x:Key="IsEqualsConverter"/>
+            <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
         </Grid.Resources>
         <TabControl SelectedIndex="0" Grid.Row="1" x:Name="TabControl">
             <TabItem Header="Импорт"
@@ -75,34 +77,42 @@
                     </Grid>
 
                     <Expander x:Name="UrlsExpander"
-                  Background="DarkOrange"
-                  IsExpanded="True"
-                  Grid.Row="1"
-                  local:ParsersImportControl.ExpandRow="{Binding Path=IsExpanded,RelativeSource={RelativeSource Self}}"
-                  IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
-                  >
+                          Background="DarkOrange"
+                          IsExpanded="True"
+                          Grid.Row="1"
+                          local:ParsersImportControl.ExpandRow="{Binding Path=IsExpanded,RelativeSource={RelativeSource Self}}"
+                          >
                         <Expander.Header>
-                            <Grid
-                    Margin="0,1,0,0"
-                    Width="{Binding ElementName=UrlsExpander, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-28}">
+                            <Grid Margin="0,1,0,0"
+                                  Width="{Binding ElementName=UrlsExpander, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-28}">
                                 <Label Padding="0" VerticalAlignment="Center" HorizontalAlignment="Left">
                                     <TextBlock Text="{Binding Path=Urls.Count, StringFormat=Найденные ссылки ({0}):}"/>
                                 </Label>
-                                <!--<StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
-                        <Label Content="Найденные ссылки (" Padding="0"/>
-                        <Label Content="{Binding Path=Urls.Count}" Padding="0"/>
-                        <Label Content="):" Padding="0"/>
-                    </StackPanel >-->
                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <DockPanel Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <Label Content="Потоки:" Padding="0"/>
+                                    <Label Padding="0" Margin="4,0"
+                                        Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        >
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}Прошло времени: {0:D2}:{1:D2}:{2:D2}">
+                                                    <Binding Path="ParseTimeElapsed.Hours" />
+                                                    <Binding Path="ParseTimeElapsed.Minutes" />
+                                                    <Binding Path="ParseTimeElapsed.Seconds" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Label>
+                                    <DockPanel Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
+                                        <Label Content="Потоки:" Padding="0" Margin="0,0,2,0"/>
                                         <TextBox Width="20" Text="{Binding Path=ThreadCount, UpdateSourceTrigger=PropertyChanged}"/>
                                     </DockPanel>
-                                    <Label Content="{Binding Path=ProgressText}" Padding="0"/>
+                                    <Label Content="{Binding Path=ProgressText}" Padding="0" Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     <Button Padding="4,0,0,0" Margin="4,0,0,0"
-                                Click="Button_Click"
-                                ContextMenuService.IsEnabled="False"
-                                >
+                                            Click="Button_Click"
+                                            ContextMenuService.IsEnabled="False"
+                                            Visibility="{Binding Path=IsParsing, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
+                                            >
                                         <Button.Content>
                                             <DockPanel>
                                                 <Label Content="Обработать ссылки" Padding="0"/>
@@ -119,25 +129,31 @@
                                         </Button.ContextMenu>
                                     </Button>
 
-
-                                    <Button 
-                            Content="Экспортировать..."
-                            Padding="4,0"
-                            Margin="4,0,0,0"
-                            Visibility="{Binding Path=AllowFileExport, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Command="{Binding Path=ExportUrlsCommand}"/>
+                                    <Button Content="Остановить" 
+                                            Padding="4,0"
+                                            Margin="4,0,0,0"
+                                            Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Command="{Binding Path=StopParseCommand}"
+                                            />
+                                    <Button Content="Экспортировать..."
+                                            Padding="4,0"
+                                            Margin="4,0,0,0"
+                                            Visibility="{Binding Path=AllowFileExport, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
+                                            Command="{Binding Path=ExportUrlsCommand}"/>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <ListBox ItemsSource="{Binding Path=Urls}"
-                     Margin="4"
-                     ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                 Margin="4"
+                                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                 IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid 
-                            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-50}"
-                            Background="{Binding Path=FinishResult, Converter={StaticResource FinishedBackgroundConverter}}"
-                            >
+                                        Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-50}"
+                                        Background="{Binding Path=FinishResult, Converter={StaticResource FinishedBackgroundConverter}}"
+                                        >
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -148,32 +164,45 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Button Grid.Row="0" Content="x" Grid.Column="0" Padding="1,-6,0,-2" Margin="0" 
-                                    Command="{Binding Path=DeleteUrlCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
-                                    CommandParameter="{Binding Path=Value}"
-                                    />
+                                            Command="{Binding Path=DeleteUrlCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding Path=Value}"
+                                            />
                                         <Button Grid.Row="0" Content="Открыть" Grid.Column="1" Padding="0" Margin="4,0" 
-                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
-                                    CommandParameter="{Binding Path=Value}"
-                                    />
+                                            Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
+                                            CommandParameter="{Binding Path=Value}"
+                                            />
                                         <Label Grid.Row="0" Padding="0" Margin="4,0,0,0" Grid.Column="2">
                                             <TextBlock Text="{Binding Path=Value}" TextWrapping="WrapWithOverflow"/>
                                         </Label>
 
-                                        <ItemsControl 
-                                Grid.Row="1"
-                                Grid.ColumnSpan="3"
-                                HorizontalAlignment="Stretch"
-                                Visibility="{Binding Path=IsFinished, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                ItemsSource="{Binding Path=Result.Data}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-20}">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{Binding Path=Key}" Padding="0" Margin="0,0,4,0"/>
-                                                        <TextBlock Grid.Column="1" Padding="0">
+                                        <Grid Grid.Row="1"
+                                              Grid.ColumnSpan="3"
+                                              HorizontalAlignment="Stretch"
+                                              Visibility="{Binding Path=IsFinished, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                              >
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel Orientation="Horizontal" Margin="2,2">
+                                                <TextBlock Padding="0" Text="{Binding Path=Result.TimeToLoadContent, StringFormat={}Время загрузки страницы: {0:0.00} сек.}" Margin="0,0,4,0"/>
+                                                <TextBlock Padding="0" Text="{Binding Path=Result.TimeToParse, StringFormat={}Время поиска ссылок на картинки: {0:0.00} сек.}" Margin="0,0,4,0"/>
+                                            </StackPanel>
+
+                                            <ItemsControl 
+                                                Grid.Row="1"
+                                                HorizontalAlignment="Stretch"
+                                                ItemsSource="{Binding Path=Result.Data}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-20}">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0" Text="{Binding Path=Key}" Padding="0" Margin="0,0,4,0"/>
+                                                            <TextBlock Grid.Column="1" Padding="0">
                                                 <Hyperlink 
                                                     NavigateUri="{Binding Path=Value}"
                                                     Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
@@ -181,43 +210,48 @@
                                                     <TextBlock Text="{Binding Path=Value}"/>
                                                 </Hyperlink>
                                             </TextBlock>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Expander>
                     <Expander x:Name="HostsExpander"
-                  Background="DarkOrange"
-                  IsExpanded="True"
-                  Grid.Row="2"
-                  local:ParsersImportControl.ExpandRow="{Binding Path=IsExpanded,RelativeSource={RelativeSource Self}}"
-                  IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
-                  >
+                          Background="DarkOrange"
+                          IsExpanded="True"
+                          Grid.Row="2"
+                          local:ParsersImportControl.ExpandRow="{Binding Path=IsExpanded,RelativeSource={RelativeSource Self}}"
+                          >
                         <Expander.Header>
-                            <Grid
-                    Margin="0,1,0,0"
-                    Width="{Binding ElementName=UrlsExpander, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-28}">
+                            <Grid Margin="0,1,0,0"
+                                  Width="{Binding ElementName=UrlsExpander, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-28}"
+                                  >
                                 <Label Padding="0" VerticalAlignment="Center" HorizontalAlignment="Left">
                                     <TextBlock Text="{Binding Path=Hosts.Count, StringFormat=Найденные хосты ({0}):}"/>
                                 </Label>
                             </Grid>
                         </Expander.Header>
 
-                        <Grid>
+                        <Grid IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="531*"/>
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <ListBox ItemsSource="{Binding Path=Hosts}"
-                     x:Name="HostLixtBox"
-                     Margin="4"
-                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                     >
+                                     x:Name="HostLixtBox"
+                                     Margin="4"
+                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                     IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}" Grid.ColumnSpan="2"
+                                    >
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <DockPanel>
@@ -242,10 +276,10 @@
                                 Grid.Row="1"
                                 Content="Сгеренировать правило..."
                                 Padding="4,2"
-                                Margin="4"
+                                Margin="4,4,0,4"
                                 HorizontalAlignment="Left"
                                 IsEnabled="{Binding ElementName=HostLixtBox, Path=SelectedItems.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
-                                Command="{Binding SelectGenerateRuleTabCommand}"/>
+                                Command="{Binding SelectGenerateRuleTabCommand}" Grid.ColumnSpan="2"/>
                         </Grid>
                     </Expander>
                 </Grid>

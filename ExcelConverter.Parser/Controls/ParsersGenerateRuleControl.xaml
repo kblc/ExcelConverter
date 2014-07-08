@@ -92,8 +92,21 @@
                     Margin="4,2"/>
             </DockPanel>
 
-            <!--<Label Content="{Binding Path=Parser.Url}"/>
-                <Label Content="'."/>-->
+            <CheckBox VerticalAlignment="Center" IsChecked="{Binding Path=NewParseRule.CollectIMGTags}" Margin="8,0">
+                <Label Padding="0" VerticalAlignment="Center">
+                    <TextBlock Text="Загружать картинки (IMG)" TextWrapping="WrapWithOverflow"/>
+                </Label>
+            </CheckBox>
+            <CheckBox VerticalAlignment="Center" IsChecked="{Binding Path=NewParseRule.CollectLINKTags}" Margin="8,0">
+                <Label Padding="0" VerticalAlignment="Center">
+                    <TextBlock Text="Загружать ссылки (A)" TextWrapping="WrapWithOverflow"/>
+                </Label>
+            </CheckBox>
+            <CheckBox VerticalAlignment="Center" IsChecked="{Binding Path=NewParseRule.CollectMETATags}" Margin="8,0">
+                <Label Padding="0" VerticalAlignment="Center">
+                    <TextBlock Text="Загружать метаданные (META)" TextWrapping="WrapWithOverflow"/>
+                </Label>
+            </CheckBox>
         </WrapPanel>
 
         <TabControl x:Name="UrlsToAddTabControl"

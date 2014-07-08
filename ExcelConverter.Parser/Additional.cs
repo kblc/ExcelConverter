@@ -1154,11 +1154,11 @@ namespace ExcelConverter.Parser
             public HtmlNode Node { get; set; }
             public Uri Url { get; set; }
         }
-        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, Uri url)
+        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, Uri url, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
         {
-            return GetAllImagesUrlsFromUrl(document, url.AbsoluteUri);
+            return GetAllImagesUrlsFromUrl(document, url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags);
         }
-        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, string url)
+        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, string url, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
         {
             if (document == null)
                 throw new ArgumentNullException("В функции GetAllImagesUrlsFromUrl() не может отсутствовать обязательный параметр document");
@@ -1166,8 +1166,10 @@ namespace ExcelConverter.Parser
             bool wasException = false;
             var logSession = Helpers.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()");
             try
-            { 
-                var allLinks = document
+            {
+                var allIMGLinks = 
+                        !collectIMGTags ? new SomeNodeElement[] {} :
+                        document
                         .DocumentNode
                         .Descendants("img")
                         .Where(n => 
@@ -1177,8 +1179,9 @@ namespace ExcelConverter.Parser
                         .ToArray();
             
                 //add some links (<a href="img_source"/>)
-
-                var allALinks = document
+                var allLINKLinks =
+                        !collectLINKTags ? new SomeNodeElement[] { } :
+                        document
                         .DocumentNode
                         .Descendants("a")
                         .Where(n => n.Attributes.Contains("href"))
@@ -1195,15 +1198,12 @@ namespace ExcelConverter.Parser
                         })
                         .ToArray();
 
-                if (allALinks.Length > 0)
-                    allLinks = allLinks.Union(allALinks).ToArray();
+                var allMETALinks = new SomeNodeElement[] { };
 
-                string regExString = "(https?:)?//?[^\'\"<>]+?\\.(jpg|jpeg|gif|png|bmp)";// @"/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$";
-
+                if (collectMETATags)
                 if (document.DocumentNode != null && document.DocumentNode.FirstChild != null && !string.IsNullOrWhiteSpace(document.DocumentNode.InnerHtml))
                 {
-                    var regexpLinks = new SomeNodeElement[] { };
-
+                    string regExString = "(https?:)?//?[^\'\"<>]+?\\.(jpg|jpeg|gif|png|bmp)";// @"/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$";
                     foreach (Match m in Regex.Matches(document.DocumentNode.InnerHtml, regExString)) //"(\\S+?)\\.(jpg|png|gif|jpeg|bmp)"
                     {
                         string value = m.Value;
@@ -1224,34 +1224,36 @@ namespace ExcelConverter.Parser
                             try
                             {
                                 Uri newUri = Helper.GetFullSourceLink(value, document, url);
-                                if (!allLinks.Any(l => l.Url.AbsoluteUri == newUri.AbsoluteUri))
-                                    regexpLinks = regexpLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
+                                    allMETALinks = allMETALinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
                             }
                             catch(Exception)
                             {
 
                             }
                     }
-
-                    if (regexpLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
-                    {
-                        regexpLinks = regexpLinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } }).ToArray();
-                    }
-
-                    if (regexpLinks.Length >= 0 && regexpLinks.Length <= 50)
-                    {
-                        allALinks = allALinks.Union(regexpLinks).ToArray();
-                    }
                 }
 
-                List<SomeNodeElement> distinctedLinks = new List<SomeNodeElement>(allLinks);
-                for (int i = distinctedLinks.Count - 1; i >= 0; i--)
-                {
-                    int lnToDel = distinctedLinks.Count(i2 => i2.Url.AbsoluteUri == distinctedLinks[i].Url.AbsoluteUri && i2 != distinctedLinks[i]);
-                    if (lnToDel > 0)
-                        distinctedLinks.RemoveAt(i);
-                }
-                return distinctedLinks.ToArray();
+                var allLinks =
+                        allIMGLinks
+                        .Union(allLINKLinks)
+                        .Union(allMETALinks)
+                        //.Distinct()
+                        .GroupBy(ne => ne.Url)
+                        .Select(neg => neg.First())
+                        .ToArray();
+
+                if (allLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
+                    allLinks = new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } };
+
+                //List<SomeNodeElement> distinctedLinks = new List<SomeNodeElement>(allLinks);
+                //for (int i = distinctedLinks.Count - 1; i >= 0; i--)
+                //{
+                //    int lnToDel = distinctedLinks.Count(i2 => i2.Url.AbsoluteUri == distinctedLinks[i].Url.AbsoluteUri && i2 != distinctedLinks[i]);
+                //    if (lnToDel > 0)
+                //        distinctedLinks.RemoveAt(i);
+                //}
+                //return distinctedLinks.ToArray();
+                return allLinks;
             }
             catch(Exception ex)
             {
@@ -1302,7 +1304,16 @@ namespace ExcelConverter.Parser
             else
                 node.Attributes.Add("Height", size.Height.ToString());
         }
-        public static ParseImageResult[] GetAllImagesFromUrl(string url, System.Drawing.Size minSize, int threadCount = 6, Helpers.PercentageProgress prgItem = null, bool downloadImages = false, ParseRuleConnectionType type = ParseRuleConnectionType.Direct)
+        public static ParseImageResult[] GetAllImagesFromUrl(
+            string url,
+            System.Drawing.Size minSize, 
+            bool collectIMGTags,
+            bool collectLINKTags,
+            bool collectMETATags,
+            int threadCount = 6, 
+            Helpers.PercentageProgress prgItem = null, 
+            bool downloadImages = false, 
+            ParseRuleConnectionType type = ParseRuleConnectionType.Direct)
         {
             List<ParseImageResult> result = new List<ParseImageResult>();
             try
@@ -1324,7 +1335,7 @@ namespace ExcelConverter.Parser
 
                 object lockAdd = new Object();
 
-                var allLinks = GetAllImagesUrlsFromUrl(document, url);
+                var allLinks = GetAllImagesUrlsFromUrl(document, url, collectIMGTags, collectLINKTags, collectMETATags);
                 int fullCnt = allLinks.Count();
                 int currLoaded = 0;
 
@@ -1658,18 +1669,18 @@ namespace ExcelConverter.Parser
 
         #endregion
 
-        public static ParseRule GetRule(HtmlNodeWithUrl[] nodes, string label, System.Drawing.Size minSize)
+        public static ParseRule GetRule(HtmlNodeWithUrl[] nodes, string label, System.Drawing.Size minSize, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
         {
             ParseRule result =
-                   GetRuleByLink(nodes, label, null)
-                ?? GetRuleByXPath(nodes, label, null)
-                ?? GetRuleByLink(nodes, label, minSize)
-                ?? GetRuleByXPath(nodes, label, minSize)
+                   GetRuleByLink(nodes, label, collectIMGTags, collectLINKTags, collectMETATags, null)
+                ?? GetRuleByXPath(nodes, label, collectIMGTags, collectLINKTags, collectMETATags, null)
+                ?? GetRuleByLink(nodes, label, collectIMGTags, collectLINKTags, collectMETATags, minSize)
+                ?? GetRuleByXPath(nodes, label, collectIMGTags, collectLINKTags, collectMETATags, minSize)
                 ?? new ParseRule();
             return result;
         }
 
-        private static ParseRule GetRuleByLink(HtmlNodeWithUrl[] nodesarr, string label, System.Drawing.Size? minSize = null)
+        private static ParseRule GetRuleByLink(HtmlNodeWithUrl[] nodesarr, string label, bool collectIMGTags, bool collectLINKTags, bool collectMETATags, System.Drawing.Size? minSize = null)
         {
             ParseRule result = null;
 
@@ -1686,7 +1697,7 @@ namespace ExcelConverter.Parser
                             .Select(nodeItem => 
                                 {
                                     var links = Helper
-                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri)
+                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
                                                 .Where(n => Helper.StringLikes(n.Url.AbsoluteUri, mask));
                                     var results =
                                         minSize == null
@@ -1717,7 +1728,7 @@ namespace ExcelConverter.Parser
                             .Select(n =>
                             {
                                 var links = Helper
-                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri)
+                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
                                             .Where(i => Helper.StringLikes(i.Url.AbsoluteUri, mask));
 
                                 string[] images =
@@ -1750,6 +1761,9 @@ namespace ExcelConverter.Parser
                 result.CheckImageSize = minSize != null ? true : false;
                 if (minSize != null)
                     result.MinImageSize = minSize.Value;
+                result.CollectIMGTags = collectIMGTags;
+                result.CollectLINKTags = collectLINKTags;
+                result.CollectMETATags = collectMETATags;
             }
 
             if (minSize != null && result == null)
@@ -1765,13 +1779,13 @@ namespace ExcelConverter.Parser
                 }
                 
                 if (minSize.Value.Height < minCalcedSize.Height || minSize.Value.Width < minCalcedSize.Width)
-                    result = GetRuleByLink(nodesarr, label, minCalcedSize);
+                    result = GetRuleByLink(nodesarr, label, collectIMGTags, collectLINKTags, collectMETATags, minCalcedSize);
             }
 
             return result;
         }
 
-        private static ParseRule GetRuleByXPath(HtmlNodeWithUrl[] nodesarr, string label, System.Drawing.Size? minSize = null)
+        private static ParseRule GetRuleByXPath(HtmlNodeWithUrl[] nodesarr, string label, bool collectIMGTags, bool collectLINKTags, bool collectMETATags, System.Drawing.Size? minSize = null)
         {
             ParseRule result = null;
 
@@ -1791,7 +1805,7 @@ namespace ExcelConverter.Parser
                             .Select(nodeItem =>
                                 {
                                     var links = Helper
-                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri)
+                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
                                                 .Where(n => Helper.StringLikes(n.Url.AbsoluteUri, mask1));
                                     return
                                         minSize == null
@@ -1814,7 +1828,7 @@ namespace ExcelConverter.Parser
                             .Select(nodeItem =>
                                 {
                                     var links = Helper
-                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri)
+                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
                                                 .Where(n => Helper.StringLikes(n.Url.AbsoluteUri, mask2));
                                     return
                                         minSize == null
@@ -1842,7 +1856,7 @@ namespace ExcelConverter.Parser
                             .Select(n => 
                                 {
                                     var links = Helper
-                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri)
+                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
                                             .Where(i => Helper.StringLikes(i.Url.AbsoluteUri, betterMask));
 
                                     string[] images =
@@ -1875,6 +1889,9 @@ namespace ExcelConverter.Parser
                 result.CheckImageSize = minSize != null ? true : false;
                 if (minSize != null)
                     result.MinImageSize = minSize.Value;
+                result.CollectIMGTags = collectIMGTags;
+                result.CollectLINKTags = collectLINKTags;
+                result.CollectMETATags = collectMETATags;
             }
 
             if (minSize != null && result == null)
@@ -1890,7 +1907,7 @@ namespace ExcelConverter.Parser
                 }
 
                 if (minSize.Value.Height < minCalcedSize.Height || minSize.Value.Width < minCalcedSize.Width)
-                    result = GetRuleByLink(nodesarr, label, minCalcedSize);
+                    result = GetRuleByLink(nodesarr, label, collectIMGTags, collectLINKTags, collectMETATags, minCalcedSize);
             }
 
             return result;

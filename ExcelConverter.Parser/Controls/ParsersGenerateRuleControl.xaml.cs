@@ -292,6 +292,9 @@ namespace ExcelConverter.Parser.Controls
 
                 int minWidth = NewParseRule.MinImageWidth;
                 int minHeight = NewParseRule.MinImageHeight;
+                bool collectIMGTags = NewParseRule.CollectIMGTags;
+                bool collectLINKTags = NewParseRule.CollectLINKTags;
+                bool collectMETATags = NewParseRule.CollectMETATags;
                 byte threadCount = this.ThreadCount;
 
                 BackgroundWorker bw = new BackgroundWorker();
@@ -325,7 +328,7 @@ namespace ExcelConverter.Parser.Controls
 
                                         System.Drawing.Size minSize = new System.Drawing.Size() { Width = minWidth, Height = minHeight };
 
-                                        var result = Helper.GetAllImagesFromUrl(item.Value, minSize, threadCount, sw.prgItem, true, type);
+                                        var result = Helper.GetAllImagesFromUrl(item.Value, minSize, collectIMGTags, collectLINKTags, collectMETATags, threadCount, sw.prgItem, true, type);
 
                                         foreach (ParseImageResult res in result)
                                             item.ParseResult.Add(res);
@@ -388,7 +391,7 @@ namespace ExcelConverter.Parser.Controls
                     .Where(i3 => i3 != null && i3.Node != null)
                     .ToArray();
 
-                ParseRule newRule = Helper.GetRule(nodes, AddRuleLabelComboBox.Text, NewParseRule.MinImageSize);
+                ParseRule newRule = Helper.GetRule(nodes, AddRuleLabelComboBox.Text, NewParseRule.MinImageSize, NewParseRule.CollectIMGTags, NewParseRule.CollectLINKTags, NewParseRule.CollectMETATags);
                 newRule.CopyObject(NewParseRule, new string[] { "Connection" });
             }
             #endregion

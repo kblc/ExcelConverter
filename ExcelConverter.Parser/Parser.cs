@@ -70,7 +70,6 @@ namespace ExcelConverter.Parser
     public class ParseRule : INotifyPropertyChanged
     {
         private string label = string.Empty;
-        [field: NonSerializedAttribute()]
         public string Label
         {
             get
@@ -85,7 +84,6 @@ namespace ExcelConverter.Parser
         }
 
         private ParseFindRuleCondition condition = ParseFindRuleCondition.None;
-        [field: NonSerializedAttribute()]
         public ParseFindRuleCondition Condition
         {
             get
@@ -100,7 +98,6 @@ namespace ExcelConverter.Parser
         }
 
         private ParseRuleConnectionType connection = ParseRuleConnectionType.Direct;
-        [field: NonSerializedAttribute()]
         public ParseRuleConnectionType Connection
         {
             get
@@ -115,7 +112,6 @@ namespace ExcelConverter.Parser
         }
 
         private int minImageWidth = ExcelConverter.Parser.Properties.Settings.Default.MinImageWidth;
-        [field: NonSerializedAttribute()]
         public int MinImageWidth
         {
             get { return minImageWidth; }
@@ -130,7 +126,6 @@ namespace ExcelConverter.Parser
         }
 
         private int minImageHeight = ExcelConverter.Parser.Properties.Settings.Default.MinImageHeight;
-        [field: NonSerializedAttribute()]
         public int MinImageHeight
         {
             get { return minImageHeight; }
@@ -145,14 +140,33 @@ namespace ExcelConverter.Parser
         }
 
         private bool checkImageSize = false;
-        [field: NonSerializedAttribute()]
         public bool CheckImageSize
         {
             get { return checkImageSize; }
             set { checkImageSize = value; RaisePropertyChanged("CheckImageSize"); }
         }
 
-        [field: NonSerializedAttribute()]
+        private bool collectIMGTags = true;
+        public bool CollectIMGTags
+        {
+            get { return collectIMGTags; }
+            set { collectIMGTags = value; RaisePropertyChanged("CollectIMGTags"); }
+        }
+
+        private bool collectLINKTags = true;
+        public bool CollectLINKTags
+        {
+            get { return collectLINKTags; }
+            set { collectLINKTags = value; RaisePropertyChanged("CollectLINKTags"); }
+        }
+
+        private bool collectMETATags = true;
+        public bool CollectMETATags
+        {
+            get { return collectMETATags; }
+            set { collectMETATags = value; RaisePropertyChanged("CollectMETATags"); }
+        }
+
         [System.Xml.Serialization.XmlIgnoreAttribute]
         public System.Drawing.Size MinImageSize
         {
@@ -168,7 +182,6 @@ namespace ExcelConverter.Parser
         }
 
         private string parameter = string.Empty;
-        [field: NonSerializedAttribute()]
         public string Parameter
         {
             get
@@ -197,7 +210,7 @@ namespace ExcelConverter.Parser
                 }
                 else
                 {
-                    var links = Helper.GetAllImagesUrlsFromUrl(doc, baseUrl)
+                    var links = Helper.GetAllImagesUrlsFromUrl(doc, baseUrl, collectIMGTags, collectLINKTags, collectMETATags)
                                        .Where(n => Helper.StringLikes(
                                            Condition == ParseFindRuleCondition.ByLink ? n.Url.AbsoluteUri : n.Node.XPath
                                            , mask))
@@ -226,7 +239,7 @@ namespace ExcelConverter.Parser
                         }
                         else
                         {
-                            var links = Helper.GetAllImagesUrlsFromUrl(doc, baseUrl)
+                            var links = Helper.GetAllImagesUrlsFromUrl(doc, baseUrl, collectIMGTags, collectLINKTags, collectMETATags)
                                         .Where(n => Helper.StringLikes(
                                             Condition == ParseFindRuleCondition.ByLinkAndIndex ? n.Url.AbsoluteUri : n.Node.XPath
                                             , mask))
@@ -294,6 +307,20 @@ namespace ExcelConverter.Parser
             set { parser = value; RaisePropertyChanged("Parser"); }
         }
 
+        private double timeToLoadContent = 0;
+        public double TimeToLoadContent
+        {
+            get { return timeToLoadContent; }
+            set { timeToLoadContent = value; RaisePropertyChanged("TimeToLoadContent"); }
+        }
+
+        private double timeToParse = 0;
+        public double TimeToParse
+        {
+            get { return timeToParse; }
+            set { timeToParse = value; RaisePropertyChanged("TimeToParse"); }
+        }
+
         public void Init(Dictionary<string, string> labelsWithData)
         {
             data.Clear();
@@ -316,7 +343,7 @@ namespace ExcelConverter.Parser
         #endregion
     }
 
-    public delegate ParseResult[] ParserParse(string[] urls, byte threadCount, string[] labels, Action<ParseResult> resultAdded = null);
+    public delegate ParseResult[] ParserParse(string[] urls, byte threadCount, string[] labels, Action<ParseResult> resultAdded = null, Func<bool> isCanceled = null);
 
     [Serializable]
     [System.Xml.Serialization.XmlRoot("ParserCollection")]
@@ -578,7 +605,7 @@ namespace ExcelConverter.Parser
             }
         }
 
-        public ParseResult[] Parse(string[] urls, byte threadCount, string[] labels = null, Action<ParseResult> resultAdded = null)
+        public ParseResult[] Parse(string[] urls, byte threadCount, string[] labels = null, Action<ParseResult> resultAdded = null, Func<bool> isCanceled = null)
         {
             List<ParseResult> result = new List<ParseResult>();
             object lockObject = new Object();
@@ -592,10 +619,13 @@ namespace ExcelConverter.Parser
                 .ForAll(
                 (parser) =>
                 {
+                    if (isCanceled != null && isCanceled())
+                        return;
+
                     string[] subUrls = urls.Where(u =>
                         Helper.IsWellFormedUriString(u, UriKind.Absolute) &&
                         Helper.StringLikes(new Uri(u).Host, parser.Url)).ToArray();
-                    ParseResult[] res = threadCount == byte.MinValue ? parser.Parse(subUrls, labels, resultAdded) : parser.Parse(subUrls, threadCount, labels, resultAdded);
+                    ParseResult[] res = threadCount == byte.MinValue ? parser.Parse(subUrls, labels, resultAdded, isCanceled) : parser.Parse(subUrls, threadCount, labels, resultAdded, isCanceled);
                     lock (lockObject)
                     {
                         result.AddRange(res);
@@ -862,7 +892,7 @@ namespace ExcelConverter.Parser
             }
         }
 
-        public ParseResult[] Parse(string[] urls, byte threadCount, string[] labels = null, Action<ParseResult> resultAdded = null)
+        public ParseResult[] Parse(string[] urls, byte threadCount, string[] labels = null, Action<ParseResult> resultAdded = null, Func<bool> isCanceled = null)
         {
             //threadCount = 1;
 
@@ -874,29 +904,45 @@ namespace ExcelConverter.Parser
                 .ForAll(
                     (url) =>
                     {
+                        if (isCanceled != null && isCanceled())
+                            return;
+
                         try
                         {
                             Dictionary<string, string> dic = new Dictionary<string, string>();
 
                             var rulesForParse = (labels == null ? Rules : Rules.Where(r => labels.Contains(r.Label))).ToArray();
 
+                            TimeSpan timeToLoad = new TimeSpan(0);
+                            TimeSpan timeToParse = new TimeSpan(0);
+
                             if (rulesForParse.Length > 0 && rulesForParse.Select(r => r.Connection).Distinct().Count() == 1)
                             {
                                 string urlResponse;
+                                DateTime startLoad = DateTime.Now;
                                 HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, rulesForParse.Select(r => r.Connection).Distinct().FirstOrDefault(), out urlResponse);
+                                timeToLoad = DateTime.Now - startLoad;
+
+                                DateTime startParse = DateTime.Now;
                                 foreach (var rule in rulesForParse)
                                 {
                                     dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
                                 }
+                                timeToParse = DateTime.Now - startParse;
                             } else if (rulesForParse.Length > 0)
                             foreach (var rule in rulesForParse)
                             {
                                 string urlResponse;
+                                DateTime startLoad = DateTime.Now;
                                 HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, rule.Connection, out urlResponse);
+                                timeToLoad = DateTime.Now - startLoad;
+
+                                DateTime startParse = DateTime.Now;
                                 dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
+                                timeToParse = DateTime.Now - startParse;
                             }
 
-                            var res = new ParseResult(url, dic) { Parser = this };
+                            var res = new ParseResult(url, dic) { Parser = this, TimeToLoadContent = timeToLoad.TotalSeconds, TimeToParse = timeToParse.TotalSeconds };
 
                             lock (lockObject)
                             {
@@ -915,9 +961,9 @@ namespace ExcelConverter.Parser
                 );
             return result.ToArray();
         }
-        public ParseResult[] Parse(string[] urls, string[] labels = null, Action<ParseResult> resultAdded = null)
+        public ParseResult[] Parse(string[] urls, string[] labels = null, Action<ParseResult> resultAdded = null, Func<bool> isCanceled = null)
         {
-            return Parse(urls, ThreadCount, labels, resultAdded);
+            return Parse(urls, ThreadCount, labels, resultAdded, isCanceled);
         }
 
         #region Serialization
