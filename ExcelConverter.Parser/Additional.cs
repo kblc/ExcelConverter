@@ -623,8 +623,14 @@ namespace ExcelConverter.Parser
             {
                 if (type == ParseRuleConnectionType.Direct)
                 {
-                    HtmlWeb htmlWeb = new HtmlWeb();
+                    HtmlWeb htmlWeb = new HtmlWeb() { AutoDetectEncoding = true, UserAgent = "Other" };
                     document = htmlWeb.Load(url);
+                    if (document.StreamEncoding != document.Encoding)
+                    {
+                        htmlWeb.AutoDetectEncoding = false;
+                        htmlWeb.OverrideEncoding = document.Encoding;
+                        document = htmlWeb.Load(url);
+                    }
                     urlResponse = htmlWeb.ResponseUri.AbsoluteUri;
                 }
                 else if (new ParseRuleConnectionType[] { ParseRuleConnectionType.IE_00_sec, ParseRuleConnectionType.IE_05_sec, ParseRuleConnectionType.IE_10_sec }.Contains(type))

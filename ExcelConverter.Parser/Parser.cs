@@ -916,30 +916,17 @@ namespace ExcelConverter.Parser
                             TimeSpan timeToLoad = new TimeSpan(0);
                             TimeSpan timeToParse = new TimeSpan(0);
 
-                            if (rulesForParse.Length > 0 && rulesForParse.Select(r => r.Connection).Distinct().Count() == 1)
+                            foreach (var conn in rulesForParse.GroupBy(r => r.Connection).Select(gr => new { Connection = gr.First().Connection, Rules = gr }))
                             {
                                 string urlResponse;
                                 DateTime startLoad = DateTime.Now;
-                                HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, rulesForParse.Select(r => r.Connection).Distinct().FirstOrDefault(), out urlResponse);
-                                timeToLoad = DateTime.Now - startLoad;
+                                HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, conn.Connection, out urlResponse);
+                                timeToLoad += DateTime.Now - startLoad;
 
                                 DateTime startParse = DateTime.Now;
-                                foreach (var rule in rulesForParse)
-                                {
+                                foreach (var rule in conn.Rules)
                                     dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
-                                }
-                                timeToParse = DateTime.Now - startParse;
-                            } else if (rulesForParse.Length > 0)
-                            foreach (var rule in rulesForParse)
-                            {
-                                string urlResponse;
-                                DateTime startLoad = DateTime.Now;
-                                HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, rule.Connection, out urlResponse);
-                                timeToLoad = DateTime.Now - startLoad;
-
-                                DateTime startParse = DateTime.Now;
-                                dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
-                                timeToParse = DateTime.Now - startParse;
+                                timeToParse += DateTime.Now - startParse;
                             }
 
                             var res = new ParseResult(url, dic) { Parser = this, TimeToLoadContent = timeToLoad.TotalSeconds, TimeToParse = timeToParse.TotalSeconds };
