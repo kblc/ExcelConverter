@@ -753,8 +753,17 @@ namespace ExcelConverter.Parser
             Uri result = null;
             if (Helper.IsWellFormedUriString(sourceLink, UriKind.Relative))
             {
-                Uri baseUri = new Uri(doc.DocumentNode.Descendants("base").Where(n => n.HasAttributes && n.Attributes.Contains("href")).Select(n => n.Attributes["href"].Value).FirstOrDefault() ?? stdBase, UriKind.Absolute);
-                result = new Uri(baseUri, sourceLink);
+                Uri baseUri = 
+                    new Uri(
+                        doc.DocumentNode
+                        .Descendants("base")
+                        .Where(n => n.HasAttributes && n.Attributes.Contains("href"))
+                        .Select(n => n.Attributes["href"].Value)
+                        .FirstOrDefault() ?? stdBase, UriKind.Absolute);
+
+                if (baseUri.AbsoluteUri.LastIndexOf(sourceLink) == baseUri.AbsoluteUri.Length - sourceLink.Length)
+                    result = baseUri; else
+                    result = new Uri(baseUri, sourceLink);
             }
             else if (Helper.IsWellFormedUriString(sourceLink, UriKind.Absolute))
             {
@@ -1561,6 +1570,8 @@ namespace ExcelConverter.Parser
         {
             string result = string.Empty;
 
+            bool needFirstSeparator = first.FirstOrDefault() == stringSeparator && second.FirstOrDefault() == stringSeparator;
+
             string[] firstSplited = first.Split(new char[] { stringSeparator }, StringSplitOptions.RemoveEmptyEntries);
             string[] secondSplited = second.Split(new char[] { stringSeparator }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -1578,13 +1589,15 @@ namespace ExcelConverter.Parser
                 }
             }
 
-            for (int i = 0; i < Math.Min(sPath.Count, lPath.Count); i++)
-            {
-                sPath[i] = LongestMaskedStringBetween(sPath[i], lPath[i]);
-            }
+            List<string> path = new List<string>();
 
             for (int i = 0; i < Math.Min(sPath.Count, lPath.Count); i++)
-                result += (result.Length > 0 ? stringSeparator.ToString() : "") + sPath[i];
+            {
+                path.Insert(0, LongestMaskedStringBetween(sPath[sPath.Count - 1 - i], lPath[lPath.Count - 1 - i]));
+            }
+
+            for (int i = 0; i < path.Count; i++)
+                result += (result.Length > 0 || needFirstSeparator ? stringSeparator.ToString() : "") + path[i];
 
             string toChange = stringSeparator.ToString() + "*" + stringSeparator.ToString() + "*";
             //while (result.Contains(toChange))
@@ -1729,12 +1742,12 @@ namespace ExcelConverter.Parser
                             {
                                 var links = Helper
                                             .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
-                                            .Where(i => Helper.StringLikes(i.Url.AbsoluteUri, mask));
+                                            .Where(i => Helper.StringLikes(i.Url.AbsoluteUri, mask)).ToArray();
 
                                 string[] images =
                                     (minSize == null 
-                                        ? links.ToArray()
-                                        : (links = Helper.GetAllImagesUrlsWithMinSize(links.ToArray(), minSize.Value))
+                                        ? links
+                                        : (links = Helper.GetAllImagesUrlsWithMinSize(links, minSize.Value))
                                     )
                                     .Select( i => i.Url.AbsoluteUri)
                                     .ToArray();
