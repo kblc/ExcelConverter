@@ -64,10 +64,15 @@ namespace ExelConverter.Core.ExelDataReader
                 double maxWeight = weightDict.Select( kvp => kvp.Value).OrderByDescending( i => i).FirstOrDefault();
                 if (maxWeight > 0)
                 {
-
                     var headerRows = weightDict.Where(kvp => kvp.Value == maxWeight).Select(kvp => kvp.Key).OrderBy(kvp => kvp);
                     int mainHeaderIndex = headerRows.FirstOrDefault();
-                    MainHeaderRowCount = headerRows.Count() > 3 ? 1 : headerRows.Count();
+
+                    int mainHeaderCnt = 1;
+                    for (mainHeaderCnt = 1; mainHeaderCnt < headerRows.Count(); mainHeaderCnt++)
+                        if (!headerRows.Contains(mainHeaderIndex + mainHeaderCnt))
+                            break;
+
+                    MainHeaderRowCount = mainHeaderCnt > 4 ? 1 : mainHeaderCnt;
                     MainHeader = Rows.ElementAt(mainHeaderIndex);
                     return;
                 }
