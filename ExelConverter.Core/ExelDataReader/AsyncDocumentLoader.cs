@@ -87,16 +87,99 @@ namespace ExelConverter.Core.ExelDataReader
 
             return result;
         }
+
+        private static bool IsIntersected(int x1, int x2, int y1, int y2)
+        {
+            return
+                (x1 <= y1 && x2 >= y1)
+                || (x2 >= y1 && x2 <= y2)
+                ;
+        }
+
+        private static bool IsIncluded(int x1, int x2, int y1, int y2)
+        {
+            return
+                (y1 >= x1 && y1 <= x2)
+                && (y2 >= x1 && y2 <= x2)
+                ;
+        }
+
+        private static Hyperlink[] GetHyperlinksForCell(Cell cell, Worksheet sheet)
+        {
+            var range = cell.GetMergedRange();
+            var hLinks = sheet.Hyperlinks.Cast<Hyperlink>();
+
+            var hLinksINCLD = hLinks
+                    .Where(l =>
+                        IsIncluded(
+                            l.Area.StartColumn,
+                            l.Area.EndColumn,
+                            range != null ? range.FirstColumn : cell.Column,
+                            range != null ? range.FirstColumn + range.ColumnCount - 1 : cell.Column)
+                        && IsIncluded(
+                            l.Area.StartRow,
+                            l.Area.EndRow,
+                            range != null ? range.FirstRow : cell.Row,
+                            range != null ? range.FirstRow + range.RowCount - 1 : cell.Row)
+                        )
+                    .ToArray();
+
+            var hLinksINSCT = hLinks
+                    .Where(l =>
+                        IsIntersected(
+                            l.Area.StartColumn,
+                            l.Area.EndColumn, 
+                            range != null ? range.FirstColumn : cell.Column,
+                            range != null ? range.FirstColumn + range.ColumnCount - 1 : cell.Column)
+                        && IsIntersected(
+                            l.Area.StartRow, 
+                            l.Area.EndRow, 
+                            range != null ? range.FirstRow : cell.Row, 
+                            range != null ? range.FirstRow + range.RowCount - 1 : cell.Row)
+                        )
+                    .ToArray();
+            return hLinksINCLD.Length > 0 ? hLinksINCLD : hLinksINSCT;
+        }
+
+        private static Hyperlink GetHyperlinkForCell(Cell cell, Worksheet sheet)
+        {
+            var range = cell.GetMergedRange();
+            var vLinks = GetHyperlinksForCell(cell, sheet);
+            var mgLinks = vLinks
+                .Select(i1 =>
+                    {
+                        double res = 0.0;
+                        res += Math.Abs(i1.Area.StartColumn - (range != null ? range.FirstColumn : cell.Column));
+                        res += Math.Abs(i1.Area.EndColumn - (range != null ? (range.FirstColumn + range.ColumnCount - 1) : cell.Column));
+                        res += Math.Abs(i1.Area.StartRow - (range != null ? range.FirstRow : cell.Row));
+                        res += Math.Abs(i1.Area.EndRow - (range != null ? (range.FirstRow + range.RowCount - 1) : cell.Column));
+                        return new { Link = i1, Length = res / 4 };
+                    }
+                )
+                .OrderBy(i1 => i1.Length)
+                .ToArray()
+                ;
+            return mgLinks != null && mgLinks.Count() > 0 ? mgLinks.First().Link : null;
+        }
+
         public static List<ExelRow> LoadRows(Worksheet sheet, int count = 0, Action<int> progressReport = null, bool deleteEmptyRows = true)
         {
             var result = new List<ExelRow>();
             var totalRowsCount = 0;
             var loaded = 0;
 
-            if (count <= 0)
-                count = sheet.Cells.Rows.Count;
+            try
+            {
+                totalRowsCount = Math.Max(sheet.Cells.MaxRow + 1, sheet.Cells.Rows.Count);
+            }
+            catch
+            {
+                totalRowsCount = sheet.Cells.Rows.Count;
+            }
 
-            totalRowsCount = sheet.Cells.Rows.Count;
+
+            if (count <= 0)
+               count = totalRowsCount;
 
             var hLinks = sheet.Hyperlinks.Cast<Hyperlink>();
             #region Select max column index for sheet
@@ -140,32 +223,12 @@ namespace ExelConverter.Core.ExelDataReader
                         var cell = sheet.Cells[index, k];
                         var c = new ExelCell();
 
-                        var hLinks2 = rowHyperLinks.Where(l => l.Area.StartColumn <= k && l.Area.EndColumn >= k);
-
-                        var link = hLinks2.OrderBy(
-                            i1 =>
-                            {
-                                double res = 0.0;
-
-                                //res += (i1.Area.StartColumn == k) ? 1.0 : 0.0;
-                                //res += (i1.Area.EndColumn == k) ? 1.0 : 0.0;
-                                //res += (i1.Area.StartRow == index) ? 1.0 : 0.0;
-                                //res += (i1.Area.EndRow == index) ? 1.0 : 0.0;
-
-                                res += Math.Abs(i1.Area.StartColumn - k);
-                                res += Math.Abs(i1.Area.EndColumn - k);
-                                res += Math.Abs(i1.Area.StartRow - index);
-                                res += Math.Abs(i1.Area.EndRow - index);
-
-                                return res / 4;
-                            }
-                            ).FirstOrDefault();
-
                         c.FormatedValue = cell.StringValue;
+
+                        var link = GetHyperlinkForCell(cell, sheet);
                         if (link != null)
-                        {
                             c.HyperLink = link.Address;
-                        }
+                        
                         else if (cell.Formula != null)
                         {
                             var formula = cell.Formula;
@@ -178,24 +241,10 @@ namespace ExelConverter.Core.ExelDataReader
                         if (cell.IsMerged)
                         {
                             c.IsMerged = true;
-                            var intersect = new Func<int, int, int, int, bool>((x1, x2, y1, y2) =>
-                            {
-                                return
-                                    (x1 <= y1 && x2 >= y1)
-                                    || (x2 >= y1 && x2 <= y2)
-                                    ;
-                            });
 
-
-                            var range = cell.GetMergedRange();
-                            var mLinks = hLinks.FirstOrDefault(
-                                l =>
-                                    intersect(l.Area.StartColumn, l.Area.EndColumn, range.FirstColumn, range.FirstColumn + range.ColumnCount)
-                                    && intersect(l.Area.StartRow, l.Area.EndRow, range.FirstRow, range.FirstRow + range.RowCount)
-                                    );
-                            if (mLinks != null)
-                                c.HyperLink = mLinks.Address;
-
+                            var hLink = GetHyperlinkForCell(cell, sheet);
+                            c.HyperLink = hLink == null ? string.Empty : hLink.Address;
+                            
                             var content = string.Empty;
                             var values = (IEnumerable)cell.GetMergedRange().Value;
                             if (values != null)
