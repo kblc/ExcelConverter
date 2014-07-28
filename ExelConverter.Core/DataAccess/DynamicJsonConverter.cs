@@ -97,6 +97,17 @@ public sealed class DynamicJsonConverter : JavaScriptConverter
             if (!_dictionary.TryGetValue(binder.Name, out result))
             {
                 // return null to avoid exception.  caller can check for null this way...
+
+                if (binder.Name == "Dictionary")
+                {
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+                    foreach (var i in _dictionary)
+                        dic.Add(i.Key, WrapResultObject(i.Value));
+
+                    result = dic;
+                    return true;
+                }
+
                 result = null;
                 return true;
             }
@@ -139,6 +150,16 @@ public sealed class DynamicJsonConverter : JavaScriptConverter
 
             return result;
         }
+
+        //public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        //{
+        //    return _dictionary.GetEnumerator();
+        //}
+
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    return _dictionary.GetEnumerator();
+        //}
     }
 
     #endregion

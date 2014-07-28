@@ -34,6 +34,8 @@ namespace ExelConverter.Core.DataWriter
             BackgroundWorker result = new BackgroundWorker();
             result.DoWork += (s, e) =>
                 {
+                    bool showLogAnytime = false;
+
                     BackgroundWorker current = s as BackgroundWorker;
                     PercentageProgress fullProgress = new PercentageProgress();
 
@@ -104,6 +106,12 @@ namespace ExelConverter.Core.DataWriter
                         string outerPdf;
 
                         HttpDataClient.Default.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
+
+                        //Log.Add(logSession, string.Format("Get CODES from server..."));
+                        //foreach (var i in idsToGet)
+                        //    Log.Add(logSession, string.Format("[Code:'{0}',Location:'{1}',Map:'{2}',Photo:'{3}']", i.Code, i.LinkLocation, i.LinkMap, i.LinkPhoto));
+                        //Log.Add(logSession, string.Format("Get CODES done"));
+
                         //HttpDataAccess.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
                         Log.Add(logSession, string.Format("Links getted"));
                         getLinksProgress.Value = 100;
@@ -277,7 +285,7 @@ namespace ExelConverter.Core.DataWriter
                     finally
                     {
                         current.ReportProgress(100);
-                        Log.SessionEnd(logSession, wasException);
+                        Log.SessionEnd(logSession, wasException || showLogAnytime);
                     }
                 };
             result.WorkerReportsProgress = true;

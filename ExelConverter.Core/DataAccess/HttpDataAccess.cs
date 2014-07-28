@@ -257,6 +257,7 @@ namespace ExelConverter.Core.DataAccess
 
                 var strRequest = string.Format("{0}&companyId={1}{2}", GetLoginPasswordCouple(), companyId, items);
                 Helpers.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
+                //var result = Post(GetUrl(PathGetResourceList), strRequest, Cookies, Proxy);
                 var result = Post(GetUrl(PathGetResourceList), Uri.EscapeUriString(strRequest), Cookies, Proxy);
                 Helpers.Log.Add(logSession, "Server answer: " + result);
 
@@ -271,16 +272,27 @@ namespace ExelConverter.Core.DataAccess
 
                 if (data["resources"] != null)
                 {
-                    foreach (var item in idsToGet)
+                    foreach (KeyValuePair<string,object> res in data["resources"].Dictionary)
                     {
-                        dynamic dynItem = data["resources"][item.Code];
-                        if (dynItem != null)
+                        dynamic dynItem = res.Value;
+                        foreach(var item in idsToGet.Where(i => i.Code.ToLower() == res.Key.ToLower()))
                         {
                             item.LinkPhoto = dynItem["photo"];
                             item.LinkLocation = dynItem["location"];
                             item.LinkMap = dynItem["map"];
                         }
                     }
+
+                    //foreach (var item in idsToGet)
+                    //{
+                    //    dynamic dynItem = data["resources"][item.Code];
+                    //    if (dynItem != null)
+                    //    {
+                    //        item.LinkPhoto = dynItem["photo"];
+                    //        item.LinkLocation = dynItem["location"];
+                    //        item.LinkMap = dynItem["map"];
+                    //    }
+                    //}
                 }
                 map = data["map"];
                 pdf = data["pdf"];
