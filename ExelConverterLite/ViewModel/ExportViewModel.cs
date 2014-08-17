@@ -343,11 +343,15 @@ namespace ExelConverterLite.ViewModel
                         {
                             foreach(var row in RowsToExport)
                             {
-                                string photo_img = string.IsNullOrWhiteSpace(row.Photo_img) ? row.Location_img : row.Photo_img;
-                                string location_img = string.IsNullOrWhiteSpace(row.Location_img) ? row.Photo_img : row.Location_img; ;
+                                //string photo_img = string.IsNullOrWhiteSpace(row.Photo_img) ? row.Location_img : row.Photo_img;
+                                //string location_img = string.IsNullOrWhiteSpace(row.Location_img) ? row.Photo_img : row.Location_img; ;
 
-                                row.Photo_img = ReplaceUrlFromData(photo_img, DBParsers.Labels[0], collection);
-                                row.Location_img = ReplaceUrlFromData(location_img, DBParsers.Labels[1], collection);
+                                //row.Photo_img = ReplaceUrlFromData(photo_img, DBParsers.Labels[0], collection);
+                                //row.Location_img = ReplaceUrlFromData(location_img, DBParsers.Labels[1], collection);
+
+                                row.Photo_img = ReplaceUrlFromData(row.Photo_img, DBParsers.Labels[0], collection);
+                                row.Location_img = ReplaceUrlFromData(row.Location_img, DBParsers.Labels[1], collection);
+
                             }
                             RaisePropertyChanged("RowsToExport");
                         }
