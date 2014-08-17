@@ -674,8 +674,9 @@ namespace ExcelConverter.Parser
             if (ParentControl != null)
             {
                 control.Visibility = System.Windows.Visibility.Hidden;
-                control.Width = 100;
-                control.Height = 100;
+                //control.Opacity = 0;
+                control.Width = 1024;
+                control.Height = 1024;
                 ParentControl.Children.Add(control);
             }
         }

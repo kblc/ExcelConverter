@@ -132,7 +132,7 @@ namespace ExcelConverter.Core.Test
                 test.GetResourcesList(
                     operatorId,
                     new System.Collections.Generic.List<ExelConverter.Core.DataWriter.ReExportData>(
-                        new ExelConverter.Core.DataWriter.ReExportData[] { new ExelConverter.Core.DataWriter.ReExportData(code) }
+                        new ExelConverter.Core.DataWriter.ReExportData[] { new ExelConverter.Core.DataWriter.ReExportData(code, 1, "test") }
                         )
                     , out map
                     , out pdf);
