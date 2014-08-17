@@ -995,9 +995,21 @@ namespace ExelConverterLite.ViewModel
                         BackgroundWorker bw = ReExport.Start(dlg.FileName, SelectedOperator.Id, ExportRules.ToArray());
                         bw.RunWorkerCompleted += (s, e) => 
                         {
-                            if (e.Error != null && !e.Cancelled)
+                            string errMessage = string.Empty;
+
+                            if (e.Error != null)
+                                errMessage = e.Error.Message;
+                            else if (e.Result != null && !string.IsNullOrEmpty(e.Result.ToString()))
+                                errMessage = e.Result.ToString();
+
+                            if (!string.IsNullOrEmpty(errMessage) && !e.Cancelled)
                             {
-                                MessageBox.Show("При попытке реэкспорта файла произошла ошибка:" + Environment.NewLine + e.Error.Message+ Environment.NewLine + "Подробности смотрите в log-файле.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show(
+                                    "При попытке реэкспорта файла произошла одна или несколько ошибок:" + Environment.NewLine + 
+                                    errMessage + Environment.NewLine +
+                                    "Подробности смотрите в log-файле." + Environment.NewLine + 
+                                    (e.Error != null ? "Ошибка критическая. Реэкспорт не завершён." : "Ошибка не критическая. Реэкспорт завершен с учётом ошибок.")
+                                    , "Ошибка", MessageBoxButtons.OK, (e.Error != null ? MessageBoxIcon.Error : MessageBoxIcon.Warning));
                             }
                             dlgWnd.DialogResult = false;
                         };

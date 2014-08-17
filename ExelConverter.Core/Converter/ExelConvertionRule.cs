@@ -324,6 +324,8 @@ namespace ExelConverter.Core.Converter
                             }
                             logPart++;
                             var outputRow = new OutputRow();
+                            outputRow.OriginalIndex = sheet.Rows[i].Index;
+                            outputRow.OriginalSheet = sheet.Name;
                             logPart++;
                             foreach (var convertionData in (conversionDataLimiter == null ? ConvertionData : ConvertionData.Where(i2 => conversionDataLimiter.Contains(i2.PropertyId))))
                             {

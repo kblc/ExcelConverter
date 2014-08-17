@@ -20,10 +20,14 @@ namespace ExelConverter.Core.DataWriter
         public string LinkPhoto = string.Empty;
         public string LinkMap = string.Empty;
         public string LinkLocation = string.Empty;
+        public int OriginalIndex = 0;
+        public string OriginalSheet = string.Empty;
 
-        public ReExportData(string code) 
+        public ReExportData(string code, int originalIndex, string originalSheet) 
         {
             Code = code;
+            OriginalIndex = originalIndex;
+            OriginalSheet = originalSheet;
         }
     }
 
@@ -34,6 +38,8 @@ namespace ExelConverter.Core.DataWriter
             BackgroundWorker result = new BackgroundWorker();
             result.DoWork += (s, e) =>
                 {
+                    StringBuilder errors = new StringBuilder();
+
                     bool showLogAnytime = false;
 
                     BackgroundWorker current = s as BackgroundWorker;
@@ -98,7 +104,7 @@ namespace ExelConverter.Core.DataWriter
                         Log.Add(logSession, string.Format("Try to get links..."));
                         List<ReExportData> idsToGet = new List<ReExportData>(
                             rowsToExport
-                            .Select(i => new ReExportData(i.Code.Trim()))
+                            .Select(i => new ReExportData(i.Code.Trim(), i.OriginalIndex, i.OriginalSheet))
                             .Cast<ReExportData>()
                             );
 
@@ -200,41 +206,25 @@ namespace ExelConverter.Core.DataWriter
                                         h2.SetStyle(h0Style);
                                         h3.SetStyle(h0Style);
 
-                                        for (int i = headerRow.Index + 1; i < sheet.Cells.Rows.Count; i++)
+                                        foreach (var item in idsToGet.Where(i => i.OriginalSheet == sheet.Name))
                                         {
-                                            var codeCell = sheet.Cells.Rows[i].GetCellOrNull(CodeColumnIndex);
-                                            if (codeCell != null)
+                                            if (!string.IsNullOrWhiteSpace(item.LinkPhoto))
                                             {
-                                                var codeInExcel = codeCell.StringValue;
-                                                if (!string.IsNullOrWhiteSpace(codeInExcel))
-                                                {
-                                                    var normalCode = rowsToExport.FirstOrDefault(itm => itm.OriginalCode.Trim() == codeInExcel.Trim());
-                                                    if (normalCode != null)
-                                                    {
-                                                        var linksForCode = idsToGet.FirstOrDefault(itm => itm.Code == normalCode.Code.Trim());
-                                                        if (linksForCode != null)
-                                                        {
-                                                            if (!string.IsNullOrWhiteSpace(linksForCode.LinkPhoto))
-                                                            {
-                                                                var c1 = sheet.Cells[i, lastIndex + 1];
-                                                                c1.Value = "фото";
-                                                                sheet.Hyperlinks.Add(c1.Name, 1, 1, linksForCode.LinkPhoto);
-                                                            }
-                                                            if (!string.IsNullOrWhiteSpace(linksForCode.LinkLocation))
-                                                            {
-                                                                var c2 = sheet.Cells[i, lastIndex + 2];
-                                                                c2.Value = "схема";
-                                                                sheet.Hyperlinks.Add(c2.Name, 1, 1, linksForCode.LinkLocation);
-                                                            }
-                                                            if (!string.IsNullOrWhiteSpace(linksForCode.LinkMap))
-                                                            {
-                                                                var c3 = sheet.Cells[i, lastIndex + 3];
-                                                                c3.Value = "карта";
-                                                                sheet.Hyperlinks.Add(c3.Name, 1, 1, linksForCode.LinkMap);
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                                var c1 = sheet.Cells[item.OriginalIndex, lastIndex + 1];
+                                                c1.Value = "фото";
+                                                sheet.Hyperlinks.Add(c1.Name, 1, 1, item.LinkPhoto);
+                                            }
+                                            if (!string.IsNullOrWhiteSpace(item.LinkLocation))
+                                            {
+                                                var c2 = sheet.Cells[item.OriginalIndex, lastIndex + 2];
+                                                c2.Value = "схема";
+                                                sheet.Hyperlinks.Add(c2.Name, 1, 1, item.LinkLocation);
+                                            }
+                                            if (!string.IsNullOrWhiteSpace(item.LinkMap))
+                                            {
+                                                var c3 = sheet.Cells[item.OriginalIndex, lastIndex + 3];
+                                                c3.Value = "карта";
+                                                sheet.Hyperlinks.Add(c3.Name, 1, 1, item.LinkMap);
                                             }
                                         }
 
@@ -272,14 +262,24 @@ namespace ExelConverter.Core.DataWriter
 
                                     }
                                     else
-                                        throw new Exception(string.Format("в Excel-файле невозможно найти колонку с кодом '{0}'", CodeColumnName));
+                                    {
+                                        errors.AppendFormat("в Excel-файле на вкладке '{0}' невозможно найти колонку с именем '{1}'", sheet.Name, CodeColumnName);
+                                        errors.AppendLine();
+                                        //throw new Exception(string.Format("в Excel-файле на вкладке '{0}' невозможно найти колонку с кодом '{1}'", sheet.Name, CodeColumnName));
+                                    }
                                     #endregion
                                 }
                                 else
-                                    throw new Exception("Отсутствует правило для определения кода");
+                                {
+                                    errors.AppendFormat("Отсутствует правило для определения кода для вкладки '{0}'", sheet.Name);
+                                    errors.AppendLine();
+                                    //throw new Exception(string.Format("Отсутствует правило для определения кода для вкладки '{0}'", sheet.Name));
+                                }
                             }
                         }
                         wb.Save(fileName);
+                        e.Result = errors.ToString();
+
                         #endregion
                     }
                     catch (Exception ex)

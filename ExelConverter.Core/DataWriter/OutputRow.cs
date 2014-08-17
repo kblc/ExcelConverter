@@ -41,7 +41,7 @@ namespace ExelConverter.Core.DataWriter
                 foreach (var propertyName in typeof(OutputRow).GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).Select(pi => pi.Name))
                 {
 
-                    if (!columnOrder.ContainsValue(propertyName))
+                    if (!columnOrder.ContainsValue(propertyName) && !propertyName.Contains("Original"))
                     {
                         columnOrder.Add(i, propertyName);
                         i++;
@@ -56,6 +56,12 @@ namespace ExelConverter.Core.DataWriter
 
         private string originalCode = string.Empty;
         public string OriginalCode { get { return originalCode; } set { originalCode = value; RaisePropertyChanged("OriginalCode"); } }
+
+        private int originalIndex = 0;
+        public int OriginalIndex { get { return originalIndex; } set { originalIndex = value; RaisePropertyChanged("OriginalIndex"); } }
+
+        private string originalSheet = string.Empty;
+        public string OriginalSheet { get { return originalSheet; } set { originalSheet = value; RaisePropertyChanged("OriginalSheet"); } }
 
         public string CodeDoors { get; set; }
 
