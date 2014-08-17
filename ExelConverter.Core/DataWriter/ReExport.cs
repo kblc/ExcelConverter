@@ -186,13 +186,19 @@ namespace ExelConverter.Core.DataWriter
                                         var h2 = sheet.Cells[headerRow.Index, lastIndex + 2];
                                         var h3 = sheet.Cells[headerRow.Index, lastIndex + 3];
 
+                                        sheet.Cells.Columns[h1.Column].IsHidden = false;
+                                        sheet.Cells.Columns[h2.Column].IsHidden = false;
+                                        sheet.Cells.Columns[h3.Column].IsHidden = false;
+
                                         h1.Value = "Фото";
                                         h2.Value = "Схема";
                                         h3.Value = "Карта";
 
-                                        h1.SetStyle(h0.GetStyle());
-                                        h2.SetStyle(h0.GetStyle());
-                                        h3.SetStyle(h0.GetStyle());
+                                        Style h0Style = h0.GetStyle();
+
+                                        h1.SetStyle(h0Style);
+                                        h2.SetStyle(h0Style);
+                                        h3.SetStyle(h0Style);
 
                                         for (int i = headerRow.Index + 1; i < sheet.Cells.Rows.Count; i++)
                                         {
