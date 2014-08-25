@@ -487,6 +487,8 @@ namespace ExcelConverter.Parser
                         finally
                         {
                             RemoveControl(wb);
+                            wb = null;
+                            GC.Collect();
                         }
                     }));
 
@@ -549,21 +551,28 @@ namespace ExcelConverter.Parser
                 Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                     new Action(() =>
                     {
-                        PutControl(wv = new CefSharp.Wpf.WebView()); //string.Empty, new CefSharp.BrowserSettings() { EncodingDetectorEnabled = true }
-                        wv.LoadCompleted += (s, e) =>
+                        try
                         {
-                            CefSharp.Wpf.WebView s1 = s as CefSharp.Wpf.WebView;
-                            if (s1.Address == e.Url)
+                            PutControl(wv = new CefSharp.Wpf.WebView()); //string.Empty, new CefSharp.BrowserSettings() { EncodingDetectorEnabled = true }
+                            wv.LoadCompleted += (s, e) =>
                             {
-                                result.ResponseUri = new Uri(e.Url);
-                                object contentScriptResult = s1.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
-                                if (contentScriptResult != null)
-                                    result.Content = contentScriptResult.ToString();
-                                done = true;
-                            }
-                        };
-                        //wv.Load(url.AbsoluteUri);
-                        wv.Address = url.AbsoluteUri;
+                                CefSharp.Wpf.WebView s1 = s as CefSharp.Wpf.WebView;
+                                if (s1.Address == e.Url)
+                                {
+                                    result.ResponseUri = new Uri(e.Url);
+                                    object contentScriptResult = s1.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
+                                    if (contentScriptResult != null)
+                                        result.Content = contentScriptResult.ToString();
+                                    done = true;
+                                }
+                            };
+                            //wv.Load(url.AbsoluteUri);
+                            wv.Address = url.AbsoluteUri;
+                        }
+                        catch(Exception ex)
+                        {
+                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().PutControl()"));
+                        }
                     }));
 
                 #region Wait (done and pause) or 30 sec
@@ -578,8 +587,9 @@ namespace ExcelConverter.Parser
                 Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                     new Action(() =>
                     {
+                        if (wv != null)
                         try
-                        { 
+                        {
                             if (wv.IsInitialized)
                             { 
                                 object contentScriptResult = wv.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
@@ -593,10 +603,14 @@ namespace ExcelConverter.Parser
                         }
                         finally
                         {
+                            wv.Delete();
                             RemoveControl(wv);
+                            wv = null;
+                            GC.Collect();
                         }
                     }));
                 #endregion
+
                 return result;
             }
         }
@@ -682,12 +696,15 @@ namespace ExcelConverter.Parser
         }
         protected void RemoveControl(System.Windows.FrameworkElement control)
         {
-            if (ParentControl != null)
-                ParentControl.Children.Remove(control);
+            if (control != null)
+            {
+                if (ParentControl != null && ParentControl.Children.Contains(control))
+                    ParentControl.Children.Remove(control);
 
-            IDisposable disp = control as IDisposable;
-            if (disp != null)
-                disp.Dispose();
+                IDisposable disp = control as IDisposable;
+                if (disp != null)
+                    disp.Dispose();
+            }
         }
         protected void Wait(int waitSeconds)
         {
@@ -1180,7 +1197,7 @@ namespace ExcelConverter.Parser
                 throw new ArgumentNullException("В функции GetAllImagesUrlsFromUrl() не может отсутствовать обязательный параметр document");
 
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()");
+            var logSession = Helpers.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()", true);
             try
             {
                 var allIMGLinks = 

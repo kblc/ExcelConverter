@@ -521,7 +521,7 @@ namespace ExelConverterLite.ViewModel
             //else
             //{
                 int res;
-                if (!string.IsNullOrWhiteSpace(row.CodeDoors) && !int.TryParse(row.CodeDoors, out res))
+                if (!string.IsNullOrWhiteSpace(row.CodeDoors) && row.CodeDoors.Any(c => !(new char[] {'1','2','3','4','5','6','7','8','9','0'}.Contains(c))))
                 {
                     var error = new Error
                     {
