@@ -124,77 +124,6 @@ namespace ExcelConverter.Parser
         #endregion
     }
 
-    public class DelegateCommand : ICommand
-    {
-        private readonly Predicate<object> _canExecute;
-        private readonly Action<object> _execute;
-
-        public event EventHandler CanExecuteChanged;
-
-        public DelegateCommand(Action<object> execute)
-            : this(execute, null)
-        {
-        }
-
-        public DelegateCommand(Action<object> execute, Predicate<object> canExecute)
-        {
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            if (_canExecute == null)
-            {
-                return true;
-            }
-
-            return _canExecute(parameter);
-        }
-
-        public void Execute(object parameter)
-        {
-            _execute(parameter);
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            if (CanExecuteChanged != null)
-            {
-                CanExecuteChanged(this, EventArgs.Empty);
-            }
-        }
-    }
-
-    public class URL: INotifyPropertyChanged
-    {
-        private string url = string.Empty;
-        public string Url
-        {
-            get
-            {
-                return url;
-            }
-            set
-            {
-                url = (new Uri(value)).ToString();
-                RaisePropertyChanged(url);
-            }
-        }
-
-        public URL() { }
-
-        public URL(string url) { this.url = url; }
-
-        private void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
-
     public static class CSVReader
     {
         private static string ClearField(string field)
@@ -508,6 +437,27 @@ namespace ExcelConverter.Parser
 
         protected class SiteManagerCHR : SiteManager
         {
+            private static ConcurrencyObjects<CefSharp.Wpf.WebView> Views = null;
+            static SiteManagerCHR()
+            {
+                Views = new ConcurrencyObjects<CefSharp.Wpf.WebView>();
+                Views.Max = 20;
+                Views.TimeToGetObject = new TimeSpan(0, 0, 10, 0);
+                Views.GetNewObject = () => { return new CefSharp.Wpf.WebView(); };
+            }
+
+            private CefSharp.Wpf.WebView GetWebView()
+            {
+                CefSharp.Wpf.WebView result = Views.GetObject();
+                PutControl(result);
+                return result;
+            }
+
+            private void ReturnWebView(CefSharp.Wpf.WebView view)
+            {
+                Views.ReturnObject(view);
+            }
+
             private static bool inited = false;
             public static void Init()
             {
@@ -525,7 +475,7 @@ namespace ExcelConverter.Parser
                         if (File.Exists(logFile))
                             File.Delete(logFile);
 
-                        CefSharp.Settings settings = new CefSharp.Settings() 
+                        CefSharp.Settings settings = new CefSharp.Settings()
                         {
                             CachePath = resources,
                             Locale = "ru",
@@ -535,7 +485,7 @@ namespace ExcelConverter.Parser
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(string.Format("SiteManagerCHR.Init() :: exception '{0}'", ex.Message));
+                        Log.Add(ex, "SiteManagerCHR.Init()");
                     }
             }
 
@@ -548,30 +498,35 @@ namespace ExcelConverter.Parser
                 bool done = false;
                 CefSharp.Wpf.WebView wv = null;
 
+                #region LoadCompleteEvent
+                CefSharp.LoadCompletedEventHandler LoadCompleteEvent = new CefSharp.LoadCompletedEventHandler(
+                    (s, e) =>
+                    {
+                        CefSharp.Wpf.WebView s1 = s as CefSharp.Wpf.WebView;
+                        if (s1.Address == e.Url)
+                        {
+                            result.ResponseUri = new Uri(e.Url);
+                            object contentScriptResult = s1.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
+                            if (contentScriptResult != null)
+                                result.Content = contentScriptResult.ToString();
+                            done = true;
+                        }
+                    }
+                    );
+                #endregion
+
                 Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
                     new Action(() =>
                     {
                         try
                         {
-                            PutControl(wv = new CefSharp.Wpf.WebView()); //string.Empty, new CefSharp.BrowserSettings() { EncodingDetectorEnabled = true }
-                            wv.LoadCompleted += (s, e) =>
-                            {
-                                CefSharp.Wpf.WebView s1 = s as CefSharp.Wpf.WebView;
-                                if (s1.Address == e.Url)
-                                {
-                                    result.ResponseUri = new Uri(e.Url);
-                                    object contentScriptResult = s1.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
-                                    if (contentScriptResult != null)
-                                        result.Content = contentScriptResult.ToString();
-                                    done = true;
-                                }
-                            };
-                            //wv.Load(url.AbsoluteUri);
+                            wv = GetWebView();
+                            wv.LoadCompleted += LoadCompleteEvent;
                             wv.Address = url.AbsoluteUri;
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().PutControl()"));
+                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().Start()"));
                         }
                     }));
 
@@ -583,34 +538,32 @@ namespace ExcelConverter.Parser
                 if (done)
                     Wait(wait);
                 #endregion
+
                 #region GetHTML
                 Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                     new Action(() =>
                     {
                         if (wv != null)
-                        try
-                        {
-                            if (wv.IsInitialized)
-                            { 
-                                object contentScriptResult = wv.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
-                                if (contentScriptResult != null)
-                                    result.Content = contentScriptResult.ToString();
+                            try
+                            {
+                                if (wv.IsInitialized)
+                                {
+                                    object contentScriptResult = wv.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
+                                    if (contentScriptResult != null)
+                                        result.Content = contentScriptResult.ToString();
+                                }
                             }
-                        }
-                        catch(Exception ex)
-                        {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().GetHTML()"));
-                        }
-                        finally
-                        {
-                            wv.Delete();
-                            RemoveControl(wv);
-                            wv = null;
-                            GC.Collect();
-                        }
+                            catch (Exception ex)
+                            {
+                                Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().GetHTML()"));
+                            }
+                            finally
+                            {
+                                wv.LoadCompleted -= LoadCompleteEvent;
+                                ReturnWebView(wv);
+                            }
                     }));
                 #endregion
-
                 return result;
             }
         }
@@ -685,7 +638,7 @@ namespace ExcelConverter.Parser
         }
         protected void PutControl(System.Windows.FrameworkElement control)
         {
-            if (ParentControl != null)
+            if (ParentControl != null && !ParentControl.Children.Contains(control))
             {
                 control.Visibility = System.Windows.Visibility.Hidden;
                 //control.Opacity = 0;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helpers.WPF;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;

@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Helpers;
 using System.Windows.Threading;
+using Helpers.WPF;
 
 namespace ExcelConverter.Parser.Controls
 {
