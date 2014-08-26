@@ -498,7 +498,7 @@ namespace ExcelConverter.Parser
                 bool done = false;
                 CefSharp.Wpf.WebView wv = null;
 
-                #region LoadCompleteEvent
+                #region LoadCompleteEvent && BrowserInitialized
                 CefSharp.LoadCompletedEventHandler LoadCompleteEvent = new CefSharp.LoadCompletedEventHandler(
                     (s, e) =>
                     {
@@ -513,6 +513,20 @@ namespace ExcelConverter.Parser
                         }
                     }
                     );
+
+                PropertyChangedEventHandler BrowserInitialized = new PropertyChangedEventHandler(
+                        (s,e) =>
+                        {
+                            if (wv != null)
+                            switch (e.PropertyName)
+                            {
+                                case "IsBrowserInitialized":
+                                    if (wv.IsBrowserInitialized)
+                                        wv.Load(url.AbsoluteUri);
+                                    break;
+                            }
+                        }
+                    );
                 #endregion
 
                 Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
@@ -521,8 +535,13 @@ namespace ExcelConverter.Parser
                         try
                         {
                             wv = GetWebView();
+                            wv.Content = null;
                             wv.LoadCompleted += LoadCompleteEvent;
-                            wv.Address = url.AbsoluteUri;
+
+                            if (!wv.IsBrowserInitialized)
+                                wv.PropertyChanged += BrowserInitialized;
+                            else
+                                wv.Load(url.AbsoluteUri);
                         }
                         catch (Exception ex)
                         {
@@ -560,6 +579,7 @@ namespace ExcelConverter.Parser
                             finally
                             {
                                 wv.LoadCompleted -= LoadCompleteEvent;
+                                wv.PropertyChanged -= BrowserInitialized;
                                 ReturnWebView(wv);
                             }
                     }));
