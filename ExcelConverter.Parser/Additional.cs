@@ -28,7 +28,7 @@ namespace ExcelConverter.Parser
         }
     }
 
-    public class ParseImageResult
+    public class ParseImageResult : IDisposable
     {
         public readonly HtmlNode node = null;
         public HtmlNode Node
@@ -78,6 +78,12 @@ namespace ExcelConverter.Parser
         public ParseImageResult(HtmlNode node, System.Drawing.Image image, System.Drawing.Size imageSize, Uri url) : this(node, image, url)
         {
             this.imageSize = imageSize;
+        }
+
+        public void Dispose()
+        {
+            if (image != null)
+                image.Dispose();
         }
     }
 
