@@ -749,9 +749,9 @@ namespace ExcelConverter.Parser.Controls
                                                     int filled = item.Data.Where(i => !string.IsNullOrWhiteSpace(i.Value)).Count();
                                                     int mustBeFilled = item.Parser.Rules.Count;
 
-                                                    if (filled == mustBeFilled && filled > 0)
+                                                    if (filled == mustBeFilled && mustBeFilled > 0)
                                                         u.FinishResult = 1;
-                                                    else if (filled < mustBeFilled && filled > 0)
+                                                    else if (filled < mustBeFilled && mustBeFilled > 0)
                                                         u.FinishResult = 2;
                                                     else
                                                         u.FinishResult = 0;

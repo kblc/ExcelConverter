@@ -764,7 +764,8 @@ namespace ExcelConverter.Parser
                         .Select(n => n.Attributes["href"].Value)
                         .FirstOrDefault() ?? stdBase, UriKind.Absolute);
 
-                if (baseUri.AbsoluteUri.LastIndexOf(sourceLink) == baseUri.AbsoluteUri.Length - sourceLink.Length)
+                var li = baseUri.AbsoluteUri.LastIndexOf(sourceLink);
+                if (li == baseUri.AbsoluteUri.Length - sourceLink.Length && li != -1)
                     result = baseUri; else
                     result = new Uri(baseUri, sourceLink);
             }
