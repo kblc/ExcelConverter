@@ -739,11 +739,11 @@ namespace ExcelConverter.Parser.Controls
                                     int filled = item.Data.Where(i => !string.IsNullOrWhiteSpace(i.Value)).Count();
                                     int mustBeFilled = item.Parser.Rules.Count;
 
-                                    if (filled == mustBeFilled && filled > 0)
+                                    if (filled == mustBeFilled && mustBeFilled > 0)
                                         u.FinishResult = 1;
                                     else if (!string.IsNullOrWhiteSpace(item.Errors))
                                         u.FinishResult = 2;
-                                    else if (filled < mustBeFilled && filled >= 0)
+                                    else if (filled < mustBeFilled && mustBeFilled > 0)
                                     {
                                         u.FinishResult = 2;
                                         item.Errors = string.Format("Было найдено меньше результатов парсинга, чем ожидалось ({0} из {1})", filled, mustBeFilled);

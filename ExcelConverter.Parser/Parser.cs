@@ -327,6 +327,8 @@ namespace ExcelConverter.Parser
             if (labelsWithData != null)
                 foreach (var i in labelsWithData)
                     data.Add(i.Key, i.Value);
+            RaisePropertyChanged("Data.Item[]");
+            RaisePropertyChanged("Data.Items[]");
         }
 
         #region INotifyPropertyChanged

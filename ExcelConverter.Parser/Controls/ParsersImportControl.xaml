@@ -18,7 +18,8 @@
             <helpers:ApplyConverter x:Key="ApplyConverter"/>
             <p:FinishedBackgroundConverter x:Key="FinishedBackgroundConverter"/>
             <helpers:IsEqualsConverter x:Key="IsEqualsConverter"/>
-            <helpers:IsEqualsToVisibilityConverter x:Key="IsEqualsToVisibilityConverter"/>
+            <helpers:IsEqualVisibilityConverter x:Key="IsEqualsToVisibilityConverter"/>
+            <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
         </Grid.Resources>
         <TabControl SelectedIndex="0" Grid.Row="1" x:Name="TabControl">
             <TabItem Header="Импорт"
@@ -113,23 +114,42 @@
                                             ContextMenuService.IsEnabled="False"
                                             Visibility="{Binding Path=IsParsing, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
                                             >
-                                        <Button.Content>
-                                            <DockPanel>
-                                                <Label Content="Обработать ссылки" Padding="0"/>
+
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/ExcelConverter.Parser;component/Icons/gear_wheel_16x16.png"/>
+                                                    <Label Content="Обработать ссылки" Padding="0" Margin="4,0,0,0"/>
                                                 <Path Margin="4" VerticalAlignment="Center" Width="10" Fill="#FF527DB5" Stretch="Uniform" HorizontalAlignment="Right" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
-                                            </DockPanel>
-                                        </Button.Content>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        
                                         <Button.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Все" Command="{Binding Path=ParseUrlsCommand}" IsEnabled="{Binding Path=AllowImportAll}"/>
                                                 <Separator />
-                                                <MenuItem Header="Только 'Фото'" Command="{Binding Path=ParseUrlsCommand}" CommandParameter="Фото" IsEnabled="{Binding Path=AllowImportPhoto}"/>
-                                                <MenuItem Header="Только 'Схема'" Command="{Binding Path=ParseUrlsCommand}" CommandParameter="Схема" IsEnabled="{Binding Path=AllowImportSchema}"/>
+                                                <MenuItem Header="Только 'Фото'" Command="{Binding Path=ParseUrlsCommand}" CommandParameter="Фото" IsEnabled="{Binding Path=AllowImportPhoto}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="Только 'Схема'" Command="{Binding Path=ParseUrlsCommand}" CommandParameter="Схема" IsEnabled="{Binding Path=AllowImportSchema}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
                                                 <Separator />
                                                 <MenuItem Header="Все с ошибками" Command="{Binding Path=ParseErrorUrlCommand}" IsEnabled="{Binding Path=AllowImportAll}"/>
                                                 <Separator />
-                                                <MenuItem Header="С ошибками и только 'Фото'" Command="{Binding Path=ParseErrorUrlCommand}" CommandParameter="Фото" IsEnabled="{Binding Path=AllowImportPhoto}"/>
-                                                <MenuItem Header="С ошибками и только 'Схема'" Command="{Binding Path=ParseErrorUrlCommand}" CommandParameter="Схема" IsEnabled="{Binding Path=AllowImportSchema}"/>
+                                                <MenuItem Header="С ошибками и только 'Фото'" Command="{Binding Path=ParseErrorUrlCommand}" CommandParameter="Фото" IsEnabled="{Binding Path=AllowImportPhoto}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="С ошибками и только 'Схема'" Command="{Binding Path=ParseErrorUrlCommand}" CommandParameter="Схема" IsEnabled="{Binding Path=AllowImportSchema}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
                                             </ContextMenu>
                                         </Button.ContextMenu>
                                     </Button>
