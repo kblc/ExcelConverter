@@ -70,7 +70,7 @@ namespace ExcelConverter.Parser
             if (isFinished == 1)
                 result = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.LightGreen);
             else if (isFinished == 2)
-                result = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.OrangeRed);
+                result = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.LightCoral);
 
             return result ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Transparent);
         }

@@ -443,23 +443,24 @@ namespace ExcelConverter.Parser
 
         protected class SiteManagerCHR : SiteManager
         {
+            #region Static
+
             private static ConcurrencyObjects<CefSharp.Wpf.WebView> Views = null;
             static SiteManagerCHR()
             {
                 Views = new ConcurrencyObjects<CefSharp.Wpf.WebView>();
                 Views.Max = 20;
                 Views.TimeToGetObject = new TimeSpan(0, 0, 10, 0);
-                Views.GetNewObject = () => { return new CefSharp.Wpf.WebView(); };
             }
 
-            private CefSharp.Wpf.WebView GetWebView()
+            private static CefSharp.Wpf.WebView GetWebView()
             {
                 CefSharp.Wpf.WebView result = Views.GetObject();
                 PutControl(result);
                 return result;
             }
 
-            private void ReturnWebView(CefSharp.Wpf.WebView view)
+            private static void ReturnWebView(CefSharp.Wpf.WebView view)
             {
                 Views.ReturnObject(view);
             }
@@ -495,6 +496,10 @@ namespace ExcelConverter.Parser
                     }
             }
 
+            private static readonly string BlankPage = "about:blank";
+
+            #endregion
+
             public SiteManagerCompletedEventArgs Navigate(Uri url, int wait = 0)
             {
                 if (!inited)
@@ -502,58 +507,71 @@ namespace ExcelConverter.Parser
 
                 SiteManagerCompletedEventArgs result = new SiteManagerCompletedEventArgs() { ResponseUri = url };
                 bool done = false;
+                bool canDone = false;
+
                 CefSharp.Wpf.WebView wv = null;
 
-                #region LoadCompleteEvent && BrowserInitialized
+                #region Create WebView
+
+                Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                    new Action(() =>
+                    {
+                        wv = GetWebView();
+                    }));
+
+                #endregion
+
+                #region Activate
+
+                #region BrowserInitializedEvent
+
+                PropertyChangedEventHandler BrowserInitialized = new PropertyChangedEventHandler(
+                    (s, e) =>
+                    {
+                        CefSharp.BrowserCore bc = s as CefSharp.BrowserCore;
+                        if (bc != null && e.PropertyName == "IsBrowserInitialized" && bc.IsBrowserInitialized)
+                            wv.Load(BlankPage);
+                    }
+                );
+
+                #endregion
+                #region LoadCompleteEvent
+
                 CefSharp.LoadCompletedEventHandler LoadCompleteEvent = new CefSharp.LoadCompletedEventHandler(
                     (s, e) =>
                     {
-                        CefSharp.Wpf.WebView s1 = s as CefSharp.Wpf.WebView;
-                        if (s1.Address == e.Url)
+                        if (wv.Address == e.Url && e.Url != BlankPage && canDone)
                         {
-                            result.ResponseUri = new Uri(e.Url);
-                            object contentScriptResult = s1.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
-                            if (contentScriptResult != null)
-                                result.Content = contentScriptResult.ToString();
                             done = true;
                         }
-                    }
-                    );
-
-                PropertyChangedEventHandler BrowserInitialized = new PropertyChangedEventHandler(
-                        (s,e) =>
+                        else if (wv.Address == e.Url && e.Url == BlankPage && !canDone)
                         {
-                            if (wv != null)
-                            switch (e.PropertyName)
-                            {
-                                case "IsBrowserInitialized":
-                                    if (wv.IsBrowserInitialized)
-                                        wv.Load(url.AbsoluteUri);
-                                    break;
-                            }
+                            canDone = true;
+                            wv.Load(url.AbsoluteUri);
                         }
-                    );
+                    }
+                );
+
                 #endregion
 
-                Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background,
+                Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
                     new Action(() =>
                     {
                         try
                         {
-                            wv = GetWebView();
-                            wv.Content = null;
                             wv.LoadCompleted += LoadCompleteEvent;
-
                             if (!wv.IsBrowserInitialized)
                                 wv.PropertyChanged += BrowserInitialized;
                             else
-                                wv.Load(url.AbsoluteUri);
+                                wv.Load(BlankPage);
                         }
                         catch (Exception ex)
                         {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().Start()"));
+                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().#Activate"));
                         }
                     }));
+
+                #endregion
 
                 #region Wait (done and pause) or 30 sec
                 DateTime endTime = DateTime.Now.AddSeconds(30);
@@ -562,6 +580,24 @@ namespace ExcelConverter.Parser
 
                 if (done)
                     Wait(wait);
+
+                #endregion
+
+                #region Disconect
+                //Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+                //    new Action(() =>
+                //    {
+                //        wv.PropertyChanged -= BrowserInitialized;
+                //        wv.Stop();
+                //    }));
+
+                //#region Wait (done) or 5 sec
+                //endTime = DateTime.Now.AddSeconds(5);
+                //while (!done && (DateTime.Now < endTime))
+                //    Thread.Sleep(100);
+
+                //#endregion
+
                 #endregion
 
                 #region GetHTML
@@ -571,8 +607,11 @@ namespace ExcelConverter.Parser
                         if (wv != null)
                             try
                             {
-                                if (wv.IsInitialized)
+                                wv.PropertyChanged -= BrowserInitialized;
+                                wv.LoadCompleted -= LoadCompleteEvent;
+                                if (done)
                                 {
+                                    result.ResponseUri = new Uri(wv.Address);
                                     object contentScriptResult = wv.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
                                     if (contentScriptResult != null)
                                         result.Content = contentScriptResult.ToString();
@@ -584,8 +623,6 @@ namespace ExcelConverter.Parser
                             }
                             finally
                             {
-                                wv.LoadCompleted -= LoadCompleteEvent;
-                                wv.PropertyChanged -= BrowserInitialized;
                                 ReturnWebView(wv);
                             }
                     }));
@@ -652,7 +689,7 @@ namespace ExcelConverter.Parser
                         SiteManagerCHR mgr = new SiteManagerCHR();
                         var res = mgr.Navigate(new Uri(url), wait);
                         document = new HtmlDocument();
-                        document.LoadHtml(res.Content);
+                        document.LoadHtml(res.Content ?? string.Empty);
                         urlResponse = res.ResponseUri.AbsoluteUri;
                     }
                 }
@@ -662,7 +699,7 @@ namespace ExcelConverter.Parser
 
             return document;
         }
-        protected void PutControl(System.Windows.FrameworkElement control)
+        protected static void PutControl(System.Windows.FrameworkElement control)
         {
             if (ParentControl != null && !ParentControl.Children.Contains(control))
             {
@@ -673,7 +710,7 @@ namespace ExcelConverter.Parser
                 ParentControl.Children.Add(control);
             }
         }
-        protected void RemoveControl(System.Windows.FrameworkElement control)
+        protected static void RemoveControl(System.Windows.FrameworkElement control)
         {
             if (control != null)
             {
@@ -764,7 +801,8 @@ namespace ExcelConverter.Parser
                         .Select(n => n.Attributes["href"].Value)
                         .FirstOrDefault() ?? stdBase, UriKind.Absolute);
 
-                if (baseUri.AbsoluteUri.LastIndexOf(sourceLink) == baseUri.AbsoluteUri.Length - sourceLink.Length)
+                var li = baseUri.AbsoluteUri.LastIndexOf(sourceLink);
+                if (li == baseUri.AbsoluteUri.Length - sourceLink.Length && li != -1)
                     result = baseUri; else
                     result = new Uri(baseUri, sourceLink);
             }
