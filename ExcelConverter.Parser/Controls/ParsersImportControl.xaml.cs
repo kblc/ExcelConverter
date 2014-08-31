@@ -788,7 +788,9 @@ namespace ExcelConverter.Parser.Controls
                 return parseSingleUrlCommand ?? (parseSingleUrlCommand = new DelegateCommand(
                         (o) =>
                         {
-                            ParseUrls(new string[] { o as string }, null);
+                            var url = o as string;
+                            Urls.Where(u => u.Value == url).AsParallel().ForAll((u) => { u.FinishResult = 0; });
+                            ParseUrls(new string[] { url }, null);
                         }
                     ));
             }
@@ -803,6 +805,7 @@ namespace ExcelConverter.Parser.Controls
                         (o) =>
                         {
                             string label = o as string;
+                            Urls.Where(u => u.FinishResult == 2).AsParallel().ForAll((u) => { u.FinishResult = 0; });
                             ParseUrls(Urls.Where(u => u.FinishResult == 2).Select(u => u.Value).ToArray(), label);
                         }
                     ));
