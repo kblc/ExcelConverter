@@ -341,6 +341,18 @@ namespace ExcelConverter.Parser
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        public bool HasErrors
+        {
+            get { return !string.IsNullOrWhiteSpace(Errors); }
+        }
+
+        private string errors = string.Empty;
+        public string Errors
+        {
+            get { return errors; }
+            set { errors = value; RaisePropertyChanged("Errors"); RaisePropertyChanged("HasErrors"); }
+        }
     }
 
     public delegate ParseResult[] ParserParse(string[] urls, byte threadCount, string[] labels, Action<ParseResult> resultAdded = null, Func<bool> isCanceled = null);
@@ -915,21 +927,36 @@ namespace ExcelConverter.Parser
 
                             TimeSpan timeToLoad = new TimeSpan(0);
                             TimeSpan timeToParse = new TimeSpan(0);
+                            string error = string.Empty;
 
                             foreach (var conn in rulesForParse.GroupBy(r => r.Connection).Select(gr => new { Connection = gr.First().Connection, Rules = gr }))
-                            {
-                                string urlResponse;
-                                DateTime startLoad = DateTime.Now;
-                                HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, conn.Connection, out urlResponse);
-                                timeToLoad += DateTime.Now - startLoad;
+                                try
+                                {
+                                    string urlResponse;
+                                    DateTime startLoad = DateTime.Now;
+                                    HtmlAgilityPack.HtmlDocument document = SiteManager.GetContent(url, conn.Connection, out urlResponse);
+                                    timeToLoad += DateTime.Now - startLoad;
 
-                                DateTime startParse = DateTime.Now;
-                                foreach (var rule in conn.Rules)
-                                    dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
-                                timeToParse += DateTime.Now - startParse;
-                            }
+                                    DateTime startParse = DateTime.Now;
+                                    foreach (var rule in conn.Rules)
+                                        try
+                                        { 
+                                            dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
+                                        }
+                                        catch(Exception ex)
+                                        {
+                                            Log.Add(ex, "Parser.Parse().#rules");
+                                            error += (string.IsNullOrWhiteSpace(error) ? string.Empty : Environment.NewLine) + string.Format("Ошибка для подключения вида '{0}' и правила '{1}': ", conn.Connection.ToString(), rule.Label) + ex.Message;
+                                        }
+                                    timeToParse += DateTime.Now - startParse;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Add(ex, "Parser.Parse().#connections");
+                                    error += (string.IsNullOrWhiteSpace(error) ? string.Empty : Environment.NewLine) + string.Format("Ошибка для подключения вида '{0}': ", conn.Connection.ToString()) + ex.Message;
+                                }
 
-                            var res = new ParseResult(url, dic) { Parser = this, TimeToLoadContent = timeToLoad.TotalSeconds, TimeToParse = timeToParse.TotalSeconds };
+                            var res = new ParseResult(url, dic) { Parser = this, TimeToLoadContent = timeToLoad.TotalSeconds, TimeToParse = timeToParse.TotalSeconds, Errors = error };
 
                             lock (lockObject)
                             {

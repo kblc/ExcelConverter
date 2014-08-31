@@ -18,7 +18,7 @@
             <helpers:ApplyConverter x:Key="ApplyConverter"/>
             <p:FinishedBackgroundConverter x:Key="FinishedBackgroundConverter"/>
             <helpers:IsEqualsConverter x:Key="IsEqualsConverter"/>
-            <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
+            <helpers:IsEqualsToVisibilityConverter x:Key="IsEqualsToVisibilityConverter"/>
         </Grid.Resources>
         <TabControl SelectedIndex="0" Grid.Row="1" x:Name="TabControl">
             <TabItem Header="Импорт"
@@ -125,6 +125,11 @@
                                                 <Separator />
                                                 <MenuItem Header="Только 'Фото'" Command="{Binding Path=ParseUrlsCommand}" CommandParameter="Фото" IsEnabled="{Binding Path=AllowImportPhoto}"/>
                                                 <MenuItem Header="Только 'Схема'" Command="{Binding Path=ParseUrlsCommand}" CommandParameter="Схема" IsEnabled="{Binding Path=AllowImportSchema}"/>
+                                                <Separator />
+                                                <MenuItem Header="Все с ошибками" Command="{Binding Path=ParseErrorUrlCommand}" IsEnabled="{Binding Path=AllowImportAll}"/>
+                                                <Separator />
+                                                <MenuItem Header="С ошибками и только 'Фото'" Command="{Binding Path=ParseErrorUrlCommand}" CommandParameter="Фото" IsEnabled="{Binding Path=AllowImportPhoto}"/>
+                                                <MenuItem Header="С ошибками и только 'Схема'" Command="{Binding Path=ParseErrorUrlCommand}" CommandParameter="Схема" IsEnabled="{Binding Path=AllowImportSchema}"/>
                                             </ContextMenu>
                                         </Button.ContextMenu>
                                     </Button>
@@ -156,24 +161,52 @@
                                         >
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
-                                        <Button Grid.Row="0" Content="x" Grid.Column="0" Padding="1,-6,0,-2" Margin="0" 
-                                            Command="{Binding Path=DeleteUrlCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
-                                            CommandParameter="{Binding Path=Value}"
-                                            />
-                                        <Button Grid.Row="0" Content="Открыть" Grid.Column="1" Padding="0" Margin="4,0" 
-                                            Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
-                                            CommandParameter="{Binding Path=Value}"
-                                            />
-                                        <Label Grid.Row="0" Padding="0" Margin="4,0,0,0" Grid.Column="2">
-                                            <TextBlock Text="{Binding Path=Value}" TextWrapping="WrapWithOverflow"/>
+                                        
+                                        <Label Grid.Row="0" Padding="0" Margin="4,0,4,0" Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock TextWrapping="WrapWithOverflow" >
+                                                <Hyperlink 
+                                                    NavigateUri="{Binding Path=Value}"
+                                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
+                                                    CommandParameter="{Binding Path=Value}">
+                                                    <TextBlock Text="{Binding Path=Value}"/>
+                                                </Hyperlink>
+                                            </TextBlock>
                                         </Label>
+                                        
+                                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                            <Button Margin="0,0,4,0" ToolTip="Обработать" ToolTipService.IsEnabled="True"
+                                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=ParseSingleUrlCommand}"
+                                                    CommandParameter="{Binding Path=Value}">
+                                                <Image Source="/ExcelConverter.Parser;component/Icons/gear_wheel_16x16.png" />
+                                            </Button>
+
+                                            <!--<Button Margin="0,0,4,0" ToolTip="Открыть" ToolTipService.IsEnabled="True"
+                                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                        Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
+                                                        CommandParameter="{Binding Path=Value}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="Открыть" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>-->
+                                        </StackPanel>
+                                        
+                                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center">
+                                            <Button Margin="0,0,4,0" ToolTip="Удалить" ToolTipService.IsEnabled="True"
+                                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                    Command="{Binding Path=DeleteUrlCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                                    CommandParameter="{Binding Path=Value}">
+                                                <Image Source="/ExcelConverter.Parser;component/Icons/trash_16x16.png" />
+                                            </Button>
+                                        </StackPanel>
 
                                         <Grid Grid.Row="1"
                                               Grid.ColumnSpan="3"
@@ -183,6 +216,7 @@
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
 
                                             <StackPanel Orientation="Horizontal" Margin="2,2">
@@ -201,19 +235,29 @@
                                                                 <ColumnDefinition Width="Auto"/>
                                                                 <ColumnDefinition Width="*"/>
                                                             </Grid.ColumnDefinitions>
-                                                            <TextBlock Grid.Column="0" Text="{Binding Path=Key}" Padding="0" Margin="0,0,4,0"/>
-                                                            <TextBlock Grid.Column="1" Padding="0">
-                                                <Hyperlink 
-                                                    NavigateUri="{Binding Path=Value}"
-                                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
-                                                    CommandParameter="{Binding Path=Value}">
-                                                    <TextBlock Text="{Binding Path=Value}"/>
-                                                </Hyperlink>
-                                            </TextBlock>
+
+                                                            <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="0,0,4,0">
+                                                                <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" Visibility="{Binding Path=Key, Converter={StaticResource IsEqualsToVisibilityConverter}, ConverterParameter=Фото}"/>
+                                                                <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png" Visibility="{Binding Path=Key, Converter={StaticResource IsEqualsToVisibilityConverter}, ConverterParameter=Схема}"/>
+                                                                <TextBlock Grid.Column="0" Text="{Binding Path=Key}" Padding="0" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                            
+                                                            <TextBlock Grid.Column="1" Padding="0" VerticalAlignment="Center">
+                                                                <Hyperlink 
+                                                                    NavigateUri="{Binding Path=Value}"
+                                                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
+                                                                    CommandParameter="{Binding Path=Value}">
+                                                                    <TextBlock Text="{Binding Path=Value}"/>
+                                                                </Hyperlink>
+                                                            </TextBlock>
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
+
+                                            <Label Grid.Row="2" Visibility="{Binding Result.HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding Result.Errors}" TextWrapping="WrapWithOverflow"/>
+                                            </Label>
                                         </Grid>
                                     </Grid>
                                 </DataTemplate>

@@ -198,10 +198,16 @@
     <None Include="msvcr110.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Resource Include="Icons\trash_16x16.png" />
+    <Resource Include="Icons\gear_wheel_16x16.png" />
+    <Resource Include="Icons\redo_16x16.png" />
+    <Resource Include="Icons\camera_16x16.png" />
+    <Resource Include="Icons\clipboard_16x16.png" />
     <Content Include="parsers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del "$(TargetDir)*.pdb"

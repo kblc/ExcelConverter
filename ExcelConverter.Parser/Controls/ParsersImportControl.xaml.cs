@@ -688,6 +688,127 @@ namespace ExcelConverter.Parser.Controls
         }
 
         private BackgroundWorker bwParseLinks = null;
+        private void ParseUrls(string[] urlsToParse, string label)
+        {
+            bwParseLinks = new BackgroundWorker();
+            bwParseLinks.WorkerSupportsCancellation = true;
+            bwParseLinks.DoWork += (s, e) =>
+            {
+                ParseLinksParams param = e.Argument as ParseLinksParams;
+                if (param != null)
+                {
+                    string[] urls = param.Urls;
+                    BackgroundWorker bw = s as BackgroundWorker;
+                    float cnt = urls.Length;
+                    float i = 0;
+                    bw.ReportProgress(0, new ProgressChangeClass() { Processed = (int)i, Total = (int)cnt });
+                    object lockObject = new Object();
+                    e.Result = param.Parse(
+                            urls
+                            , param.ThreadCount
+                            , label == null ? null : new string[] { label }
+                            , new Action<ParseResult>((ps) =>
+                            {
+                                lock (lockObject)
+                                {
+                                    i++;
+                                    bw.ReportProgress((int)((i / cnt) * 100), new ProgressChangeClass() { Processed = (int)i, Total = (int)cnt });
+                                }
+                            })
+                            , new Func<bool>(() => { return bw.CancellationPending; })
+                        );
+
+                }
+            };
+            bwParseLinks.RunWorkerCompleted += (s, e) =>
+            {
+                try
+                {
+                    if (e.Error != null)
+                        throw e.Error;
+
+                    ParseResult[] res = (ParseResult[])e.Result;
+
+                    foreach (var item in res)
+                        Urls
+                            .AsParallel()
+                            .Where(u => u.Value == item.Url)
+                            .ForAll(
+                                (u) =>
+                                {
+                                    int filled = item.Data.Where(i => !string.IsNullOrWhiteSpace(i.Value)).Count();
+                                    int mustBeFilled = item.Parser.Rules.Count;
+
+                                    if (filled == mustBeFilled && filled > 0)
+                                        u.FinishResult = 1;
+                                    else if (!string.IsNullOrWhiteSpace(item.Errors))
+                                        u.FinishResult = 2;
+                                    else if (filled < mustBeFilled && filled >= 0)
+                                    {
+                                        u.FinishResult = 2;
+                                        item.Errors = string.Format("Было найдено меньше результатов парсинга, чем ожидалось ({0} из {1})", filled, mustBeFilled);
+                                    }
+                                    else
+                                        u.FinishResult = 0;
+
+                                    u.Result = item;
+                                }
+                            );
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("Ошибка при парсинге:{0}{1}", Environment.NewLine, ex.Message), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    bwParseLinks.Dispose();
+                    bwParseLinks = null;
+                    IsBusy = false;
+                    IsParsing = false;
+                    StopTimer();
+                }
+            };
+            bwParseLinks.ProgressChanged += (s, e) =>
+            {
+                ProgressChangeClass c = (ProgressChangeClass)e.UserState;
+
+                ProgressText = string.Format("Завершено: {0}% ({1}/{2})", e.ProgressPercentage, c.Processed, c.Total);
+            };
+            bwParseLinks.WorkerReportsProgress = true;
+            IsBusy = true;
+            IsParsing = true;
+            StartTimer();
+            bwParseLinks.RunWorkerAsync(new ParseLinksParams() { Urls = urlsToParse, Parse = Parsers.Parse, ThreadCount = AllowFileExport ? this.ThreadCount : byte.MinValue });
+        }
+
+        private DelegateCommand parseSingleUrlCommand = null;
+        public ICommand ParseSingleUrlCommand
+        {
+            get{
+                return parseSingleUrlCommand ?? (parseSingleUrlCommand = new DelegateCommand(
+                        (o) =>
+                        {
+                            ParseUrls(new string[] { o as string }, null);
+                        }
+                    ));
+            }
+        }
+
+        private DelegateCommand parseErrorUrlCommand = null;
+        public ICommand ParseErrorUrlCommand
+        {
+            get
+            {
+                return parseErrorUrlCommand ?? (parseErrorUrlCommand = new DelegateCommand(
+                        (o) =>
+                        {
+                            string label = o as string;
+                            ParseUrls(Urls.Where(u => u.FinishResult == 2).Select(u => u.Value).ToArray(), label);
+                        }
+                    ));
+            }
+        }
+
         private DelegateCommand parseUrlsCommand = null;
         public ICommand ParseUrlsCommand
         {
@@ -697,93 +818,8 @@ namespace ExcelConverter.Parser.Controls
                     (o) =>
                     {
                         string label = o as string;
-
                         Urls.AsParallel().ForAll((u) => { u.FinishResult = 0; });
-
-                        bwParseLinks = new BackgroundWorker();
-                        bwParseLinks.WorkerSupportsCancellation = true;
-                        bwParseLinks.DoWork += (s, e) =>
-                            {
-                                ParseLinksParams param = e.Argument as ParseLinksParams;
-                                if (param != null)
-                                {
-                                    string[] urls = param.Urls;
-                                    BackgroundWorker bw = s as BackgroundWorker;
-                                    float cnt = urls.Length;
-                                    float i = 0;
-                                    bw.ReportProgress(0, new ProgressChangeClass() { Processed = (int)i, Total = (int)cnt });
-                                    object lockObject = new Object();
-                                    e.Result = param.Parse(
-                                            urls
-                                            , param.ThreadCount
-                                            , label == null ? null : new string[] { label }
-                                            , new Action<ParseResult>((ps) =>
-                                            {
-                                                lock (lockObject)
-                                                {
-                                                    i++;
-                                                    bw.ReportProgress((int)((i / cnt) * 100), new ProgressChangeClass() { Processed = (int)i, Total = (int)cnt });
-                                                }
-                                            })
-                                            , new Func<bool>(() => { return bw.CancellationPending; })
-                                        );
-
-                                }
-                            };
-                        bwParseLinks.RunWorkerCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                        throw e.Error;
-
-                                    ParseResult[] res = (ParseResult[])e.Result;
-
-                                    foreach (var item in res)
-                                        Urls
-                                            .AsParallel()
-                                            .Where(u => u.Value == item.Url)
-                                            .ForAll(
-                                                (u) =>
-                                                {
-                                                    int filled = item.Data.Where(i => !string.IsNullOrWhiteSpace(i.Value)).Count();
-                                                    int mustBeFilled = item.Parser.Rules.Count;
-
-                                                    if (filled == mustBeFilled && filled > 0)
-                                                        u.FinishResult = 1;
-                                                    else if (filled < mustBeFilled && filled > 0)
-                                                        u.FinishResult = 2;
-                                                    else
-                                                        u.FinishResult = 0;
-
-                                                    u.Result = item;
-                                                }
-                                            );
-                                }
-                                catch (Exception ex)
-                                {
-                                    MessageBox.Show(string.Format("Ошибка при парсинге:{0}{1}", Environment.NewLine, ex.Message),"Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                }
-                                finally
-                                {
-                                    bwParseLinks.Dispose();
-                                    bwParseLinks = null;
-                                    IsBusy = false;
-                                    IsParsing = false;
-                                    StopTimer();
-                                }
-                            };
-                        bwParseLinks.ProgressChanged += (s, e) =>
-                            {
-                                ProgressChangeClass c = (ProgressChangeClass)e.UserState;
-
-                                ProgressText = string.Format("Завершено: {0}% ({1}/{2})", e.ProgressPercentage, c.Processed, c.Total);
-                            };
-                        bwParseLinks.WorkerReportsProgress = true;
-                        IsBusy = true;
-                        IsParsing = true;
-                        StartTimer();
-                        bwParseLinks.RunWorkerAsync(new ParseLinksParams() { Urls = Urls.Select(u => u.Value).ToArray(), Parse = Parsers.Parse, ThreadCount = AllowFileExport ? this.ThreadCount : byte.MinValue });
+                        ParseUrls(Urls.Select(u => u.Value).ToArray(), label);
                     }
                 ));
             }
