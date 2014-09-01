@@ -67,9 +67,9 @@
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="Метка: "/>
-                            <Label Content="{Binding Key, Mode=OneWay}"/>
+                            <Label Content="{Binding Label, Mode=OneWay}"/>
                         </StackPanel>
-                        <TextBox Text="{Binding Value, Mode=OneWay}" Grid.Row="1" IsReadOnly="True"/>
+                        <TextBox Text="{Binding Link, Mode=OneWay}" Grid.Row="1" IsReadOnly="True"/>
                         <Expander Header="Картинка" Grid.Row="2">
                             <Image 
 											MaxWidth="200" 

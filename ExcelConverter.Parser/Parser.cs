@@ -277,6 +277,40 @@ namespace ExcelConverter.Parser
         #endregion
     }
 
+    public class ParseResultDataItem : Helpers.WPF.PropertyChangedBase
+    {
+        private string label = string.Empty;
+        public string Label
+        {
+            get { return label; }
+            set { if (label == value) return; label = value; RaisePropertyChange("Label"); }
+        }
+
+        private string link = string.Empty;
+        public string Link
+        {
+            get { return link; }
+            set { if (link == value) return; link = value; RaisePropertyChange("Link"); }
+        }
+    }
+
+    public class ParseResultDataItems : ObservableCollection<ParseResultDataItem>
+    {
+        public string this[string label]
+        {
+            get
+            {
+                var res = this.FirstOrDefault(i => i.Label == label);
+                return res == null ? string.Empty : res.Link;
+            }
+        }
+
+        public bool ContainsLabel(string label)
+        {
+            return this.Any(i => i.Label == label);
+        }
+    }
+
     public class ParseResult: INotifyPropertyChanged
     {
         private string url = string.Empty;
@@ -286,15 +320,15 @@ namespace ExcelConverter.Parser
             set { url = value; RaisePropertyChanged("Url"); }
         }
 
-        private Dictionary<string, string> data = new Dictionary<string,string>();
-        public Dictionary<string, string> Data
+        private ParseResultDataItems data = new ParseResultDataItems();
+        public ParseResultDataItems Data
         {
             get { return data; }
-            set { Init(value); RaisePropertyChanged("Data"); }
+            set { Init(value == null ? null : value.ToArray()); RaisePropertyChanged("Data"); }
         }
 
         public ParseResult() { }
-        public ParseResult(string url, Dictionary<string,string> labelsWithData)
+        public ParseResult(string url, ParseResultDataItem[] labelsWithData)
         {
             this.Url = url;
             Init(labelsWithData);
@@ -321,14 +355,16 @@ namespace ExcelConverter.Parser
             set { timeToParse = value; RaisePropertyChanged("TimeToParse"); }
         }
 
-        public void Init(Dictionary<string, string> labelsWithData)
+        public void Init(ParseResultDataItem[] labelsWithData)
         {
             data.Clear();
             if (labelsWithData != null)
                 foreach (var i in labelsWithData)
-                    data.Add(i.Key, i.Value);
-            RaisePropertyChanged("Data.Item[]");
-            RaisePropertyChanged("Data.Items[]");
+                {
+                    var item = new ParseResultDataItem();
+                    i.CopyObject(item);
+                    data.Add(item);
+                }
         }
 
         #region INotifyPropertyChanged
@@ -923,7 +959,7 @@ namespace ExcelConverter.Parser
 
                         try
                         {
-                            Dictionary<string, string> dic = new Dictionary<string, string>();
+                            List<ParseResultDataItem> dic = new List<ParseResultDataItem>();
 
                             var rulesForParse = (labels == null ? Rules : Rules.Where(r => labels.Contains(r.Label))).ToArray();
 
@@ -942,8 +978,9 @@ namespace ExcelConverter.Parser
                                     DateTime startParse = DateTime.Now;
                                     foreach (var rule in conn.Rules)
                                         try
-                                        { 
-                                            dic.Add(rule.Label, rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse));
+                                        {
+                                            dic.Add(
+                                                new ParseResultDataItem() { Label = rule.Label, Link = rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse) });
                                         }
                                         catch(Exception ex)
                                         {
@@ -958,7 +995,7 @@ namespace ExcelConverter.Parser
                                     error += (string.IsNullOrWhiteSpace(error) ? string.Empty : Environment.NewLine) + string.Format("Ошибка для подключения вида '{0}': ", conn.Connection.ToString()) + ex.Message;
                                 }
 
-                            var res = new ParseResult(url, dic) { Parser = this, TimeToLoadContent = timeToLoad.TotalSeconds, TimeToParse = timeToParse.TotalSeconds, Errors = error };
+                            var res = new ParseResult(url, dic.ToArray()) { Parser = this, TimeToLoadContent = timeToLoad.TotalSeconds, TimeToParse = timeToParse.TotalSeconds, Errors = error };
 
                             lock (lockObject)
                             {

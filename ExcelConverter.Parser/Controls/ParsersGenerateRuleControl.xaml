@@ -185,9 +185,14 @@
                                     </Grid.RowDefinitions>
 
                                     <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                        <Button Content="x" Grid.Column="0" Padding="1,-6,0,-2" Margin="0" 
-                                                Command="{Binding Path=DeleteUrlWithImagesCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
-                                                CommandParameter="{Binding Path=Value}"/>
+                                        
+                                        <Button Margin="0" ToolTip="Удалить" ToolTipService.IsEnabled="True"
+                                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                    Command="{Binding Path=DeleteUrlWithImagesCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                                    CommandParameter="{Binding Path=Value}">
+                                            <Image Source="/ExcelConverter.Parser;component/Icons/trash_16x16.png" />
+                                        </Button>
+
                                         <Label Content="{Binding Path=Value}" Padding="0"/>
                                     </StackPanel>
 

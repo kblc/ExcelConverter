@@ -730,30 +730,25 @@ namespace ExcelConverter.Parser.Controls
                     ParseResult[] res = (ParseResult[])e.Result;
 
                     foreach (var item in res)
-                        Urls
-                            .AsParallel()
-                            .Where(u => u.Value == item.Url)
-                            .ForAll(
-                                (u) =>
-                                {
-                                    int filled = item.Data.Where(i => !string.IsNullOrWhiteSpace(i.Value)).Count();
-                                    int mustBeFilled = item.Parser.Rules.Count;
+                        foreach (var u in Urls.AsParallel().Where(u => u.Value == item.Url))
+                        {
+                            int filled = item.Data.Where(i => !string.IsNullOrWhiteSpace(i.Link)).Count();
+                            int mustBeFilled = item.Parser.Rules.Count;
 
-                                    if (filled == mustBeFilled && mustBeFilled > 0)
-                                        u.FinishResult = 1;
-                                    else if (!string.IsNullOrWhiteSpace(item.Errors))
-                                        u.FinishResult = 2;
-                                    else if (filled < mustBeFilled && mustBeFilled > 0)
-                                    {
-                                        u.FinishResult = 2;
-                                        item.Errors = string.Format("Было найдено меньше результатов парсинга, чем ожидалось ({0} из {1})", filled, mustBeFilled);
-                                    }
-                                    else
-                                        u.FinishResult = 0;
+                            if (filled == mustBeFilled && mustBeFilled > 0)
+                                u.FinishResult = 1;
+                            else if (!string.IsNullOrWhiteSpace(item.Errors))
+                                u.FinishResult = 2;
+                            else if (filled < mustBeFilled && mustBeFilled > 0)
+                            {
+                                u.FinishResult = 2;
+                                item.Errors = string.Format("Было найдено меньше результатов парсинга, чем ожидалось ({0} из {1})", filled, mustBeFilled);
+                            }
+                            else
+                                u.FinishResult = 0;
 
-                                    u.Result = item;
-                                }
-                            );
+                            u.Result = item;
+                        }
                 }
                 catch (Exception ex)
                 {
@@ -861,7 +856,7 @@ namespace ExcelConverter.Parser.Controls
                                         object lockObject = new Object();
                                         param.Urls.AsParallel().ForAll((u) =>
                                         {
-                                            foreach(var key in u.Result.Data.Keys)
+                                            foreach(var key in u.Result.Data.Select(i => i.Label))
                                                 if (!labels.Contains(key))
                                                     lock (lockObject)
                                                     {
@@ -883,7 +878,7 @@ namespace ExcelConverter.Parser.Controls
                                             DataRow nRow = dt.NewRow();
                                             nRow[0] = u.Value;
                                             foreach (string c in distinctLabels)
-                                                nRow[c] = u.Result.Data.ContainsKey(c) ? u.Result.Data[c] : string.Empty;
+                                                nRow[c] = u.Result.Data.Any(i => i.Label == c) ? u.Result.Data.First(i => i.Label == c).Link : string.Empty;
                                             dt.Rows.Add(nRow);
                                         }
 

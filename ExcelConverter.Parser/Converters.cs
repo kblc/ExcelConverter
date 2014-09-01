@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace ExcelConverter.Parser
@@ -68,9 +69,9 @@ namespace ExcelConverter.Parser
             System.Windows.Media.Brush result = null;
 
             if (isFinished == 1)
-                result = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.LightGreen);
+                result = new System.Windows.Media.SolidColorBrush((Color)(ColorConverter.ConvertFromString("#FFC3FFC3"))); //#FFC3FFC3 System.Windows.Media.Colors.LightGreen
             else if (isFinished == 2)
-                result = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.LightCoral);
+                result = new System.Windows.Media.SolidColorBrush((Color)(ColorConverter.ConvertFromString("#FFFBBCBC"))); //#FFFBBCBC System.Windows.Media.Colors.LightCoral
 
             return result ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Transparent);
         }

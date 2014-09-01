@@ -173,8 +173,8 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
-        private ObservableCollection<KeyValuePair<string, string>> parseResults = new ObservableCollection<KeyValuePair<string, string>>();
-        public ObservableCollection<KeyValuePair<string, string>> ParseResults
+        private ObservableCollectionEx<ParseResultDataItem> parseResults = new ObservableCollectionEx<ParseResultDataItem>();
+        public ObservableCollectionEx<ParseResultDataItem> ParseResults
         {
             get
             {

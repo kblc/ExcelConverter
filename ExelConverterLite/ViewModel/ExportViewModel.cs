@@ -366,7 +366,7 @@ namespace ExelConverterLite.ViewModel
             if (colRes != null)
             {
                 result = string.Empty;
-                if (colRes.Result != null && colRes.Result.Data != null && colRes.Result.Data.ContainsKey(label))
+                if (colRes.Result != null && colRes.Result.Data != null && colRes.Result.Data.ContainsLabel(label))
                     result = colRes.Result.Data[label];
             }
             return result;
