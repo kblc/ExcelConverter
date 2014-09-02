@@ -28,7 +28,7 @@ namespace ExcelConverter.Parser
         }
     }
 
-    public class ParseImageResult : IDisposable
+    public class ParseImageResult : Helpers.WPF.PropertyChangedBase, IDisposable
     {
         public readonly HtmlNode node = null;
         public HtmlNode Node
@@ -66,7 +66,12 @@ namespace ExcelConverter.Parser
             }
         }
 
-        public bool IsSelected { get; set; }
+        private bool isSelected = false;
+        public bool IsSelected 
+        {
+            get { return isSelected; }
+            set { isSelected = value; RaisePropertyChange("IsSelected"); }
+        }
 
         public ParseImageResult() { }
         public ParseImageResult(HtmlNode node, System.Drawing.Image image, Uri url)

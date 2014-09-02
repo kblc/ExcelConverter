@@ -18,7 +18,7 @@ using System.Windows.Shapes;
 
 namespace ExcelConverter.Parser.Controls
 {
-    public class UrlResultWrapper: INotifyPropertyChanged
+    public class UrlResultWrapper: Helpers.WPF.PropertyChangedBase
     {
         private string value = string.Empty;
         public string Value
@@ -33,7 +33,7 @@ namespace ExcelConverter.Parser.Controls
                     throw new ArgumentNullException();
 
                 this.value = value;
-                RaisePropertyChanged("Value");
+                RaisePropertyChange("Value");
             }
         }
 
@@ -45,19 +45,6 @@ namespace ExcelConverter.Parser.Controls
                 return parseResult;
             }
         }
-
-        #region INotifyPropertyChanged
-
-        private void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion;
-
     }
 
     public partial class ParsersListControl : UserControl, INotifyPropertyChanged

@@ -82,6 +82,24 @@ namespace ExcelConverter.Parser
         }
     }
 
+    public class IsSelectedBackgroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isSelected = (bool)value;
+
+            if (isSelected)
+                return System.Windows.Media.Colors.Orange;
+            else
+                return System.Windows.Media.Colors.Black;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class IsEqualsConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:p="clr-namespace:ExcelConverter.Parser"
+             xmlns:helpers="clr-namespace:Helpers.WPF.Converters;assembly=Helpers.WPF"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
              d:DesignHeight="320" d:DesignWidth="700"
@@ -11,9 +12,38 @@
     <UserControl.Resources>
         <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
         <p:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
+        <p:IsSelectedBackgroundConverter x:Key="IsSelectedBackgroundConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <p:ParseRuleConnectionTypeList x:Key="ParseRuleConnectionTypeList"/>
+        <helpers:ApplyConverter x:Key="ApplyConverter"/>
         <!--<p:ParseFindRuleConditionList x:Key="ParseFindRuleConditionList"/>-->
+
+        <Style x:Key="ListBoxItemStyleClear" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, 
+            RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment,
+             RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Padding" Value="2,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" 
+                            Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid 
             Background="LightGreen" 
@@ -149,106 +179,136 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
 
-                    <WrapPanel Margin="0,4" Grid.ColumnSpan="2">
-                        <WrapPanel.Resources>
-                            <Style TargetType="{x:Type Label}">
-                                <Setter Property="Padding" Value="0"/>
-                            </Style>
-                        </WrapPanel.Resources>
+                    <Label Padding="0" Grid.ColumnSpan="2">
+                        <TextBlock Text="{Binding ElementName=AddRuleLabelComboBox, Path=Text, StringFormat={}Выберите по одному изображению в каждой строке\, которое соответствует метке \'{0}\'. На основании этих данных будет подготовлено правило.}" TextWrapping="WrapWithOverflow"/>
+                    </Label>
 
-                        <Label>
-                            <TextBlock Text="Выберите по одному изображению в каждой строке, которое соответствует метке '" TextWrapping="WrapWithOverflow"/>
-                        </Label>
-                        <Label Content="{Binding ElementName=AddRuleLabelComboBox, Path=Text}"/>
-                        <Label Content="'. "/>
-                        <Label>
-                            <TextBlock Text="На основании этих данных будет подготовлено правило." TextWrapping="WrapWithOverflow"/>
-                        </Label>
-                    </WrapPanel>
-                    <ListBox 
-                                Grid.Row="1"
-                                x:Name="AddNewRuleSelectionListBox"
-                                ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                SelectionChanged="AddNewRuleSelectionListBox_SelectionChanged"
-                                ItemsSource="{Binding Path=UrlsToAddList}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="1"
+                                  CanContentScroll="True" 
+                                  HorizontalScrollBarVisibility="Hidden"  
+                                  VerticalScrollBarVisibility="Auto"
+                                  x:Name="resultScrollViewer">
+                        <ListBox
+                                 x:Name="AddNewRuleSelectionListBox"
+                                 ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                 SelectionChanged="AddNewRuleSelectionListBox_SelectionChanged"
+                                 ItemsSource="{Binding Path=UrlsToAddList}"
+                                 ItemContainerStyle="{DynamicResource ListBoxItemStyleClear}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="2,2" MaxWidth="450">
+                                        <Border.Background>
+                                            <SolidColorBrush Color="DarkGray"/>
+                                        </Border.Background>
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="10" Color="Black" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                                        </Border.Effect>
 
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                        
-                                        <Button Margin="0" ToolTip="Удалить" ToolTipService.IsEnabled="True"
-                                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                    Command="{Binding Path=DeleteUrlWithImagesCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock TextWrapping="WrapWithOverflow" VerticalAlignment="Center" Margin="4,0">
+                                                <Hyperlink 
+                                                    NavigateUri="{Binding Path=Value}"
+                                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
                                                     CommandParameter="{Binding Path=Value}">
-                                            <Image Source="/ExcelConverter.Parser;component/Icons/trash_16x16.png" />
-                                        </Button>
+                                                    <TextBlock Text="{Binding Path=Value}"/>
+                                                </Hyperlink>
+                                            </TextBlock>
 
-                                        <Label Content="{Binding Path=Value}" Padding="0"/>
-                                    </StackPanel>
+                                            <Button Margin="4,0" ToolTip="Удалить" ToolTipService.IsEnabled="True"
+                                                Grid.Column="1"
+                                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                Command="{Binding Path=DeleteUrlWithImagesCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding Path=Value}">
+                                                <Image Source="/ExcelConverter.Parser;component/Icons/trash_16x16.png" />
+                                            </Button>
 
-
-                                    <ListBox Grid.Row="1" 
+                                            <ListBox Grid.Row="1" Grid.ColumnSpan="2" Margin="2"
                                                      ItemsSource="{Binding ParseResult}" 
                                                      SelectionChanged="ListBox_SelectionChanged"
-                                                     ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                                        <ListBox.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel IsItemsHost="True" />
-                                            </ItemsPanelTemplate>
-                                        </ListBox.ItemsPanel>
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <!--<Label Grid.Row="0" Content="{Binding Path=Url.AbsoluteUri}" HorizontalAlignment="Center" Padding="0"/>-->
-                                                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                                        <StackPanel.Resources>
-                                                            <Style TargetType="{x:Type Label}">
-                                                                <Setter Property="Padding" Value="0"/>
-                                                            </Style>
-                                                        </StackPanel.Resources>
-                                                        <Label Content="("/>
-                                                        <Label Content="{Binding Path=Node.Name}"/>
-                                                        <Label Content=") Размер: "/>
-                                                        <Label Content="{Binding Path=Image.Width}"/>
-                                                        <Label Content="x"/>
-                                                        <Label Content="{Binding Path=Image.Height}"/>
-                                                    </StackPanel>
-                                                    <Image 
-                                                                Grid.Row="2"
-                                                                Source="{Binding Path=Image, Converter={StaticResource ImageFromUrlConverter}}"
-                                                                MaxHeight="80"
-                                                                MaxWidth="80"/>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
+                                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                     ItemContainerStyle="{DynamicResource ListBoxItemStyleClear}">
+                                                <ListBox.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel IsItemsHost="True" />
+                                                    </ItemsPanelTemplate>
+                                                </ListBox.ItemsPanel>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Width="140" Height="100" x:Name="imageBorder">
+                                                            <Border.Background>
+                                                                <SolidColorBrush Color="{Binding Path=IsSelected, Converter={StaticResource IsSelectedBackgroundConverter}}"/>
+                                                            </Border.Background>
 
-                    <Image Grid.Row="1" Grid.Column="1" MaxWidth="200" MaxHeight="200" 
-                                Source="{Binding Path=LastSelected, Converter={StaticResource ImageFromUrlConverter}}"/>
+                                                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                                <Image 
+                                                                    HorizontalAlignment="Stretch"
+                                                                    VerticalAlignment="Center"
+                                                                    Source="{Binding Path=Image, Converter={StaticResource ImageFromUrlConverter}}"/>
+
+                                                                <Border HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{Binding ElementName=imageBorder, Path=Background}" Panel.ZIndex="99">
+                                                                    <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding Path=Node.Name}" Margin="4,0,0,0"/>    
+                                                                </Border>
+
+                                                                <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{Binding ElementName=imageBorder, Path=Background}" Panel.ZIndex="99">
+                                                                    <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="4,0,0,0">
+                                                                        <Hyperlink 
+                                                                            NavigateUri="{Binding Path=Url.AbsoluteUri}"
+                                                                            Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
+                                                                            CommandParameter="{Binding Path=Url.AbsoluteUri}">
+                                                                            <TextBlock>
+                                                                                <TextBlock.Text>
+                                                                                    <MultiBinding StringFormat="{}{0}x{1}">
+                                                                                        <Binding Path="Image.Width" />
+                                                                                        <Binding Path="Image.Height" />
+                                                                                    </MultiBinding>
+                                                                                </TextBlock.Text>
+                                                                            </TextBlock>
+                                                                        </Hyperlink>
+                                                                    </TextBlock>
+
+
+                                                                </Border>
+
+                                                                <Button Margin="4,4" ToolTip="Увеличить" ToolTipService.IsEnabled="True" Panel.ZIndex="100"
+                                                                        HorizontalAlignment="Right"
+                                                                        VerticalAlignment="Top"
+                                                                        Width="22"
+                                                                        Height="22"
+                                                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                                        Command="{Binding Path=ShowImageCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                                                        CommandParameter="{Binding Path=Image}">
+                                                                    <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" />
+                                                                </Button>
+                                                            </Grid>
+
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </Grid>
+                                    </Border>    
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" 
+                                               Orientation="Horizontal" 
+                                               MaxWidth="{Binding ElementName=resultScrollViewer, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-10;0}"
+                                               ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                    </ScrollViewer>
                 </Grid>
             </TabItem>
             <TabItem Header="Правило">
@@ -347,5 +407,42 @@
                     Visibility="{Binding Path=CanCancel, Converter={StaticResource BooleanToVisibilityConverter}}"
                     Command="{Binding CancelCommand}"/>
         </StackPanel>
+
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="999"
+              Visibility="{Binding Path=ShowImageMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.15*"/>
+                <RowDefinition Height="0.70*"/>
+                <RowDefinition Height="0.15*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.15*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.15*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Fill="Black" Opacity="0.7" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="1000" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                Visibility="{Binding Path=ShowImageMode, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                MouseLeftButtonUp="Border_MouseLeftButtonUp"/>
+
+            <!--<Rectangle Fill="Red" Grid.Row="1" Grid.Column="1" Panel.ZIndex="1001"/>-->
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Panel.ZIndex="1001" MouseLeftButtonUp="Border_MouseLeftButtonUp" Padding="10">
+                <Border.Background>
+                    <SolidColorBrush Color="White"/>
+                </Border.Background>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20" Color="White" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="0" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Для закрытия этого окна просто нажмите в любую области экрана" TextWrapping="WrapWithOverflow" Margin="4,0,4,10" HorizontalAlignment="Center"/>
+                    <Image Source="{Binding Path=LastSelected, Converter={StaticResource ImageFromUrlConverter}}" Grid.Row="1"/>
+                </Grid>
+            </Border>
+        </Grid>
+
     </Grid>
 </UserControl>

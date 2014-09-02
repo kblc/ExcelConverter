@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Helpers;
 using Helpers.WPF;
+using System.Diagnostics;
 
 namespace ExcelConverter.Parser.Controls
 {
@@ -352,7 +353,13 @@ namespace ExcelConverter.Parser.Controls
                         {
                             List<UrlResultWrapper> urlResultWrapper = e.Result as List<UrlResultWrapper>;
                             foreach (var item in urlResultWrapper)
+                            {
+                                if (item.ParseResult != null)
+                                    foreach (var ps in item.ParseResult)
+                                        ps.IsSelected = (item.ParseResult.IndexOf(ps) == 0);
+                                
                                 UrlsToAddList.Add(item);
+                            }
                         }
                         finally
                         {
@@ -434,6 +441,10 @@ namespace ExcelConverter.Parser.Controls
                 i.IsSelected = false;
             foreach (ParseImageResult i in e.AddedItems.Cast<ParseImageResult>())
             {
+                foreach (ParseImageResult n in ((ListBox)sender).Items.Cast<ParseImageResult>().Where(u => u.IsSelected == true))
+                {
+                    n.IsSelected = false;
+                }
                 i.IsSelected = true;
                 LastSelected = i.Image;
             }
@@ -487,6 +498,63 @@ namespace ExcelConverter.Parser.Controls
             UpdateStep(0, false);
 
             //SiteManager.Init(GridMain, Dispatcher);
+        }
+
+        private DelegateCommand navigateCommand = null;
+        public ICommand NavigateCommand
+        {
+            get
+            {
+                return navigateCommand ?? (navigateCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        string url = o as string;
+                        if (!string.IsNullOrEmpty(url))
+                            Process.Start(url);
+                    }
+                ));
+            }
+        }
+
+        private DelegateCommand showImageCommand = null;
+        public ICommand ShowImageCommand
+        {
+            get
+            {
+                return showImageCommand ?? (showImageCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        LastSelected = o as System.Drawing.Image;
+                        ShowImageMode = true;
+                    }
+                ));
+            }
+        }
+
+        private DelegateCommand hideImageCommand = null;
+        public ICommand HideImageCommand
+        {
+            get
+            {
+                return hideImageCommand ?? (hideImageCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        ShowImageMode = false;
+                    }
+                ));
+            }
+        }
+
+        private bool showImageMode = false;
+        public bool ShowImageMode 
+        {
+            get { return showImageMode; }
+            set { showImageMode = value; RaisePropertyChanged("ShowImageMode"); }
+        }
+
+        private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            HideImageCommand.Execute(null);
         }
     }
 }
