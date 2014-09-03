@@ -13,42 +13,13 @@
              TextOptions.TextRenderingMode="ClearType"
              Loaded="UserControl_Loaded">
     <UserControl.Resources>
-        <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
-        <p:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
-        <p:IsSelectedBackgroundConverter x:Key="IsSelectedBackgroundConverter"/>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <p:ParseRuleConnectionTypeList x:Key="ParseRuleConnectionTypeList"/>
-        <helpers:ApplyConverter x:Key="ApplyConverter"/>
-        <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
-        <p:ThicknessMaxConverter x:Key="ThicknessMaxConverter"/>
-
-        <Style x:Key="ListBoxItemStyleClear" TargetType="{x:Type ListBoxItem}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, 
-            RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment,
-             RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-            <Setter Property="Padding" Value="2,0,0,0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" 
-                            BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" 
-                            Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="true">
-                                <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
+
     <Grid 
             x:Name="GridMain"
             IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
@@ -166,7 +137,7 @@
                     <ToggleButton IsChecked="{Binding Path=NewParseRule.CheckImageSize}" Margin="8,0,0,0" ToolTipService.IsEnabled="True" ToolTip="Обязательно проверять размер картинки при загрузке" >
                         <Image Source="/ExcelConverter.Parser;component/Icons/check_mark_16x16.png"/>
                     </ToggleButton>
-                    
+
                     <!--<CheckBox IsChecked="{Binding Path=NewParseRule.CheckImageSize}" Margin="8,0">
                         <TextBlock Text="Обязательно проверять размер"/>
                     </CheckBox>-->
@@ -209,14 +180,15 @@
                     </CheckBox>-->
                 </DockPanel>
             </Border>
-            
+
         </WrapPanel>
 
         <TabControl x:Name="UrlsToAddTabControl"
                         SelectedIndex="0"
                         Margin="4,0"
                         Grid.Row="1">
-            <TabItem Header="Список URL для определения">
+
+            <TabItem Header="Список URL для определения" Style="{StaticResource TabItemBigStyle}">
                 <Grid Margin="4,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -246,7 +218,7 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Выбор изображений для метки">
+            <TabItem Header="Выбор изображений для метки" Style="{StaticResource TabItemBigStyle}">
                 <Grid Margin="4,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -331,7 +303,7 @@
                                                                     Source="{Binding Path=Image, Converter={StaticResource ImageFromUrlConverter}}"/>
 
                                                                 <Border HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{Binding ElementName=imageBorder, Path=Background}" Panel.ZIndex="99">
-                                                                    <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding Path=Node.Name}" Margin="4,0,0,0"/>    
+                                                                    <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding Path=Node.Name}" Margin="4,0,0,0"/>
                                                                 </Border>
 
                                                                 <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{Binding ElementName=imageBorder, Path=Background}" Panel.ZIndex="99">
@@ -371,7 +343,7 @@
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
                                         </Grid>
-                                    </Border>    
+                                    </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                             <ListBox.ItemsPanel>
@@ -386,154 +358,167 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            <TabItem Header="Правило">
-                <Border VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="DarkGray" BorderThickness="2" Background="White">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="20" Color="Green" Direction="235" Opacity=".7" RenderingBias="Quality" ShadowDepth="0" />
-                    </Border.Effect>
-                    
-                    <StackPanel>
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type Label}">
-                                <Setter Property="Padding" Value="0"/>
-                            </Style>
-                            
-                            <Style TargetType="{x:Type Button}" x:Key="AddButtonStyle">
-                                <Setter Property="Margin" Value="0,14"/>
-                                <Setter Property="Padding" Value="10,10"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="FontSize" Value="14"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                                <!--<Setter Property="FontFamily" Value="Corbel"/>-->
-                                <Setter Property="Cursor" Value="Hand"/>
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Color="LightGreen" Offset="0"/>
-                                            <GradientStop Color="#FF81C581" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type Button}">
-                                            <Border Background="{TemplateBinding Background}" Padding="10,6" CornerRadius="3">
-                                                <Border.Effect>
-                                                    <DropShadowEffect BlurRadius="10" Color="Black" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
-                                                </Border.Effect>
-                                                <ContentPresenter/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background">
-                                            <Setter.Value>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="#FF81C581" Offset="0"/>
-                                                    <GradientStop Color="LightGreen" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Resources>
+            <TabItem Header="Правило" Style="{StaticResource TabItemBigStyle}">
+                <Grid>
+                    <Rectangle Panel.ZIndex="1" Fill="Black" Opacity=".2"/>
+                    <Border VerticalAlignment="Stretch" 
+                            HorizontalAlignment="Center" 
+                            BorderBrush="DarkGray"
+                            BorderThickness="2,0,2,0" 
+                            Background="White"
+                            MaxWidth="400"
+                            Margin="0,0,0,0"
+                            Panel.ZIndex="2">
+                        <!--<Border.Effect>
+                            <DropShadowEffect BlurRadius="20" Color="Green" Direction="235" Opacity=".7" RenderingBias="Quality" ShadowDepth="0" />
+                        </Border.Effect>-->
 
-                        <Border Background="LightGreen" Padding="4" Grid.Row="0" Margin="0,0,0,4">
-                            <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png" Width="16" Height="16"/>
-                                <TextBlock TextWrapping="WrapWithOverflow" VerticalAlignment="Center" Margin="4,0">
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}Для парсера '{0}' метки '{1}' было создано правило со следующими параметрами:">
-                                            <Binding Path="Parser.Url"/>
-                                            <Binding ElementName="AddRuleLabelComboBox" Path="Text"/>
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </WrapPanel>
-                        </Border>
+                        <StackPanel>
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Label}">
+                                    <Setter Property="Padding" Value="0"/>
+                                </Style>
 
-                        <Grid Grid.Row="1" Margin="4,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="160"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
+                                <Style TargetType="{x:Type Button}" x:Key="AddButtonStyle">
+                                    <Setter Property="Margin" Value="0,14"/>
+                                    <Setter Property="Padding" Value="10,10"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <!--<Setter Property="FontFamily" Value="Corbel"/>-->
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="LightGreen" Offset="0"/>
+                                                <GradientStop Color="#FF81C581" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Border Background="{TemplateBinding Background}" Padding="10,6" CornerRadius="3">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="10" Color="Black" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                                                    </Border.Effect>
+                                                    <ContentPresenter/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#FF81C581" Offset="0"/>
+                                                        <GradientStop Color="LightGreen" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Resources>
 
-                            <Label Content="Тип подключения: " Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right"/>
-                            <Label Content="{Binding Path=NewParseRule.Connection}" Grid.Row="0" Grid.Column="1"/>
+                            <Border Background="LightGreen" Padding="4" Grid.Row="0" Margin="0,0,0,4">
+                                <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png" Width="16" Height="16"/>
+                                    <TextBlock TextWrapping="WrapWithOverflow" VerticalAlignment="Center" Margin="4,0"
+                                               FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Path=FontSize, Converter={StaticResource ApplyConverter}, ConverterParameter=+2}">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}Для парсера '{0}' метки '{1}' было создано правило со следующими параметрами:">
+                                                <Binding Path="Parser.Url"/>
+                                                <Binding ElementName="AddRuleLabelComboBox" Path="Text"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </WrapPanel>
+                            </Border>
 
-                            <Label Content="Условие: " Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
-                            <Label Content="{Binding Path=NewParseRule.Condition}" Grid.Row="1" Grid.Column="1"/>
+                            <Grid Grid.Row="1" Margin="4,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="17*"/>
+                                    <ColumnDefinition Width="23*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <Label Content="Параметр: " Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
-                            <TextBox Text="{Binding Path=NewParseRule.Parameter}" MinWidth="200" Grid.Row="2" Grid.Column="1"/>
+                                <Label Content="Тип подключения: " Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right"/>
+                                <Label Content="{Binding Path=NewParseRule.Connection}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"/>
 
-                            <Label Content="Количество потоков: " Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
-                            <Label Content="{Binding Path=ThreadCount}" Grid.Row="3" Grid.Column="1"/>
+                                <Label Content="Условие: " Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
+                                <Label Content="{Binding Path=NewParseRule.Condition}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
 
-                            <Label Content="Мин. размер изображения: " Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right"/>
-                            <Label Grid.Row="4" Grid.Column="1">
-                                <TextBlock>
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0}x{1}">
-                                            <Binding Path="NewParseRule.MinImageWidth"/>
-                                            <Binding Path="NewParseRule.MinImageHeight"/>
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </Label>
+                                <Label Content="Параметр: " Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                                <TextBox Text="{Binding Path=NewParseRule.Parameter}" MinWidth="200" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"/>
 
-                            <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right" TextBlock.TextAlignment="Right" Margin="0,0,4,0">
-                                <TextBlock Text="Обязательно проверять размер изображения перед иммортом:" TextWrapping="WrapWithOverflow"/>
-                            </Label>
-                            <Label Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
-                                <DockPanel>
-                                    <TextBlock Text="Да" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                    <TextBlock Text="Нет" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"/>
-                                </DockPanel>
-                            </Label>
+                                <Label Content="Количество потоков: " Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
+                                <Label Content="{Binding Path=ThreadCount}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"/>
 
-                            <Label Content="Настройки: " Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right"/>
-                            <WrapPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1">
-                                <WrapPanel.Resources>
-                                    <Style TargetType="{x:Type Image}">
-                                        <Setter Property="Width" Value="16"/>
-                                        <Setter Property="Height" Value="16"/>
-                                    </Style>
-                                </WrapPanel.Resources>
-                                <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectIMGTags}" ToolTipService.IsEnabled="True" ToolTip="Загружать картинки" Margin="4,0">
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png"/>
-                                </ToggleButton>
+                                <Label Content="Мин. размер изображения: " Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right"/>
+                                <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}x{1}">
+                                                <Binding Path="NewParseRule.MinImageWidth"/>
+                                                <Binding Path="NewParseRule.MinImageHeight"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Label>
 
-                                <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectLINKTags}" ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки" Margin="4,0">
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png"/>
-                                </ToggleButton>
+                                <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right" TextBlock.TextAlignment="Right" Margin="0,0,4,0">
+                                    <TextBlock Text="Обязательно проверять размер изображения перед иммортом:" TextWrapping="WrapWithOverflow"/>
+                                </Label>
+                                <Label Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="0,14">
+                                    <DockPanel>
+                                        <TextBlock Text="Да" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        <TextBlock Text="Нет" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"/>
+                                    </DockPanel>
+                                </Label>
 
-                                <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectMETATags}" ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0,0,0">
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png"/>
-                                </ToggleButton>
-                            </WrapPanel>
-                        </Grid>
+                                <Label Content="Настройки: " Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right"/>
+                                <WrapPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
+                                    <WrapPanel.Resources>
+                                        <Style TargetType="{x:Type Image}">
+                                            <Setter Property="Width" Value="16"/>
+                                            <Setter Property="Height" Value="16"/>
+                                        </Style>
+                                    </WrapPanel.Resources>
 
-                        <Button Grid.Row="2"
-                                Content="Добавить это правило"
-                                TextOptions.TextFormattingMode="Display"
-                                TextOptions.TextRenderingMode="ClearType"
-                                Style="{StaticResource AddButtonStyle}"
-                                Command="{Binding Path=AddNewRuleCommand}"/>
-                    </StackPanel>
-                </Border>
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png"
+                                           ToolTipService.IsEnabled="True" ToolTip="Загружать картинки" Margin="4,0"
+                                           Visibility="{Binding Path=NewParseRule.CollectIMGTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png"
+                                           ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки" Margin="4,0"
+                                           Visibility="{Binding Path=NewParseRule.CollectLINKTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png"
+                                           ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0"
+                                           Visibility="{Binding Path=NewParseRule.CollectMETATags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </WrapPanel>
+                            </Grid>
+
+                            <Button Grid.Row="2"
+                                    Content="Добавить это правило"
+                                    TextOptions.TextFormattingMode="Display"
+                                    TextOptions.TextRenderingMode="ClearType"
+                                    Style="{StaticResource AddButtonStyle}"
+                                    Command="{Binding Path=AddNewRuleCommand}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </TabItem>
         </TabControl>
 
