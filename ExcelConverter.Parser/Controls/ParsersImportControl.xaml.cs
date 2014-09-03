@@ -43,7 +43,7 @@ namespace ExcelConverter.Parser.Controls
         }
 
         private bool isItemEnabled = true;
-        internal bool IsItemEnabled
+        public bool IsItemEnabled
         {
             get { return isItemEnabled; }
             set

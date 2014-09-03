@@ -203,6 +203,8 @@
     <Resource Include="Icons\redo_16x16.png" />
     <Resource Include="Icons\camera_16x16.png" />
     <Resource Include="Icons\clipboard_16x16.png" />
+    <Resource Include="Icons\database_16x16.png" />
+    <Resource Include="Icons\check_mark_16x16.png" />
     <Content Include="parsers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
