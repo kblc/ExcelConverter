@@ -405,7 +405,7 @@ namespace ExcelConverter.Parser.Controls
             #endregion
 
             for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
-                (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == step) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+                (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == step) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
             UrlsToAddTabControl.SelectedIndex = step;
         }
 

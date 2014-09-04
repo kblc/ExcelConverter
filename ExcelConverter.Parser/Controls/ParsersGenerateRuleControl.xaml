@@ -9,13 +9,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="420" d:DesignWidth="700"
              FontFamily="Candara"
-             TextOptions.TextFormattingMode="Display"
+             TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="ClearType"
              Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -30,7 +31,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <WrapPanel Margin="4">
+        <WrapPanel Margin="4,4,4,0">
             <WrapPanel.Resources>
                 <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
                     <Setter Property="Padding" Value="0"/>
@@ -39,9 +40,6 @@
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
-                </Style>
-                <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
-                    <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                     <Setter Property="Height" Value="16"/>
@@ -56,54 +54,16 @@
                     <Setter Property="Height" Value="16"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Margin" Value="1,1"/>
-                    <Setter Property="CornerRadius" Value="3"/>
-                    <Setter Property="Padding" Value="4"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="BorderBrush">
-                        <Setter.Value>
-                            <!--<DrawingBrush Viewport="0,0,2,2" ViewportUnits="Absolute" TileMode="Tile">
-                                <DrawingBrush.Drawing>
-                                    <DrawingGroup>
-                                        <GeometryDrawing Brush="Black">
-                                            <GeometryDrawing.Geometry>
-                                                <GeometryGroup>
-                                                    <RectangleGeometry Rect="0,0,50,50" RadiusX="43" RadiusY="2"/>
-                                                    <RectangleGeometry Rect="50,50,50,50" RadiusX="2" RadiusY="2"/>
-                                                </GeometryGroup>
-                                            </GeometryDrawing.Geometry>
-                                        </GeometryDrawing>
-                                    </DrawingGroup>
-                                </DrawingBrush.Drawing>
-                            </DrawingBrush>-->
-                            <SolidColorBrush Color="Black" Opacity="0.2"/>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Background">
-                        <Setter.Value>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="White" Offset="0"/>
-                                <GradientStop Color="LightGray" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect BlurRadius="10" Color="Black" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
-                        </Setter.Value>
-                    </Setter>
-                </Style>
             </WrapPanel.Resources>
 
-            <Border>
+            <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Парсер:"/>
                     <TextBox Text="{Binding Path=Parser.Url}" Width="200" Margin="4,0,0,0" IsReadOnly="{Binding Path=CanEditUrl, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}" Padding="0"/>
                 </DockPanel>
             </Border>
 
-            <Border>
+            <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Метка:" Margin="0,0,4,0"/>
                     <ComboBox Width="100" Padding="2,0" SelectedIndex="0" x:Name="AddRuleLabelComboBox" 
@@ -111,7 +71,7 @@
                 </DockPanel>
             </Border>
 
-            <Border>
+            <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Подключение:" Margin="0,0,4,0"/>
                     <ComboBox Width="100" Padding="2,0" x:Name="ParseRuleConnectionTypeComboBox"
@@ -120,14 +80,14 @@
                 </DockPanel>
             </Border>
 
-            <Border>
+            <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Количество потоков:"/>
                     <TextBox Text="{Binding Path=ThreadCount}" Width="50" Margin="4,0,0,0" Padding="0" VerticalAlignment="Center"/>
                 </DockPanel>
             </Border>
 
-            <Border>
+            <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Мин. размер:" ToolTipService.IsEnabled="True" ToolTip="Минимальный размер изображения при загрузке"/>
                     <TextBox Width="50" Margin="4,0" Text="{Binding Path=NewParseRule.MinImageWidth}"/>
@@ -144,7 +104,7 @@
                 </DockPanel>
             </Border>
 
-            <Border>
+            <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Настройки:"/>
 
@@ -186,9 +146,10 @@
         <TabControl x:Name="UrlsToAddTabControl"
                         SelectedIndex="0"
                         Margin="4,0"
+                        Padding="2,0"
                         Grid.Row="1">
 
-            <TabItem Header="Список URL для определения" Style="{StaticResource TabItemBigStyle}">
+            <TabItem Header="Список URL для определения" Style="{StaticResource themeTabItemBigStyle}">
                 <Grid Margin="4,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -218,7 +179,7 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Выбор изображений для метки" Style="{StaticResource TabItemBigStyle}">
+            <TabItem Header="Выбор изображений для метки" Style="{StaticResource themeTabItemBigStyle}">
                 <Grid Margin="4,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -358,7 +319,7 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            <TabItem Header="Правило" Style="{StaticResource TabItemBigStyle}">
+            <TabItem Header="Правило" Style="{StaticResource themeTabItemBigStyle}">
                 <Grid>
                     <Rectangle Panel.ZIndex="1" Fill="Black" Opacity=".2"/>
                     <Border VerticalAlignment="Stretch" 
@@ -378,51 +339,9 @@
                                 <Style TargetType="{x:Type Label}">
                                     <Setter Property="Padding" Value="0"/>
                                 </Style>
-
-                                <Style TargetType="{x:Type Button}" x:Key="AddButtonStyle">
-                                    <Setter Property="Margin" Value="0,14"/>
-                                    <Setter Property="Padding" Value="10,10"/>
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="FontSize" Value="14"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <!--<Setter Property="FontFamily" Value="Corbel"/>-->
-                                    <Setter Property="Cursor" Value="Hand"/>
-                                    <Setter Property="Background">
-                                        <Setter.Value>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="LightGreen" Offset="0"/>
-                                                <GradientStop Color="#FF81C581" Offset="1"/>
-                                            </LinearGradientBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border Background="{TemplateBinding Background}" Padding="10,6" CornerRadius="3">
-                                                    <Border.Effect>
-                                                        <DropShadowEffect BlurRadius="10" Color="Black" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
-                                                    </Border.Effect>
-                                                    <ContentPresenter/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background">
-                                                <Setter.Value>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                        <GradientStop Color="#FF81C581" Offset="0"/>
-                                                        <GradientStop Color="LightGreen" Offset="1"/>
-                                                    </LinearGradientBrush>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
                             </StackPanel.Resources>
 
-                            <Border Background="LightGreen" Padding="4" Grid.Row="0" Margin="0,0,0,4">
+                            <Border Background="{DynamicResource themeHightLightingSolidBrush}" Padding="4" Grid.Row="0" Margin="0,0,0,4">
                                 <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
                                     <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png" Width="16" Height="16"/>
                                     <TextBlock TextWrapping="WrapWithOverflow" VerticalAlignment="Center" Margin="4,0"
@@ -496,15 +415,15 @@
                                         </Style>
                                     </WrapPanel.Resources>
 
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png"
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" Width="16" Height="16"
                                            ToolTipService.IsEnabled="True" ToolTip="Загружать картинки" Margin="4,0"
                                            Visibility="{Binding Path=NewParseRule.CollectIMGTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png"
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png" Width="16" Height="16"
                                            ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки" Margin="4,0"
                                            Visibility="{Binding Path=NewParseRule.CollectLINKTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png"
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png" Width="16" Height="16"
                                            ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0"
                                            Visibility="{Binding Path=NewParseRule.CollectMETATags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                 </WrapPanel>
@@ -512,9 +431,11 @@
 
                             <Button Grid.Row="2"
                                     Content="Добавить это правило"
-                                    TextOptions.TextFormattingMode="Display"
+                                    TextOptions.TextFormattingMode="Ideal"
                                     TextOptions.TextRenderingMode="ClearType"
-                                    Style="{StaticResource AddButtonStyle}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,14"
+                                    Style="{DynamicResource themeGoodButtonBigStyle}"
                                     Command="{Binding Path=AddNewRuleCommand}"/>
                         </StackPanel>
                     </Border>

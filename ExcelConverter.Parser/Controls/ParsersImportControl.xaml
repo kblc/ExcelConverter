@@ -359,10 +359,9 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Создание правила" 
-                     Background="LightGreen"
                      IsEnabled="{Binding ElementName=HostLixtBox, Path=SelectedItems.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                      Visibility="{Binding ElementName=ParsersGenerateRuleControl, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Border Background="LightGreen">
+                <Border>
                     <Controls:ParsersGenerateRuleControl 
                             Parser="{Binding ElementName=HostLixtBox, Path=SelectedItem.Parser}"
                             Urls="{Binding ElementName=HostLixtBox, Path=SelectedItem.Urls}"
