@@ -39,17 +39,17 @@ namespace ExcelConverter.Parser
     {
         [Description("Напрямую")]
         Direct = 0,
-        [Description("Используя IE (без задержки)")]
+        [Description("IE (без задержки)")]
         IE_00_sec,
-        [Description("Используя IE (с задержкой 5 сек.)")]
+        [Description("IE (5 сек.)")]
         IE_05_sec,
-        [Description("Используя IE (с задержкой 10 сек.)")]
+        [Description("IE (10 сек.)")]
         IE_10_sec,
-        [Description("Используя Chromium (без задержки)")]
+        [Description("Chromium (без задержки)")]
         CHR_00_sec,
-        [Description("Используя Chromium (с задержкой 5 сек.)")]
+        [Description("Chromium (5 сек.)")]
         CHR_05_sec,
-        [Description("Используя Chromium (с задержкой 10 сек.)")]
+        [Description("Chromium (10 сек.)")]
         CHR_10_sec
     }
 
@@ -104,16 +104,7 @@ namespace ExcelConverter.Parser
 
     public sealed class ParseFindRuleConditionList : ParseRuleEnumList<ParseFindRuleCondition> { }
 
-    public sealed class ParseRuleConnectionTypeList : List<ParseRuleConnectionType>
-    {
-        public ParseRuleConnectionTypeList()
-        {
-            foreach (var item in typeof(ParseRuleConnectionType).GetEnumValues().Cast<int>().Select(i => (ParseRuleConnectionType)i))
-            {
-                Add(item);
-            }
-        }
-    }
+    public sealed class ParseRuleConnectionTypeList : ParseRuleEnumList<ParseRuleConnectionType> { }
 
     [Serializable]
     public class ParseRule : INotifyPropertyChanged
@@ -652,8 +643,8 @@ namespace ExcelConverter.Parser
     [System.Xml.Serialization.XmlInclude(typeof(ParserCollection))]
     public class ParserCollection : INotifyPropertyChanged, Helpers.Serialization.ISerializable
     {
-        private const string LabelPhoto = "Фото";
-        private const string LabelSchema = "Схема";
+        private static string LabelPhoto = ParseRuleLabelType.Photo.GetAttributeValue<DescriptionAttribute, string>( i => i.Description);
+        private static string LabelSchema = ParseRuleLabelType.Schema.GetAttributeValue<DescriptionAttribute, string>(i => i.Description);
 
         public ParserCollection()
         {

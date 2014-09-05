@@ -10,6 +10,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="600"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.Resources>
             <p:IsEqualsConverter x:Key="IsEqualsConverter"/>
@@ -42,24 +50,23 @@
 
             <StackPanel Grid.Row="0" Orientation="Horizontal">
                 <StackPanel.Resources>
-                    <Style TargetType="{x:Type Button}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource themeDefaultButtonStyle}">
                         <Setter Property="Margin" Value="0,4,4,4"/>
                     </Style>
                 </StackPanel.Resources>
-                <Button 
-					Content="Новый..."
-					Command="{Binding ParserNewCommand}" 
-                    />
+                <Button Content="Новый..."
+                        Height="21"
+					    Command="{Binding ParserNewCommand}"/>
                 <!--<Button 
 					Content="Изменить..."
 					Command="{Binding ParserChangeCommand}" 
 					CommandParameter="{Binding SelectedItem, ElementName=ParsersListBox}"
 					IsEnabled="{Binding SelectedItems.Count, ConverterParameter=1, Converter={StaticResource IsEqualsConverter}, ElementName=ParsersListBox}"/>-->
-                <Button 
-					Content="Удалить" 
-					Command="{Binding ParserDeleteCommand}" 
-					CommandParameter="{Binding SelectedItems, ElementName=ParsersListBox}"
-					IsEnabled="{Binding SelectedItems.Count, ElementName=ParsersListBox}"/>
+                <Button Content="Удалить"
+                        Height="21"
+					    Command="{Binding ParserDeleteCommand}" 
+					    CommandParameter="{Binding SelectedItems, ElementName=ParsersListBox}"
+					    IsEnabled="{Binding SelectedItems.Count, ElementName=ParsersListBox}"/>
             </StackPanel>
 
             <ListBox 

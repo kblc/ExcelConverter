@@ -8,6 +8,14 @@
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="670">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.Resources>
             <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
@@ -48,8 +56,8 @@
 
             <Grid Margin="0,0,0,4" Grid.Row="1" >
                 <Label Content="Правила:" Padding="0" VerticalAlignment="Center"/>
-                <Button 
-                        x:Name="AddRuleButton"
+                <Button x:Name="AddRuleButton"
+                        Style="{DynamicResource themeDefaultButtonStyle}"
 					    HorizontalAlignment="Right" 
 					    Content="Добавить..."
 					    Command="{Binding ShowParsersGenerateRuleControlCommand}"
@@ -66,6 +74,11 @@
                     IsEnabled="{Binding ElementName=ParsersGenerateRuleControl, Path=Visibility, Converter={StaticResource IsNotVisibleConverter}}"
                     x:Name="RulesDataGrid"
                     >
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
                     <DataGridComboBoxColumn
                         SelectedValueBinding="{Binding Label}"
@@ -81,12 +94,15 @@
                         ItemsSource="{StaticResource ParseFindRuleConditionList}" 
                         Header="Условие"/>
                     <DataGridComboBoxColumn 
-                        SelectedItemBinding="{Binding Connection}" 
+                        SelectedValueBinding="{Binding Connection}"
+                        SelectedValuePath="Value"
+                        DisplayMemberPath="Description"
                         ItemsSource="{StaticResource ParseRuleConnectionTypeList}" 
                         Header="Тип соединения"/>
                     <DataGridTextColumn Binding="{Binding MinImageWidth}" Width="140">
+                        
                         <DataGridTextColumn.Header>
-                            <Label Padding="0" HorizontalAlignment="Stretch">
+                            <Label Padding="0" HorizontalAlignment="Center" Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGridTextColumn}}, Path=ActualWidth, Converter={StaticResource ApplyConverter}, ConverterParameter=-4}">
                                 <Label.Content>
                                     <TextBlock TextWrapping="WrapWithOverflow" Text="Минимальная длинна изображения (px)" TextAlignment="Center"/>
                                 </Label.Content>

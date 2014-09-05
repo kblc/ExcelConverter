@@ -11,7 +11,6 @@
     <p:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>
     <p:IsSelectedBackgroundConverter x:Key="IsSelectedBackgroundConverter"/>
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    <p:ParseRuleConnectionTypeList x:Key="ParseRuleConnectionTypeList"/>
     <helpers:ApplyConverter x:Key="ApplyConverter"/>
     <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
     

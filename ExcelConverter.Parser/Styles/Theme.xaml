@@ -169,8 +169,57 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
+    <ControlTemplate x:Key="themeTabItemTemplate" TargetType="{x:Type TabItem}">
+        <Border Name="Border" 
+                BorderThickness="1,1,1,0" 
+                BorderBrush="{DynamicResource themeBorderSolidBrush}" 
+                Margin="0,0,2,0"
+                Background="{DynamicResource themeDefaultColorSolidBrush}"
+                >
+            <Border.Effect>
+                <DropShadowEffect x:Name="BorderDropShadowEffect"
+                    BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="0" Opacity=".5" RenderingBias="Quality" ShadowDepth="0" />
+            </Border.Effect>
+            <Border Name="BorderInside"
+                    BorderThickness="0,0,0,4"
+                    BorderBrush="{DynamicResource themeHightLightingSolidBrush}"
+                    Padding="4,0"
+                    Margin="-1,0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20" Color="{DynamicResource themeHightLightingColor}" Direction="0" Opacity=".3" RenderingBias="Quality" ShadowDepth="2" />
+                </Border.Effect>
+                <Grid x:Name="contentPresenterGrid" Margin="0,3,0,0"
+                      TextBlock.FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=FontSize, Converter={StaticResource themeApplyConverter}, ConverterParameter=+1}">
+                    <ContentPresenter Name="ContentSite"
+                                      IsEnabled="{TemplateBinding IsEnabled}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      ContentSource="Header"
+                                      Margin="10,2"/>
+                </Grid>
+            </Border>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="BorderInside" Property="BorderBrush" Value="{DynamicResource ResourceKey=themeHightLightingSolidBrush}" />
+                <Setter TargetName="contentPresenterGrid" Property="TextBlock.FontWeight" Value="Bold" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="False">
+                <Setter TargetName="BorderInside" Property="BorderBrush" Value="{DynamicResource ResourceKey=themeTransparentSolidBrush}" />
+                <Setter TargetName="contentPresenterGrid" Property="TextBlock.FontWeight" Value="Normal" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
     <Style x:Key="themeTabItemBigStyle" TargetType="{x:Type TabItem}" BasedOn="{x:Null}">
         <Setter Property="Template" Value="{DynamicResource themeTabItemBigTemplate}"/>
+    </Style>
+    <Style x:Key="themeTabItemStyle" TargetType="{x:Type TabItem}" BasedOn="{x:Null}">
+        <Setter Property="Template" Value="{DynamicResource themeTabItemTemplate}"/>
     </Style>
 
     <Style TargetType="{x:Type Border}" x:Key="themeDefaultBorderStyle">

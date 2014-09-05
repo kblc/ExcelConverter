@@ -8,6 +8,15 @@
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.Resources>
             <!--<p:IsEqualsConverter x:Key="IsEqualsConverter"/>-->
@@ -30,13 +39,14 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox x:Name="UrlToParseTextBox"/>
-            <Button 
-							Content="Тестировать" 
-							Grid.Column="1" 
-							Margin="4,0,0,0"
-							Command="{Binding ParserTestUrl}"
-							CommandParameter="{Binding Text, ElementName=UrlToParseTextBox}"
-							IsEnabled="{Binding IsEnableTesting}"/>
+            <Button Content="Тестировать" 
+                    Height="21"
+                    Style="{DynamicResource themeHighlightButtonStyle}"
+					Grid.Column="1" 
+					Margin="4,0,0,0"
+					Command="{Binding ParserTestUrl}"
+					CommandParameter="{Binding Text, ElementName=UrlToParseTextBox}"
+					IsEnabled="{Binding IsEnableTesting}"/>
         </Grid>
         <CheckBox 
             Grid.Row="2" 

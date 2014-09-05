@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
                 <ResourceDictionary>
                     <p:ParseRuleLabelList x:Key="ParseRuleLabelList"/>
+                    <p:ParseRuleConnectionTypeList x:Key="ParseRuleConnectionTypeList"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -82,7 +83,9 @@
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Подключение:" Margin="0,0,4,0"/>
-                    <ComboBox Width="100" Padding="2,0"
+                    <ComboBox Width="120" Padding="2,0"
+                              SelectedValuePath="Value"
+                              DisplayMemberPath="Description"
                               ItemsSource="{StaticResource ResourceKey=ParseRuleConnectionTypeList}"
                               SelectedValue="{Binding Path=NewParseRule.Connection}"/>
                 </DockPanel>
@@ -105,10 +108,6 @@
                     <ToggleButton IsChecked="{Binding Path=NewParseRule.CheckImageSize}" Margin="8,0,0,0" ToolTipService.IsEnabled="True" ToolTip="Обязательно проверять размер картинки при загрузке" >
                         <Image Source="/ExcelConverter.Parser;component/Icons/check_mark_16x16.png"/>
                     </ToggleButton>
-
-                    <!--<CheckBox IsChecked="{Binding Path=NewParseRule.CheckImageSize}" Margin="8,0">
-                        <TextBlock Text="Обязательно проверять размер"/>
-                    </CheckBox>-->
                 </DockPanel>
             </Border>
 
@@ -127,25 +126,6 @@
                     <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectMETATags}" ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0,0,0">
                         <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png"/>
                     </ToggleButton>
-
-                    <!--<CheckBox IsChecked="{Binding Path=NewParseRule.CollectIMGTags}" Margin="8,0">
-                        <DockPanel>
-                            <TextBlock Text="Загружать картинки"/>
-                            <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" Margin="2,0,0,0"/>
-                        </DockPanel>
-                    </CheckBox>
-                    <CheckBox IsChecked="{Binding Path=NewParseRule.CollectLINKTags}" Margin="8,0">
-                        <DockPanel>
-                            <TextBlock Text="Загружать ссылки"/>
-                            <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png" Margin="2,0,0,0"/>
-                        </DockPanel>
-                    </CheckBox>
-                    <CheckBox IsChecked="{Binding Path=NewParseRule.CollectMETATags}" Margin="8,0">
-                        <DockPanel>
-                            <TextBlock Text="Загружать метаданные"/>
-                            <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png" Margin="2,0,0,0"/>
-                        </DockPanel>
-                    </CheckBox>-->
                 </DockPanel>
             </Border>
 
@@ -161,7 +141,6 @@
                 <Grid Margin="4,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!--<RowDefinition Height="Auto"/>-->
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Label Grid.Row="0" Padding="0">
@@ -353,7 +332,7 @@
                     Command="{Binding CancelCommand}"/>
         </WrapPanel>
 
-        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="-999"
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="999"
               Visibility="{Binding Path=ShowRuleMode, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.15*"/>
@@ -494,7 +473,7 @@
             </Border>
         </Grid>
 
-        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="-999"
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="999"
               Visibility="{Binding Path=ShowImageMode, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.05*"/>
