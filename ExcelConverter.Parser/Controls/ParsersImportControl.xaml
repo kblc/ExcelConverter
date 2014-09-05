@@ -14,6 +14,14 @@
              TextOptions.TextRenderingMode="ClearType"
              d:DesignHeight="600" d:DesignWidth="600"
              Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
+                <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid x:Name="GridMain">
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -25,7 +33,7 @@
             <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
         </Grid.Resources>
         <TabControl SelectedIndex="0" Grid.Row="1" x:Name="TabControl">
-            <TabItem Header="Импорт"
+            <TabItem Header="Импорт" Style="{StaticResource themeTabItemBigStyle}"
                      IsEnabled="{Binding ElementName=TabControl, Path=SelectedIndex, Converter={StaticResource IsEqualsConverter}, ConverterParameter=0}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -35,9 +43,9 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" 
-              Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}"
-              IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
-              >
+                          Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
+                          >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -51,20 +59,17 @@
                         <Label Grid.Row="0" Padding="0" Margin="0,0,0,4" Grid.ColumnSpan="4">
                             <TextBlock Text="Выберите файл-таблицу и нажмите на кнопку 'Импортировать' для загрузки ссылок." TextWrapping="WrapWithOverflow"/>
                         </Label>
-                        <Label Grid.Row="1" Grid.Column="0" Content="Файл:" Padding="0" Margin="0,0,4,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ImportFileNameTextBox" IsReadOnly="True" Text="{Binding Path=ImportFileName}"/>
-                        <Button Grid.Row="1" Grid.Column="2" Padding="4,0" Margin="-1,0,0,0"
-                    Content="..."
-                    Command="{Binding Path=SelectFileCommand}"/>
-                        <!--<Button Grid.Row="1" Grid.Column="3" Padding="4,0" Margin="4,0,0,0"
-                    Content="Импортировать" 
-                    Command="{Binding Path=ImportFileCommand}"
-                    CommandParameter="{Binding ElementName=ImportFileNameTextBox, Path=Text}"
-                    />-->
-                        <Button Grid.Row="1" Grid.Column="3" Padding="4,0,0,0" Margin="4,0,2,0"
-                    Click="Button_Click"
-                    ContextMenuService.IsEnabled="False"
-                    >
+                        <Label Grid.Row="1" Grid.Column="0" Content="Файл:" Padding="0" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ImportFileNameTextBox" IsReadOnly="True" Text="{Binding Path=ImportFileName}" Height="17"/>
+                        <Button Grid.Row="1" Grid.Column="2" Padding="4,0" Margin="-1,0,0,0" Height="17"
+                            Content="..."
+                            Style="{DynamicResource themeDefaultButtonStyle}"
+                            Command="{Binding Path=SelectFileCommand}"/>
+
+                        <Button Grid.Row="1" Grid.Column="3"
+                                Style="{DynamicResource themeDefaultButtonStyle}"
+                                Padding="4,0,0,0" Margin="4,0,2,0" Height="21"
+                                Click="Button_Click" ContextMenuService.IsEnabled="False">
                             <Button.Content>
                                 <DockPanel>
                                     <Label Content="Импортировать" Padding="0"/>
@@ -81,7 +86,7 @@
                     </Grid>
 
                     <Expander x:Name="UrlsExpander"
-                          Background="DarkOrange"
+                          Background="{DynamicResource themeHightLightingDarkSolidBrush}"
                           IsExpanded="True"
                           Grid.Row="1"
                           local:ParsersImportControl.ExpandRow="{Binding Path=IsExpanded,RelativeSource={RelativeSource Self}}"
@@ -109,10 +114,12 @@
                                     <DockPanel Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
                                         <Label Content="Потоки:" Padding="0" Margin="0,0,2,0" VerticalAlignment="Center"/>
-                                        <TextBox Width="20" Text="{Binding Path=ThreadCount, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Width="20" Text="{Binding Path=ThreadCount, UpdateSourceTrigger=PropertyChanged}" Height="17"/>
                                     </DockPanel>
                                     <Label Content="{Binding Path=ProgressText}" Padding="0" Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     <Button Padding="4,0,0,0" Margin="4,0,0,0"
+                                            Height="21"
+                                            Style="{DynamicResource themeHighlightButtonStyle}"
                                             Click="Button_Click"
                                             ContextMenuService.IsEnabled="False"
                                             Visibility="{Binding Path=IsParsing, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
@@ -157,13 +164,17 @@
                                         </Button.ContextMenu>
                                     </Button>
 
-                                    <Button Content="Остановить" 
+                                    <Button Content="Остановить"
+                                            Height="21"
+                                            Style="{DynamicResource themeBadButtonStyle}"
                                             Padding="4,0"
                                             Margin="4,0,0,0"
                                             Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Command="{Binding Path=StopParseCommand}"
                                             />
                                     <Button Content="Экспортировать..."
+                                            Height="21"
+                                            Style="{DynamicResource themeDefaultButtonStyle}"
                                             Padding="4,0"
                                             Margin="4,0,0,0"
                                             Visibility="{Binding Path=AllowFileExport, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -295,7 +306,7 @@
                         </ListBox>
                     </Expander>
                     <Expander x:Name="HostsExpander"
-                          Background="DarkOrange"
+                          Background="{DynamicResource themeHightLightingDarkSolidBrush}"
                           IsExpanded="True"
                           Grid.Row="2"
                           local:ParsersImportControl.ExpandRow="{Binding Path=IsExpanded,RelativeSource={RelativeSource Self}}"
@@ -348,17 +359,23 @@
                             </ListBox>
                             <Button
                                 Grid.Row="1"
-                                Content="Сгеренировать правило..."
+                                Height="21"
+                                Style="{DynamicResource themeHighlightButtonStyle}"
                                 Padding="4,2"
                                 Margin="4,4,0,4"
                                 HorizontalAlignment="Left"
                                 IsEnabled="{Binding ElementName=HostLixtBox, Path=SelectedItems.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
-                                Command="{Binding SelectGenerateRuleTabCommand}" Grid.ColumnSpan="2"/>
+                                Command="{Binding SelectGenerateRuleTabCommand}" Grid.ColumnSpan="2">
+                                <WrapPanel>
+                                    <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png"/>
+                                    <TextBlock Text="Сгеренировать правило..." VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                </WrapPanel>
+                            </Button>
                         </Grid>
                     </Expander>
                 </Grid>
             </TabItem>
-            <TabItem Header="Создание правила" 
+            <TabItem Header="Создание правила" Style="{StaticResource themeTabItemBigStyle}"
                      IsEnabled="{Binding ElementName=HostLixtBox, Path=SelectedItems.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                      Visibility="{Binding ElementName=ParsersGenerateRuleControl, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Border>

@@ -13,16 +13,54 @@ using System.Windows.Media.Imaging;
 
 namespace ExcelConverter.Parser
 {
-    public class ThicknessMaxConverter : IValueConverter
+    public class MultiBooleanANDToVisibilityConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object[] values,
+                                Type targetType,
+                                object parameter,
+                                System.Globalization.CultureInfo culture)
         {
-            Thickness thickness = (Thickness)value;
-            double horizontalMax = Math.Max(thickness.Left, thickness.Right);
-            double verticalMax = Math.Max(thickness.Top, thickness.Bottom);
-            return Math.Max(horizontalMax, verticalMax);
+            bool visible = true;
+            foreach (object value in values)
+                if (value is bool)
+                    visible = visible && (bool)value;
+
+            if (visible)
+                return System.Windows.Visibility.Visible;
+            else
+                return System.Windows.Visibility.Collapsed;
         }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+
+        public object[] ConvertBack(object value,
+                                    Type[] targetTypes,
+                                    object parameter,
+                                    System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class MultiBooleanORToVisibilityConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values,
+                                Type targetType,
+                                object parameter,
+                                System.Globalization.CultureInfo culture)
+        {
+            bool visible = false;
+            foreach (object value in values)
+                if (value is bool)
+                    visible = visible || (bool)value;
+
+            if (visible)
+                return System.Windows.Visibility.Visible;
+            else
+                return System.Windows.Visibility.Collapsed;
+        }
+
+        public object[] ConvertBack(object value,
+                                    Type[] targetTypes,
+                                    object parameter,
+                                    System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
         }

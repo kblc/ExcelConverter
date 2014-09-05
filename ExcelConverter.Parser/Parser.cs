@@ -25,9 +25,6 @@ namespace ExcelConverter.Parser
         None = 0,
         ByLink,
         ByLinkAndIndex,
-        //ByAttributes,
-        //ByClass,
-        //ByParent,
         ByXPath,
         ByXPathAndIndex
     }
@@ -42,6 +39,55 @@ namespace ExcelConverter.Parser
         CHR_00_sec,
         CHR_05_sec,
         CHR_10_sec
+    }
+
+    [Serializable]
+    public enum ParseRuleLabelType
+    {
+        [Description("Фото")]
+        Photo = 0,
+        [Description("Схема")]
+        Schema
+    }
+
+    public class ParseRuleLabel : Helpers.WPF.PropertyChangedBase
+    {
+        private ParseRuleLabelType label = ParseRuleLabelType.Photo;
+
+        public ParseRuleLabelType Label
+        {
+            get { return label; }
+            internal set 
+            {
+                if (value == label)
+                    return;
+                label = value;
+                RaisePropertyChange("Label");
+                RaisePropertyChange("Description");
+            }
+        }
+
+        public string Description
+        {
+            get 
+            {
+                return Label.GetAttributeValue<DescriptionAttribute, string>(i => i.Description);
+            }
+        }
+
+        public ParseRuleLabel(ParseRuleLabelType label)
+        {
+            this.label = label;
+        }
+    }
+
+    public sealed class ParseRuleLabelList : List<ParseRuleLabel>
+    {
+        public ParseRuleLabelList()
+        {
+            foreach (var item in typeof(ParseRuleLabelType).GetEnumValues().Cast<int>().Select(i => (ParseRuleLabelType)i))
+                Add(new ParseRuleLabel(item));
+        }
     }
 
     public sealed class ParseFindRuleConditionList : List<ParseFindRuleCondition>
@@ -69,7 +115,7 @@ namespace ExcelConverter.Parser
     [Serializable]
     public class ParseRule : INotifyPropertyChanged
     {
-        private string label = string.Empty;
+        private string label = "Фото";
         public string Label
         {
             get

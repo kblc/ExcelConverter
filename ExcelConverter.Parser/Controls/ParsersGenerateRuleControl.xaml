@@ -17,6 +17,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/ParserVisualStyles.xaml"/>
                 <ResourceDictionary Source="/ExcelConverter.Parser;component/Styles/Theme.xaml"/>
+                <ResourceDictionary>
+                    <p:ParseRuleLabelList x:Key="ParseRuleLabelList"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -66,15 +69,20 @@
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Метка:" Margin="0,0,4,0"/>
-                    <ComboBox Width="100" Padding="2,0" SelectedIndex="0" x:Name="AddRuleLabelComboBox" 
-                              ItemsSource="{Binding Parser.Labels}"/>
+                    <ComboBox Width="100" Padding="2,0"
+                              SelectedValue="{Binding Path=NewParseRule.Label}"
+                              SelectedValuePath="Description"
+                              DisplayMemberPath="Description"
+                              ItemsSource="{StaticResource ParseRuleLabelList}"
+                              />
+                              <!--ItemsSource="{Binding Parser.Labels}"/>-->
                 </DockPanel>
             </Border>
 
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Подключение:" Margin="0,0,4,0"/>
-                    <ComboBox Width="100" Padding="2,0" x:Name="ParseRuleConnectionTypeComboBox"
+                    <ComboBox Width="100" Padding="2,0"
                               ItemsSource="{StaticResource ResourceKey=ParseRuleConnectionTypeList}"
                               SelectedValue="{Binding Path=NewParseRule.Connection}"/>
                 </DockPanel>
@@ -161,10 +169,6 @@
                                    TextWrapping="WrapWithOverflow"
                                    FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=FontSize, Converter={StaticResource ApplyConverter}, ConverterParameter=-2;0}"/>
                     </Label>
-                    <!--<StackPanel Grid.Row="1" Orientation="Horizontal">
-                            <Label Content="Метка: " Padding="0" VerticalAlignment="Center" Margin="0,2"/>
-                            <ComboBox ItemsSource="{Binding Parser.Labels}" SelectedIndex="0" MinWidth="200" x:Name="AddRuleLabelComboBox"/>
-                        </StackPanel>-->
                     <DataGrid 
                                 Grid.Row="2"
                                 ItemsSource="{Binding Path=Urls}"
@@ -187,7 +191,7 @@
                     </Grid.RowDefinitions>
 
                     <Label Grid.Row="0" Padding="0" Grid.ColumnSpan="2">
-                        <TextBlock Text="{Binding ElementName=AddRuleLabelComboBox, Path=Text, StringFormat={}Выберите по одному изображению в каждой строке\, которое соответствует метке \'{0}\'. На основании этих данных будет подготовлено правило.}"
+                        <TextBlock Text="{Binding Path=NewParseRule.Label, StringFormat={}Выберите по одному изображению в каждой строке\, которое соответствует метке \'{0}\'. На основании этих данных будет подготовлено правило.}"
                                    TextWrapping="WrapWithOverflow"
                                    FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=FontSize, Converter={StaticResource ApplyConverter}, ConverterParameter=-2;0}"/>
                     </Label>
@@ -200,7 +204,6 @@
                                   x:Name="resultScrollViewer">
                         <ListBox x:Name="AddNewRuleSelectionListBox"
                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                                 SelectionChanged="AddNewRuleSelectionListBox_SelectionChanged"
                                  ItemsSource="{Binding Path=UrlsToAddList}"
                                  ItemContainerStyle="{DynamicResource ListBoxItemStyleClear}">
                             <ListBox.ItemTemplate>
@@ -267,8 +270,13 @@
                                                                     <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding Path=Node.Name}" Margin="4,0,0,0"/>
                                                                 </Border>
 
-                                                                <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{Binding ElementName=imageBorder, Path=Background}" Panel.ZIndex="99">
-                                                                    <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="4,0,0,0">
+                                                                <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Panel.ZIndex="99"
+                                                                        Background="{Binding ElementName=imageBorder, Path=Background}" 
+                                                                        >
+                                                                    
+                                                                    <TextBlock VerticalAlignment="Center" Foreground="White" FontWeight="Bold" 
+                                                                               Margin="4,0,0,0"
+                                                                               ToolTipService.IsEnabled="True" ToolTip="{Binding Path=Url.AbsoluteUri}">
                                                                         <Hyperlink 
                                                                             NavigateUri="{Binding Path=Url.AbsoluteUri}"
                                                                             Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
@@ -283,8 +291,6 @@
                                                                             </TextBlock>
                                                                         </Hyperlink>
                                                                     </TextBlock>
-
-
                                                                 </Border>
 
                                                                 <Button Margin="4,4" ToolTip="Увеличить" ToolTipService.IsEnabled="True" Panel.ZIndex="100"
@@ -294,7 +300,7 @@
                                                                         Height="22"
                                                                         Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                                                         Command="{Binding Path=ShowImageCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
-                                                                        CommandParameter="{Binding Path=Image}">
+                                                                        CommandParameter="{Binding Path=.}">
                                                                     <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" />
                                                                 </Button>
                                                             </Grid>
@@ -319,160 +325,36 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            <TabItem Header="Правило" Style="{StaticResource themeTabItemBigStyle}">
-                <Grid>
-                    <Rectangle Panel.ZIndex="1" Fill="Black" Opacity=".2"/>
-                    <Border VerticalAlignment="Stretch" 
-                            HorizontalAlignment="Center" 
-                            BorderBrush="DarkGray"
-                            BorderThickness="2,0,2,0" 
-                            Background="White"
-                            MaxWidth="400"
-                            Margin="0,0,0,0"
-                            Panel.ZIndex="2">
-                        <!--<Border.Effect>
-                            <DropShadowEffect BlurRadius="20" Color="Green" Direction="235" Opacity=".7" RenderingBias="Quality" ShadowDepth="0" />
-                        </Border.Effect>-->
-
-                        <StackPanel>
-                            <StackPanel.Resources>
-                                <Style TargetType="{x:Type Label}">
-                                    <Setter Property="Padding" Value="0"/>
-                                </Style>
-                            </StackPanel.Resources>
-
-                            <Border Background="{DynamicResource themeHightLightingSolidBrush}" Padding="4" Grid.Row="0" Margin="0,0,0,4">
-                                <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png" Width="16" Height="16"/>
-                                    <TextBlock TextWrapping="WrapWithOverflow" VerticalAlignment="Center" Margin="4,0"
-                                               FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Path=FontSize, Converter={StaticResource ApplyConverter}, ConverterParameter=+2}">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}Для парсера '{0}' метки '{1}' было создано правило со следующими параметрами:">
-                                                <Binding Path="Parser.Url"/>
-                                                <Binding ElementName="AddRuleLabelComboBox" Path="Text"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </WrapPanel>
-                            </Border>
-
-                            <Grid Grid.Row="1" Margin="4,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="160"/>
-                                    <ColumnDefinition Width="17*"/>
-                                    <ColumnDefinition Width="23*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Label Content="Тип подключения: " Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right"/>
-                                <Label Content="{Binding Path=NewParseRule.Connection}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"/>
-
-                                <Label Content="Условие: " Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
-                                <Label Content="{Binding Path=NewParseRule.Condition}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
-
-                                <Label Content="Параметр: " Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
-                                <TextBox Text="{Binding Path=NewParseRule.Parameter}" MinWidth="200" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"/>
-
-                                <Label Content="Количество потоков: " Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
-                                <Label Content="{Binding Path=ThreadCount}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"/>
-
-                                <Label Content="Мин. размер изображения: " Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right"/>
-                                <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
-                                    <TextBlock>
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0}x{1}">
-                                                <Binding Path="NewParseRule.MinImageWidth"/>
-                                                <Binding Path="NewParseRule.MinImageHeight"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </Label>
-
-                                <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right" TextBlock.TextAlignment="Right" Margin="0,0,4,0">
-                                    <TextBlock Text="Обязательно проверять размер изображения перед иммортом:" TextWrapping="WrapWithOverflow"/>
-                                </Label>
-                                <Label Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="0,14">
-                                    <DockPanel>
-                                        <TextBlock Text="Да" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        <TextBlock Text="Нет" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"/>
-                                    </DockPanel>
-                                </Label>
-
-                                <Label Content="Настройки: " Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right"/>
-                                <WrapPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
-                                    <WrapPanel.Resources>
-                                        <Style TargetType="{x:Type Image}">
-                                            <Setter Property="Width" Value="16"/>
-                                            <Setter Property="Height" Value="16"/>
-                                        </Style>
-                                    </WrapPanel.Resources>
-
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" Width="16" Height="16"
-                                           ToolTipService.IsEnabled="True" ToolTip="Загружать картинки" Margin="4,0"
-                                           Visibility="{Binding Path=NewParseRule.CollectIMGTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png" Width="16" Height="16"
-                                           ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки" Margin="4,0"
-                                           Visibility="{Binding Path=NewParseRule.CollectLINKTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-                                    <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png" Width="16" Height="16"
-                                           ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0"
-                                           Visibility="{Binding Path=NewParseRule.CollectMETATags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                </WrapPanel>
-                            </Grid>
-
-                            <Button Grid.Row="2"
-                                    Content="Добавить это правило"
-                                    TextOptions.TextFormattingMode="Ideal"
-                                    TextOptions.TextRenderingMode="ClearType"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,14"
-                                    Style="{DynamicResource themeGoodButtonBigStyle}"
-                                    Command="{Binding Path=AddNewRuleCommand}"/>
-                        </StackPanel>
-                    </Border>
-                </Grid>
-            </TabItem>
         </TabControl>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,4">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Margin" Value="2,4"/>
-                </Style>
-            </StackPanel.Resources>
-            <Label Content="Загружено: " Padding="0" VerticalAlignment="Center"/>
-            <Label Content="{Binding Path=LoadedPercent}" Padding="0" VerticalAlignment="Center"/>
-            <Label Content="%" Padding="0" VerticalAlignment="Center"/>
-            <Button 
+        <WrapPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="2,4">
+            <Label Padding="0" VerticalAlignment="Center" Margin="0,0,10,0">
+                <TextBlock Text="{Binding Path=LoadedPercent, StringFormat={}Загружено: {0}%}"/>
+            </Label>
+            <Button Style="{DynamicResource themeDefaultButtonStyle}"
+                    Margin="4,0"
                     Content="Назад"
-                    Width="60"
+                    Width="80"
                     IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                     Command="{Binding PrevStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
-            <Button 
+            <Button Style="{DynamicResource themeDefaultButtonStyle}"
+                    Margin="4,0"
                     Content="Далее" 
-                    Width="60"
+                    Width="80"
                     IsDefault="True"
                     IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=2}"
                     Command="{Binding NextStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
-            <Button 
+            <Button Style="{DynamicResource themeBadButtonStyle}"
+                    Margin="4,0"
                     Content="Отмена" 
-                    Width="60"
+                    Width="80"
                     IsCancel="True"
                     Visibility="{Binding Path=CanCancel, Converter={StaticResource BooleanToVisibilityConverter}}"
                     Command="{Binding CancelCommand}"/>
-        </StackPanel>
+        </WrapPanel>
 
-        <!--<Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="999"
-              Visibility="{Binding Path=ShowImageMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="-999"
+              Visibility="{Binding Path=ShowRuleMode, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.15*"/>
                 <RowDefinition Height="0.70*"/>
@@ -484,9 +366,150 @@
                 <ColumnDefinition Width="0.15*"/>
             </Grid.ColumnDefinitions>
 
-            <Rectangle Fill="Black" Opacity="0.7" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="1000" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                Visibility="{Binding Path=ShowImageMode, Converter={StaticResource BooleanToVisibilityConverter}}" 
-                MouseLeftButtonUp="Border_MouseLeftButtonUp"/>
+            <Rectangle Fill="Black" Opacity="0.7" Panel.ZIndex="1000"
+                       Grid.RowSpan="99" Grid.ColumnSpan="99"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
+            <Border VerticalAlignment="Center" 
+                    HorizontalAlignment="Center" 
+                    BorderBrush="DarkGray"
+                    BorderThickness="2,2,2,2" 
+                    Background="White"
+                    MaxWidth="400"
+                    Margin="0,0,0,0"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Panel.ZIndex="1001">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20" Color="Green" Direction="235" Opacity=".7" RenderingBias="Quality" ShadowDepth="0" />
+                </Border.Effect>
+
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,2"/>
+                        </Style>
+                    </StackPanel.Resources>
+
+                    <Border Background="{DynamicResource themeHightLightingSolidBrush}" Padding="4" Grid.Row="0" Margin="0,0,0,4">
+                        <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png" Width="16" Height="16"/>
+                            <TextBlock TextWrapping="WrapWithOverflow" VerticalAlignment="Center" Margin="4,0"
+                                       FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Path=FontSize, Converter={StaticResource ApplyConverter}, ConverterParameter=+2}">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}Для парсера '{0}' метки '{1}' было создано правило со следующими параметрами:">
+                                        <Binding Path="Parser.Url"/>
+                                        <Binding Path="NewParseRule.Label"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </WrapPanel>
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="8,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="17*"/>
+                            <ColumnDefinition Width="23*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Content="Тип подключения: " Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <Label Content="{Binding Path=NewParseRule.Connection}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"/>
+
+                        <Label Content="Условие: " Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <Label Content="{Binding Path=NewParseRule.Condition}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
+
+                        <Label Content="Параметр: " Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <TextBox Text="{Binding Path=NewParseRule.Parameter}" MinWidth="200" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"/>
+
+                        <Label Content="Количество потоков: " Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <Label Content="{Binding Path=ThreadCount}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"/>
+
+                        <Label Content="Мин. размер изображения: " Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}x{1}">
+                                        <Binding Path="NewParseRule.MinImageWidth"/>
+                                        <Binding Path="NewParseRule.MinImageHeight"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Label>
+
+                        <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right" TextBlock.TextAlignment="Right" Margin="0,0,4,0">
+                            <TextBlock Text="Обязательно проверять размер изображения перед иммортом:" TextWrapping="WrapWithOverflow"/>
+                        </Label>
+                        <Label Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="0,14">
+                            <DockPanel>
+                                <TextBlock Text="Да" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                <TextBlock Text="Нет" Visibility="{Binding Path=NewParseRule.CheckImageSize, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"/>
+                            </DockPanel>
+                        </Label>
+
+                        <Label Content="Настройки: " Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right"/>
+                        <WrapPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
+                            <WrapPanel.Resources>
+                                <Style TargetType="{x:Type Image}">
+                                    <Setter Property="Width" Value="16"/>
+                                    <Setter Property="Height" Value="16"/>
+                                </Style>
+                            </WrapPanel.Resources>
+
+                            <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png" Width="16" Height="16"
+                                        ToolTipService.IsEnabled="True" ToolTip="Загружать картинки" Margin="4,0"
+                                        Visibility="{Binding Path=NewParseRule.CollectIMGTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                            <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png" Width="16" Height="16"
+                                        ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки" Margin="4,0"
+                                        Visibility="{Binding Path=NewParseRule.CollectLINKTags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                            <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png" Width="16" Height="16"
+                                        ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0"
+                                        Visibility="{Binding Path=NewParseRule.CollectMETATags, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </WrapPanel>
+                    </Grid>
+
+                    <WrapPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,14">
+                        <Button 
+                                Content="Добавить это правило" Margin="4,0"
+                                Style="{DynamicResource themeHighlightButtonBigStyle}"
+                                Command="{Binding Path=AddNewRuleCommand}"/>
+                        <Button 
+                                Content="Назад" Margin="4,0"
+                                Style="{DynamicResource themeBadButtonBigStyle}"
+                                Command="{Binding Path=HideRuleModeCommand}"/>
+                    </WrapPanel>
+
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.RowSpan="99" Grid.ColumnSpan="99" Panel.ZIndex="-999"
+              Visibility="{Binding Path=ShowImageMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.05*"/>
+                <RowDefinition Height="0.90*"/>
+                <RowDefinition Height="0.05*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.05*"/>
+                <ColumnDefinition Width="0.90*"/>
+                <ColumnDefinition Width="0.05*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Fill="Black" Opacity="0.7" Panel.ZIndex="1000"
+                       Grid.RowSpan="99" Grid.ColumnSpan="99"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                       MouseLeftButtonUp="Border_MouseLeftButtonUp"/>
 
             <Border HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Panel.ZIndex="1001" MouseLeftButtonUp="Border_MouseLeftButtonUp" Padding="10">
                 <Border.Background>
@@ -499,11 +522,45 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Text="Для закрытия этого окна просто нажмите в любую области экрана" TextWrapping="WrapWithOverflow" Margin="4,0,4,10" HorizontalAlignment="Center"/>
-                    <Image Source="{Binding Path=LastSelected, Converter={StaticResource ImageFromUrlConverter}}" Grid.Row="1"/>
+                    <Image Grid.Row="1"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           Source="{Binding Path=ResultToShow.Image, Converter={StaticResource ImageFromUrlConverter}}"
+                           Stretch="Uniform"
+                           MaxHeight="{Binding Path=ResultToShow.Image.Height}"
+                           MaxWidth="{Binding Path=ResultToShow.Image.Width}"
+                           />
+
+                    <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Label ToolTipService.IsEnabled="True" ToolTip="Перейти по ссылке..." Padding="0" Grid.Column="0">
+                            <Hyperlink NavigateUri="{Binding Path=ResultToShow.Url.AbsoluteUri}"
+                                       Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=NavigateCommand}"
+                                       CommandParameter="{Binding Path=ResultToShow.Url.AbsoluteUri}">
+                                <TextBlock Text="{Binding Path=ResultToShow.Url.AbsoluteUri}" TextWrapping="WrapWithOverflow"/>
+                            </Hyperlink>
+                        </Label>
+
+                        <WrapPanel Orientation="Vertical" VerticalAlignment="Top" Margin="4,0,0,0" Grid.Column="1">
+                            <TextBlock Text="{Binding Path=ResultToShow.Node.Name, StringFormat={}Вид: {0}}" Margin="0,0,0,2"/>
+                            <TextBlock ToolTipService.IsEnabled="True" ToolTip="Размер изображения">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}Размер: {0}x{1}">
+                                        <Binding Path="ResultToShow.Image.Width" />
+                                        <Binding Path="ResultToShow.Image.Height" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </WrapPanel>
+                    </Grid>
                 </Grid>
             </Border>
-        </Grid>-->
+        </Grid>
     </Grid>
 </UserControl>

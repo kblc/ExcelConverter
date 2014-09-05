@@ -20,6 +20,7 @@
     <!-- Gainsboro -->
     <Color x:Key="themeTransparentColor">Transparent</Color>
     <Color x:Key="themeDefaultPanelColor">LightGray</Color>
+    <Color x:Key="themeDisabledFontColor">#FF838383</Color>
 
     <SolidColorBrush x:Key="themeHightLightingSolidBrush" Color="{DynamicResource themeHightLightingColor}"/>
     <SolidColorBrush x:Key="themeHightLightingDarkSolidBrush" Color="{DynamicResource themeHightLightingDarkColor}"/>
@@ -27,6 +28,8 @@
     <SolidColorBrush x:Key="themeDefaultColorSolidBrush" Color="{DynamicResource themeDefaultColor}"/>
     <SolidColorBrush x:Key="themeBorderSolidBrush" Color="{DynamicResource themeBorderColor}"/>
     <SolidColorBrush x:Key="themeTransparentSolidBrush" Color="{DynamicResource themeTransparentColor}"/>
+    <SolidColorBrush x:Key="themeDisabledSolidBrush" Color="{DynamicResource themeDisabledFontColor}"/>
+    
 
     <LinearGradientBrush x:Key="themeHightLightingLinearBrush">
         <GradientStop Color="{DynamicResource themeDefaultColor}" Offset="0"/>
@@ -70,11 +73,55 @@
         <GradientStop Color="#FF64A064" Offset="1"/>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="themeGoodButtonDisabledLinearBrush" StartPoint="0,0" EndPoint="0,1">
+    <LinearGradientBrush x:Key="themeBadButtonDefaultLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFAB64" Offset="0"/>
+        <GradientStop Color="#FFFF7A2E" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeBadButtonHoverLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFAB64" Offset="0"/>
+        <GradientStop Color="#FFDC6928" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeBadButtonDownLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFDC6928" Offset="0"/>
+        <GradientStop Color="#FFDC6928" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeButtonDisabledLinearBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="{DynamicResource themeInactiveColor}" Offset="0"/>
         <GradientStop Color="{DynamicResource themeInactiveColor}" Offset="1"/>
     </LinearGradientBrush>
 
+    <LinearGradientBrush x:Key="themeHighlightButtonDefaultLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{DynamicResource themeHightLightingColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource themeHightLightingColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeHighlightButtonHoverLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{DynamicResource themeHightLightingColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource themeHightLightingDarkColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeHighlightButtonDownLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{DynamicResource themeHightLightingDarkColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource themeHightLightingDarkColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeDefaultButtonDefaultLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{DynamicResource themeDefaultColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource themeDefaultColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeDefaultButtonHoverLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{DynamicResource themeDefaultColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource themeDefaultPanelColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="themeDefaultButtonDownLinearBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{DynamicResource themeDefaultPanelColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource themeDefaultPanelColor}" Offset="1"/>
+    </LinearGradientBrush>
 
     <ControlTemplate x:Key="themeTabItemBigTemplate" TargetType="{x:Type TabItem}">
         <Border Name="Border" 
@@ -97,11 +144,12 @@
                 </Border.Effect>
                 <Grid x:Name="contentPresenterGrid" Margin="0,3,0,0"
                       TextBlock.FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=FontSize, Converter={StaticResource themeApplyConverter}, ConverterParameter=+2}">
-                    <ContentPresenter x:Name="ContentSite"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center"
-                                            ContentSource="Header"
-                                            Margin="10,2"/>
+                    <ContentPresenter Name="ContentSite"
+                                      IsEnabled="{TemplateBinding IsEnabled}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      ContentSource="Header"
+                                      Margin="10,2"/>
                 </Grid>
             </Border>
         </Border>
@@ -113,6 +161,11 @@
             <Trigger Property="IsSelected" Value="False">
                 <Setter TargetName="BorderInside" Property="BorderBrush" Value="{DynamicResource ResourceKey=themeTransparentSolidBrush}" />
                 <Setter TargetName="contentPresenterGrid" Property="TextBlock.FontWeight" Value="Normal" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -151,7 +204,10 @@
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="10" Color="#FF79C979" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
                         </Border.Effect>
-                        <ContentPresenter IsEnabled="{TemplateBinding IsEnabled}"/>
+                        <ContentPresenter Name="contentPresender"
+                                          IsEnabled="{TemplateBinding IsEnabled}" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -166,10 +222,11 @@
                             </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource themeGoodButtonDownLinearBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource themeButtonDownLinearBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="{DynamicResource themeGoodButtonDisabledLinearBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
                             <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -184,8 +241,174 @@
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Cursor" Value="Arrow"/>
+            <Trigger Property="IsEnabled" Value="True">
+                <Setter Property="Cursor" Value="Hand"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="themeBadButtonStyle">
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource themeBorderSolidBrush}"
+                            BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" Color="#FFFFAB64" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                        </Border.Effect>
+                        <ContentPresenter IsEnabled="{TemplateBinding IsEnabled}" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeBadButtonHoverLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeBadButtonDefaultLinearBrush}"/>
+                            <Setter TargetName="Border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeBadButtonDownLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                            <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="themeBadButtonBigStyle" BasedOn="{StaticResource themeBadButtonStyle}">
+        <Setter Property="Padding" Value="15,6"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="True">
+                <Setter Property="Cursor" Value="Hand"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="themeHighlightButtonStyle">
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource themeBorderSolidBrush}"
+                            BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeHightLightingDarkColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                        </Border.Effect>
+                        <ContentPresenter Name="contentPresender"
+                                          IsEnabled="{TemplateBinding IsEnabled}" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeHighlightButtonHoverLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeHighlightButtonDefaultLinearBrush}"/>
+                            <Setter TargetName="Border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeHighlightButtonDownLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                            <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="themeHighlightButtonBigStyle" BasedOn="{StaticResource themeHighlightButtonStyle}">
+        <Setter Property="Padding" Value="15,6"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="True">
+                <Setter Property="Cursor" Value="Hand"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="themeDefaultButtonStyle">
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource themeBorderSolidBrush}"
+                            BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                        </Border.Effect>
+                        <ContentPresenter Name="contentPresender"
+                                          IsEnabled="{TemplateBinding IsEnabled}" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeDefaultButtonHoverLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeDefaultButtonDefaultLinearBrush}"/>
+                            <Setter TargetName="Border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeDefaultButtonDownLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                            <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="themeDefaultButtonBigStyle" BasedOn="{StaticResource themeDefaultButtonStyle}">
+        <Setter Property="Padding" Value="15,6"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="True">
+                <Setter Property="Cursor" Value="Hand"/>
             </Trigger>
         </Style.Triggers>
     </Style>

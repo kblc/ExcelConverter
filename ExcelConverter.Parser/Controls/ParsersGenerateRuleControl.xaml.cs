@@ -240,7 +240,7 @@ namespace ExcelConverter.Parser.Controls
                 return nextStepCommand ?? (nextStepCommand = new DelegateCommand((o) =>
                 {
                     TabControl tc = o as TabControl;
-                    if (tc != null && tc.SelectedIndex < tc.Items.Count - 1)
+                    if (tc != null && tc.SelectedIndex < tc.Items.Count)
                     {
                         UpdateStep(tc.SelectedIndex + 1, true);
                     }
@@ -399,14 +399,26 @@ namespace ExcelConverter.Parser.Controls
                     .Where(i3 => i3 != null && i3.Node != null)
                     .ToArray();
 
-                ParseRule newRule = Helper.GetRule(nodes, AddRuleLabelComboBox.Text, NewParseRule.MinImageSize, NewParseRule.CollectIMGTags, NewParseRule.CollectLINKTags, NewParseRule.CollectMETATags);
+                ParseRule newRule = Helper.GetRule(nodes, NewParseRule.Label, NewParseRule.MinImageSize, NewParseRule.CollectIMGTags, NewParseRule.CollectLINKTags, NewParseRule.CollectMETATags);
                 newRule.CopyObject(NewParseRule, new string[] { "Connection" });
+
+                ShowRuleModeCommand.Execute(null);
             }
             #endregion
 
-            for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
-                (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == step) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-            UrlsToAddTabControl.SelectedIndex = step;
+            if (step >= UrlsToAddTabControl.Items.Count)
+                for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
+                    (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == UrlsToAddTabControl.Items.Count - 1) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            else if (step < 0)
+                for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
+                    (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == 0) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            else
+            { 
+                for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
+                    (UrlsToAddTabControl.Items[i] as TabItem).Visibility = (i == step) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            }
+
+            UrlsToAddTabControl.SelectedIndex = UrlsToAddTabControl.Items.IndexOf(UrlsToAddTabControl.Items.Cast<TabItem>().FirstOrDefault(ti => ti.Visibility == System.Windows.Visibility.Visible));
         }
 
         public ParseRule NewParseRule
@@ -421,48 +433,17 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
-        private System.Drawing.Image lastSelected = null;
-        public System.Drawing.Image LastSelected
-        {
-            get
-            {
-                return lastSelected;
-            }
-            private set
-            {
-                lastSelected = value;
-                RaisePropertyChanged("LastSelected");
-            }
-        }
-
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            foreach (ParseImageResult i in e.RemovedItems.Cast<ParseImageResult>())
+            foreach (ParseImageResult i in e.RemovedItems.Cast<ParseImageResult>().Where(u => u.IsSelected))
                 i.IsSelected = false;
+
             foreach (ParseImageResult i in e.AddedItems.Cast<ParseImageResult>())
             {
-                foreach (ParseImageResult n in ((ListBox)sender).Items.Cast<ParseImageResult>().Where(u => u.IsSelected == true))
-                {
+                foreach (ParseImageResult n in ((ListBox)sender).Items.Cast<ParseImageResult>().Where(u => u.IsSelected))
                     n.IsSelected = false;
-                }
+                
                 i.IsSelected = true;
-                LastSelected = i.Image;
-            }
-        }
-
-        private void AddNewRuleSelectionListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0 && e.AddedItems[0] is ParseImageResult)
-                foreach (ParseImageResult i in e.AddedItems.Cast<ParseImageResult>())
-                {
-                    i.IsSelected = true;
-                    LastSelected = i.Image;
-                }
-            else if (e.AddedItems.Count > 0 && e.AddedItems[0] is UrlResultWrapper)
-            {
-                UrlResultWrapper wrapper = e.AddedItems.Cast<UrlResultWrapper>().LastOrDefault();
-                if (wrapper != null)
-                    LastSelected = wrapper.ParseResult.Where(i => i.IsSelected).Select(i => i.Image).FirstOrDefault();
             }
         }
 
@@ -516,6 +497,20 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
+        private ParseImageResult resultToShow = null;
+        public ParseImageResult ResultToShow
+        {
+            get
+            {
+                return resultToShow;
+            }
+            private set
+            {
+                resultToShow = value;
+                RaisePropertyChanged("ResultToShow");
+            }
+        }
+
         private DelegateCommand showImageCommand = null;
         public ICommand ShowImageCommand
         {
@@ -524,8 +519,9 @@ namespace ExcelConverter.Parser.Controls
                 return showImageCommand ?? (showImageCommand = new DelegateCommand(
                     (o) =>
                     {
-                        LastSelected = o as System.Drawing.Image;
-                        ShowImageMode = true;
+                        ResultToShow = o as ParseImageResult;
+                        if (ResultToShow != null)
+                            ShowImageMode = true;
                     }
                 ));
             }
@@ -545,11 +541,53 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
+        private DelegateCommand showRuleModeCommand = null;
+        public ICommand ShowRuleModeCommand
+        {
+            get
+            {
+                return showRuleModeCommand ?? (showRuleModeCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        ShowRuleMode = true;
+                    }
+                ));
+            }
+        }
+
+        private DelegateCommand hideRuleModeCommand = null;
+        public ICommand HideRuleModeCommand
+        {
+            get
+            {
+                return hideRuleModeCommand ?? (hideRuleModeCommand = new DelegateCommand(
+                    (o) =>
+                    {
+                        ShowRuleMode = false;
+                        UpdateStep(1, false);
+                    }
+                ));
+            }
+        }
+
         private bool showImageMode = false;
         public bool ShowImageMode 
         {
             get { return showImageMode; }
             set { showImageMode = value; RaisePropertyChanged("ShowImageMode"); }
+        }
+
+        private bool showRuleMode = false;
+        public bool ShowRuleMode
+        {
+            get { return showRuleMode; }
+            set
+            {
+                if (showRuleMode == value)
+                    return;
+                showRuleMode = value; 
+                RaisePropertyChanged("ShowRuleMode");
+            }
         }
 
         private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
