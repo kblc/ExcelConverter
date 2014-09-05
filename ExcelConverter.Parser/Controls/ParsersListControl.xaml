@@ -14,7 +14,6 @@
         <Grid.Resources>
             <p:IsEqualsConverter x:Key="IsEqualsConverter"/>
             <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
-            <p:ParseFindRuleConditionList x:Key="ParseFindRuleConditionList"/>
             <p:BoolToBoldConverter x:Key="BoolToBoldConverter"/>
             
             <CollectionViewSource x:Key="SortedParseItems" Source="{Binding Path=Parsers.Parsers}">

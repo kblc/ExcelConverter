@@ -227,6 +227,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
                             <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                            <Setter Property="Opacity" TargetName="contentPresender" Value=".5"/>
                             <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -260,7 +261,8 @@
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="10" Color="#FFFFAB64" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
                         </Border.Effect>
-                        <ContentPresenter IsEnabled="{TemplateBinding IsEnabled}" 
+                        <ContentPresenter Name="contentPresender" 
+                                          IsEnabled="{TemplateBinding IsEnabled}" 
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                     </Border>
@@ -281,6 +283,7 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                            <Setter Property="Opacity" TargetName="contentPresender" Value=".5"/>
                             <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -337,6 +340,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
                             <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                            <Setter Property="Opacity" TargetName="contentPresender" Value=".5"/>
                             <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -393,6 +397,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
                             <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                            <Setter Property="Opacity" TargetName="contentPresender" Value=".5"/>
                             <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>

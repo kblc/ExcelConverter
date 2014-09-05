@@ -22,22 +22,34 @@ namespace ExcelConverter.Parser
     [Serializable]
     public enum ParseFindRuleCondition
     {
+        [Description("Не определено")]
         None = 0,
+        [Description("По ссылке")]
         ByLink,
+        [Description("По ссылке и индексу")]
         ByLinkAndIndex,
+        [Description("По XPath")]
         ByXPath,
+        [Description("По XPath и индексу")]
         ByXPathAndIndex
     }
 
     [Serializable]
     public enum ParseRuleConnectionType
     {
+        [Description("Напрямую")]
         Direct = 0,
+        [Description("Используя IE (без задержки)")]
         IE_00_sec,
+        [Description("Используя IE (с задержкой 5 сек.)")]
         IE_05_sec,
+        [Description("Используя IE (с задержкой 10 сек.)")]
         IE_10_sec,
+        [Description("Используя Chromium (без задержки)")]
         CHR_00_sec,
+        [Description("Используя Chromium (с задержкой 5 сек.)")]
         CHR_05_sec,
+        [Description("Используя Chromium (с задержкой 10 сек.)")]
         CHR_10_sec
     }
 
@@ -50,56 +62,47 @@ namespace ExcelConverter.Parser
         Schema
     }
 
-    public class ParseRuleLabel : Helpers.WPF.PropertyChangedBase
+    public class ParseRuleEnumWrapper<T> : Helpers.WPF.PropertyChangedBase
     {
-        private ParseRuleLabelType label = ParseRuleLabelType.Photo;
+        private T value = default(T);
 
-        public ParseRuleLabelType Label
+        public T Value
         {
-            get { return label; }
-            internal set 
+            get { return value; }
+            internal set
             {
-                if (value == label)
-                    return;
-                label = value;
-                RaisePropertyChange("Label");
+                this.value = value;
+                RaisePropertyChange("Value");
                 RaisePropertyChange("Description");
             }
         }
 
         public string Description
         {
-            get 
+            get
             {
-                return Label.GetAttributeValue<DescriptionAttribute, string>(i => i.Description);
+                return (value as Enum).GetAttributeValue<DescriptionAttribute, string>(i => i.Description);
             }
         }
 
-        public ParseRuleLabel(ParseRuleLabelType label)
+        public ParseRuleEnumWrapper(T value)
         {
-            this.label = label;
+            this.value = value;
         }
     }
 
-    public sealed class ParseRuleLabelList : List<ParseRuleLabel>
+    public class ParseRuleEnumList<T> : List<ParseRuleEnumWrapper<T>>
     {
-        public ParseRuleLabelList()
+        public ParseRuleEnumList()
         {
-            foreach (var item in typeof(ParseRuleLabelType).GetEnumValues().Cast<int>().Select(i => (ParseRuleLabelType)i))
-                Add(new ParseRuleLabel(item));
+            foreach (var item in typeof(T).GetEnumValues().Cast<T>())
+                Add(new ParseRuleEnumWrapper<T>(item));
         }
     }
 
-    public sealed class ParseFindRuleConditionList : List<ParseFindRuleCondition>
-    {
-        public ParseFindRuleConditionList()
-        {
-            foreach (var item in typeof(ParseFindRuleCondition).GetEnumValues().Cast<int>().Select( i=> (ParseFindRuleCondition)i))
-            {
-                Add(item);
-            }
-        }
-    }
+    public sealed class ParseRuleLabelList : ParseRuleEnumList<ParseRuleLabelType> { }
+
+    public sealed class ParseFindRuleConditionList : ParseRuleEnumList<ParseFindRuleCondition> { }
 
     public sealed class ParseRuleConnectionTypeList : List<ParseRuleConnectionType>
     {

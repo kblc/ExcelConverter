@@ -12,6 +12,7 @@
         <Grid.Resources>
             <p:ImageFromUrlConverter x:Key="ImageFromUrlConverter"/>
             <p:ParseFindRuleConditionList x:Key="ParseFindRuleConditionList"/>
+            <p:ParseRuleLabelList x:Key="ParseRuleLabelList"/>
             <p:ParseRuleConnectionTypeList x:Key="ParseRuleConnectionTypeList"/>
             <p:IsNotVisibleConverter x:Key="IsNotVisibleConverter"/>
         </Grid.Resources>
@@ -66,14 +67,17 @@
                     x:Name="RulesDataGrid"
                     >
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Label}" Header="Метка"/>
-                    <!--<DataGridComboBoxColumn
-                        SelectedItemBinding="{Binding Label}"
-                        ItemsSource="{Binding Source=Parser.Labels}" 
-                        Header="Метка"/>-->
+                    <DataGridComboBoxColumn
+                        SelectedValueBinding="{Binding Label}"
+                        SelectedValuePath="Description"
+                        DisplayMemberPath="Description"
+                        ItemsSource="{StaticResource ParseRuleLabelList}" 
+                        Header="Метка"/>
                     <DataGridTextColumn Binding="{Binding Parameter}" Header="Параметр"/>
                     <DataGridComboBoxColumn 
-                        SelectedItemBinding="{Binding Condition}" 
+                        SelectedValueBinding="{Binding Condition}"
+                        SelectedValuePath="Value"
+                        DisplayMemberPath="Description"
                         ItemsSource="{StaticResource ParseFindRuleConditionList}" 
                         Header="Условие"/>
                     <DataGridComboBoxColumn 
