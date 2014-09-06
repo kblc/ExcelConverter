@@ -8,9 +8,6 @@
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
              d:DesignHeight="420" d:DesignWidth="700"
-             FontFamily="Candara"
-             TextOptions.TextFormattingMode="Ideal"
-             TextOptions.TextRenderingMode="ClearType"
              Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -42,10 +39,8 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
                 </Style>
-                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-                    <Setter Property="Height" Value="21"/>
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource themeDefaultTextBox}">
                     <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="VerticalContentAlignment" Value="Center"/>
                 </Style>
                 <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
                     <Setter Property="Height" Value="21"/>

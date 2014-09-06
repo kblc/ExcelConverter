@@ -519,5 +519,9 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="themeDefaultTextBox">
+        <Setter Property="Height" Value="21"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
 
 </ResourceDictionary>

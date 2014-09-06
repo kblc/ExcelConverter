@@ -9,11 +9,12 @@
              xmlns:helpers="clr-namespace:Helpers.WPF.Converters;assembly=Helpers.WPF"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
-             FontFamily="Candara"
+             FontFamily="Gisha"
              TextOptions.TextFormattingMode="Display"
-             TextOptions.TextRenderingMode="ClearType"
+             TextOptions.TextRenderingMode="Grayscale"
              d:DesignHeight="600" d:DesignWidth="600"
              Loaded="UserControl_Loaded">
+    <!--FontFamily="Corbel"-->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -31,6 +32,8 @@
             <helpers:IsEqualsConverter x:Key="IsEqualsConverter"/>
             <helpers:IsEqualVisibilityConverter x:Key="IsEqualsToVisibilityConverter"/>
             <helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>
+            <helpers:MultiBooleanANDToVisibilityConverter x:Key="MultiBooleanANDToVisibilityConverter"/>
+            <helpers:MultiBooleanANDToBooleanConverter x:Key="MultiBooleanANDToBooleanConverter"/>
         </Grid.Resources>
         <TabControl SelectedIndex="0" Grid.Row="1" x:Name="TabControl">
             <TabItem Header="Импорт" Style="{StaticResource themeTabItemBigStyle}"
@@ -61,26 +64,29 @@
                             <TextBlock Text="Выберите файл-таблицу и нажмите на кнопку 'Импортировать' для загрузки ссылок." TextWrapping="WrapWithOverflow"/>
                         </Label>
                         <Label Grid.Row="1" Grid.Column="0" Content="Файл:" Padding="0" Margin="0,0,4,0" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ImportFileNameTextBox" IsReadOnly="True" Text="{Binding Path=ImportFileName}" Height="21" Padding="2,0" VerticalContentAlignment="Center"/>
-                        <Button Grid.Row="1" Grid.Column="2" Padding="4,0" Margin="-1,0,0,0" Height="21" Width="21" VerticalContentAlignment="Center"
-                            Content="..."
-                            Style="{DynamicResource themeDefaultButtonStyle}"
-                            Command="{Binding Path=SelectFileCommand}"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" 
+                                 IsReadOnly="True"
+                                 Text="{Binding Path=ImportFileName}" Style="{StaticResource themeDefaultTextBox}"/>
+                        <Button Grid.Row="1" Grid.Column="2" Margin="-1,0,0,0" Height="21" Width="21"
+                                Content="..."
+                                Style="{DynamicResource themeDefaultButtonStyle}"
+                                Command="{Binding Path=SelectFileCommand}"/>
 
                         <Button Grid.Row="1" Grid.Column="3"
                                 Style="{DynamicResource themeDefaultButtonStyle}"
-                                Padding="4,0,0,0" Margin="4,0,2,0" Height="21"
-                                Click="Button_Click" ContextMenuService.IsEnabled="False">
+                                Margin="4,0,2,0" Height="21"
+                                Click="Button_Click" ContextMenuService.IsEnabled="False"
+                                IsEnabled="{Binding Path=ImportFileName.Length, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}">
                             <Button.Content>
                                 <DockPanel>
-                                    <Label Content="Импортировать" Padding="0"/>
-                                    <Path Margin="4" VerticalAlignment="Center" Width="10" Fill="#FF527DB5" Stretch="Uniform" HorizontalAlignment="Right" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
+                                    <Label Content="Импортировать" Padding="0" VerticalAlignment="Center" />
+                                    <Path Margin="4" VerticalAlignment="Center" Width="10" Fill="{DynamicResource themeHightLightingDarkSolidBrush}" Stretch="Uniform" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
                                 </DockPanel>
                             </Button.Content>
                             <Button.ContextMenu>
                                 <ContextMenu >
-                                    <MenuItem Header="Импортировать" Command="{Binding Path=ImportFileCommand}" CommandParameter="{Binding ElementName=ImportFileNameTextBox, Path=Text}"/>
-                                    <MenuItem Header="Импортировать (детально)" Command="{Binding Path=ImportFileAdditionalCommand}" CommandParameter="{Binding ElementName=ImportFileNameTextBox, Path=Text}"/>
+                                    <MenuItem Header="Импортировать" Command="{Binding Path=ImportFileCommand}"/>
+                                    <MenuItem Header="Импортировать (детально)" Command="{Binding Path=ImportFileAdditionalCommand}"/>
                                 </ContextMenu>
                             </Button.ContextMenu>
                         </Button>
@@ -98,13 +104,13 @@
                                 <Label Padding="0" VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="labelHeader">
                                     <TextBlock Text="{Binding Path=Urls.Count, StringFormat=Найденные ссылки ({0}):}"/>
                                 </Label>
+                                
                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <Label Padding="0" Margin="4,0"
-                                        Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        >
+                                    <Label Padding="0" Margin="4,0" VerticalAlignment="Center"
+                                           Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <TextBlock>
                                             <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}Прошло времени: {0:D2}:{1:D2}:{2:D2}">
+                                                <MultiBinding StringFormat="{}Прошло: {0:D2}:{1:D2}:{2:D2}">
                                                     <Binding Path="ParseTimeElapsed.Hours" />
                                                     <Binding Path="ParseTimeElapsed.Minutes" />
                                                     <Binding Path="ParseTimeElapsed.Seconds" />
@@ -112,17 +118,24 @@
                                             </TextBlock.Text>
                                         </TextBlock>
                                     </Label>
+
+                                    <Label Content="{Binding Path=ProgressText}" 
+                                           Padding="0" VerticalAlignment="Center"
+                                           Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
                                     <DockPanel Visibility="{Binding Path=AllowFileImport, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}">
                                         <Label Content="Потоки:" Padding="0" Margin="0,0,2,0" VerticalAlignment="Center"/>
-                                        <TextBox Width="30" Text="{Binding Path=ThreadCount, UpdateSourceTrigger=PropertyChanged}" Height="21" Padding="2,0" VerticalContentAlignment="Center"/>
+                                        <TextBox Width="30" 
+                                                 Text="{Binding Path=ThreadCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource themeDefaultTextBox}"/>
                                     </DockPanel>
-                                    <Label Content="{Binding Path=ProgressText}" Padding="0" Visibility="{Binding Path=IsParsing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    
                                     <Button Padding="4,0,0,0" Margin="4,0,0,0"
                                             Height="21"
                                             Style="{DynamicResource themeHighlightButtonStyle}"
                                             Click="Button_Click"
                                             ContextMenuService.IsEnabled="False"
+                                            IsEnabled="{Binding Path=Urls.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                                             Visibility="{Binding Path=IsParsing, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
                                             >
 
@@ -178,9 +191,20 @@
                                             Style="{DynamicResource themeDefaultButtonStyle}"
                                             Padding="4,0"
                                             Margin="4,0,0,0"
-                                            Visibility="{Binding Path=AllowFileExport, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            IsEnabled="{Binding Path=IsBusy, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"
-                                            Command="{Binding Path=ExportUrlsCommand}"/>
+                                            Command="{Binding Path=ExportUrlsCommand}">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource MultiBooleanANDToVisibilityConverter}">
+                                                <Binding Path="AllowFileExport"/>
+                                                <Binding Path="IsParsing" Converter="{StaticResource IsNotEqualsConverter}" ConverterParameter="true"/>
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                        <Button.IsEnabled>
+                                            <MultiBinding Converter="{StaticResource MultiBooleanANDToBooleanConverter}">
+                                                <Binding Path="IsBusy" Converter="{StaticResource IsNotEqualsConverter}" ConverterParameter="true"/>
+                                                <Binding Path="Urls.Count" Converter="{StaticResource IsNotEqualsConverter}" ConverterParameter="0"/>
+                                            </MultiBinding>
+                                        </Button.IsEnabled>
+                                    </Button>
                                 </StackPanel>
                             </Grid>
                         </Expander.Header>
