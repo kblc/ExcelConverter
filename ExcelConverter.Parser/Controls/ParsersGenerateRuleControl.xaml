@@ -37,21 +37,23 @@
 
         <WrapPanel Margin="4,4,4,0">
             <WrapPanel.Resources>
-                <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
-                    <Setter Property="Padding" Value="0"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                </Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Margin" Value="4,0"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
                 </Style>
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-                    <Setter Property="Height" Value="16"/>
+                    <Setter Property="Height" Value="21"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
                 </Style>
                 <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
-                    <Setter Property="Height" Value="16"/>
+                    <Setter Property="Height" Value="21"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource themeDefaultToggleButtonStyle}">
+                    <Setter Property="Margin" Value="4,0,0,0"/>
                 </Style>
                 <Style TargetType="{x:Type Image}">
                     <Setter Property="Width" Value="16"/>
@@ -63,27 +65,29 @@
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Парсер:"/>
-                    <TextBox Text="{Binding Path=Parser.Url}" Width="200" Margin="4,0,0,0" IsReadOnly="{Binding Path=CanEditUrl, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}" Padding="0"/>
+                    <TextBox Text="{Binding Path=Parser.Url}" 
+                             Width="200"
+                             IsReadOnly="{Binding Path=CanEditUrl, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=true}"/>
                 </DockPanel>
             </Border>
 
-            <Border Style="{DynamicResource themeDefaultBorderStyle}">
+            <Border Style="{DynamicResource themeDefaultBorderStyle}" SnapsToDevicePixels="True">
                 <DockPanel>
-                    <TextBlock Text="Метка:" Margin="0,0,4,0"/>
-                    <ComboBox Width="100" Padding="2,0"
+                    <TextBlock Text="Метка:"/>
+                    <ComboBox Width="100"
+                              SelectedIndex="0"
                               SelectedValue="{Binding Path=NewParseRule.Label}"
                               SelectedValuePath="Description"
                               DisplayMemberPath="Description"
-                              ItemsSource="{StaticResource ParseRuleLabelList}"
-                              />
-                              <!--ItemsSource="{Binding Parser.Labels}"/>-->
+                              ItemsSource="{StaticResource ParseRuleLabelList}"/>
                 </DockPanel>
             </Border>
 
-            <Border Style="{DynamicResource themeDefaultBorderStyle}">
+            <Border Style="{DynamicResource themeDefaultBorderStyle}" SnapsToDevicePixels="True">
                 <DockPanel>
-                    <TextBlock Text="Подключение:" Margin="0,0,4,0"/>
-                    <ComboBox Width="120" Padding="2,0"
+                    <TextBlock Text="Подключение:"/>
+                    <ComboBox Width="120"
+                              SelectedIndex="0"
                               SelectedValuePath="Value"
                               DisplayMemberPath="Description"
                               ItemsSource="{StaticResource ResourceKey=ParseRuleConnectionTypeList}"
@@ -94,18 +98,19 @@
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Количество потоков:"/>
-                    <TextBox Text="{Binding Path=ThreadCount}" Width="50" Margin="4,0,0,0" Padding="0" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding Path=ThreadCount}" Width="50"/>
                 </DockPanel>
             </Border>
 
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Мин. размер:" ToolTipService.IsEnabled="True" ToolTip="Минимальный размер изображения при загрузке"/>
-                    <TextBox Width="50" Margin="4,0" Text="{Binding Path=NewParseRule.MinImageWidth}"/>
+                    <TextBox Width="50" Text="{Binding Path=NewParseRule.MinImageWidth}"/>
                     <TextBlock Text="х"/>
-                    <TextBox Width="50" Margin="4,0,0,0" Text="{Binding Path=NewParseRule.MinImageHeight}"/>
+                    <TextBox Width="50" Text="{Binding Path=NewParseRule.MinImageHeight}"/>
 
-                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CheckImageSize}" Margin="8,0,0,0" ToolTipService.IsEnabled="True" ToolTip="Обязательно проверять размер картинки при загрузке" >
+                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CheckImageSize}" 
+                                  ToolTipService.IsEnabled="True" ToolTip="Обязательно проверять размер картинки при загрузке" >
                         <Image Source="/ExcelConverter.Parser;component/Icons/check_mark_16x16.png"/>
                     </ToggleButton>
                 </DockPanel>
@@ -114,21 +119,21 @@
             <Border Style="{DynamicResource themeDefaultBorderStyle}">
                 <DockPanel>
                     <TextBlock Text="Настройки:"/>
-
-                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectIMGTags}" ToolTipService.IsEnabled="True" ToolTip="Загружать картинки" Margin="4,0">
+                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectIMGTags}" 
+                                  ToolTipService.IsEnabled="True" ToolTip="Загружать картинки">
                         <Image Source="/ExcelConverter.Parser;component/Icons/camera_16x16.png"/>
                     </ToggleButton>
-
-                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectLINKTags}" ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки" Margin="4,0">
+                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectLINKTags}" 
+                                  ToolTipService.IsEnabled="True" ToolTip="Загружать ссылки">
                         <Image Source="/ExcelConverter.Parser;component/Icons/redo_16x16.png"/>
                     </ToggleButton>
 
-                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectMETATags}" ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные" Margin="4,0,0,0">
+                    <ToggleButton IsChecked="{Binding Path=NewParseRule.CollectMETATags}" 
+                                  ToolTipService.IsEnabled="True" ToolTip="Загружать метаданные">
                         <Image Source="/ExcelConverter.Parser;component/Icons/database_16x16.png"/>
                     </ToggleButton>
                 </DockPanel>
             </Border>
-
         </WrapPanel>
 
         <TabControl x:Name="UrlsToAddTabControl"
@@ -316,7 +321,7 @@
                     Width="80"
                     IsEnabled="{Binding ElementName=UrlsToAddTabControl, Path=SelectedIndex, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                     Command="{Binding PrevStepCommand}" CommandParameter="{Binding ElementName=UrlsToAddTabControl, Path=.}"/>
-            <Button Style="{DynamicResource themeDefaultButtonStyle}"
+            <Button Style="{DynamicResource themeHighlightButtonStyle}"
                     Margin="4,0"
                     Content="Далее" 
                     Width="80"

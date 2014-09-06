@@ -12,7 +12,10 @@
     <helpers:ReverseBooleanToVisibilityConverter x:Key="themeReverseBooleanToVisibilityConverter"/>
 
     <Color x:Key="themeHightLightingColor">LightSkyBlue</Color>
+    <!-- #FF34A2EB -->
+
     <Color x:Key="themeHightLightingDarkColor">#FF5894B9</Color>
+    <!-- #FF46B3FC -->
     <Color x:Key="themeInactiveColor">GhostWhite</Color>
     <Color x:Key="themeDefaultColor">White</Color>
     <Color x:Key="themeDefaultShadowColor">Black</Color>
@@ -466,5 +469,55 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="{x:Type ToggleButton}" x:Key="themeDefaultToggleButtonStyle">
+        <Setter Property="Padding" Value="2,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource themeBorderSolidBrush}"
+                            BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                        </Border.Effect>
+                        <ContentPresenter Name="contentPresender"
+                                          IsEnabled="{TemplateBinding IsEnabled}" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeDefaultButtonHoverLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeDefaultButtonDefaultLinearBrush}"/>
+                            <Setter TargetName="Border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="10" Color="{DynamicResource themeDefaultShadowColor}" Direction="235" Opacity=".5" RenderingBias="Quality" ShadowDepth="2" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource themeDefaultButtonDownLinearBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource themeButtonDisabledLinearBrush}"/>
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresender" Value="{DynamicResource themeDisabledSolidBrush}"/>
+                            <Setter Property="Opacity" TargetName="contentPresender" Value=".5"/>
+                            <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource themeHighlightButtonHoverLinearBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 
 </ResourceDictionary>
