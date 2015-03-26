@@ -52,12 +52,19 @@ namespace ExelConverter.Core.Converter.CommonTypes
         [XmlAttribute("AbsoluteCoincidence")]
         public bool AbsoluteCoincidence
         {
-            get { return _absoluteCoincidence; }
+            get { return Owner == null ? _absoluteCoincidence : Owner.AbsoluteCoincidence; }
             set
             {
-                if (_absoluteCoincidence != value)
+                if (Owner == null)
+                { 
+                    if (_absoluteCoincidence != value)
+                    {
+                        _absoluteCoincidence = value;
+                        RaisePropertyChanged("AbsoluteCoincidence");
+                    }
+                } else
                 {
-                    _absoluteCoincidence = value;
+                    Owner.AbsoluteCoincidence = value;
                     RaisePropertyChanged("AbsoluteCoincidence");
                 }
             }

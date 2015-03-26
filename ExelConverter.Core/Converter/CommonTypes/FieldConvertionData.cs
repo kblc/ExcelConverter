@@ -163,8 +163,8 @@ namespace ExelConverter.Core.Converter.CommonTypes
             }
         }
 
-        private bool _absoluteCoincidence;
-        [XmlIgnore]
+        private bool _absoluteCoincidence = false;
+        [XmlAttribute("AbsoluteCoincidence")]
         public bool AbsoluteCoincidence
         {
             get { return _absoluteCoincidence; }
@@ -177,6 +177,8 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 }
             }
         }
+
+        public bool ShouldSerializeAbsoluteCoincidence() { return AbsoluteCoincidence; }
 
         private MappingsContainer _mappingsTable = null;
         [XmlArray("MappingContainer")]
