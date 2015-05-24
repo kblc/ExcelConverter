@@ -683,7 +683,7 @@
           </Key>
           <Property Name="id" Type="uint" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="company_id" Type="uint" Nullable="false" />
-          <Property Name="manager_id" Type="uint" Nullable="false" />
+          <Property Name="manager_id" Type="uint" Nullable="true" />
           <Property Name="login" Type="varchar" MaxLength="255" />
           <Property Name="password" Type="char" Nullable="false" MaxLength="32" />
           <Property Name="email" Type="varchar" Nullable="false" MaxLength="255" />
@@ -1712,7 +1712,7 @@
           </Key>
           <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="company_id" Type="Int64" Nullable="false" />
-          <Property Name="manager_id" Type="Int64" Nullable="false" a:SetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" />
+          <Property Name="manager_id" Type="Int64" a:SetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" Nullable="true" />
           <Property Name="login" Type="String" MaxLength="255" Unicode="false" FixedLength="false" />
           <Property Name="password" Type="String" Nullable="false" MaxLength="32" Unicode="false" FixedLength="false" />
           <Property Name="email" Type="String" Nullable="false" MaxLength="255" Unicode="false" FixedLength="false" />

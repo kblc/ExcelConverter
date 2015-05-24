@@ -23,7 +23,7 @@ namespace ExelConverter.Core.DataAccess
     
         public long id { get; set; }
         public long company_id { get; set; }
-        public long manager_id { get; private set; }
+        public Nullable<long> manager_id { get; private set; }
         public string login { get; set; }
         public string password { get; set; }
         public string email { get; set; }
