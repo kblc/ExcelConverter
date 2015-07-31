@@ -299,7 +299,7 @@ namespace ExelConverter.Core.Converter
 
         #region Some methods
 
-        public List<OutputRow> Convert(ExelSheet sheet, string[] conversionDataLimiter = null)
+        public List<OutputRow> Convert(ExelSheet sheet, string[] conversionDataLimiter = null, Action<Exception, int> additionalErrorAction = null)
         {
             Guid logSession = Log.SessionStart("ExelConvertionRule.Convert()");
             var result = new List<OutputRow>();
@@ -333,7 +333,6 @@ namespace ExelConverter.Core.Converter
                                 int subLogPart = 1;
                                 try
                                 {
-                                    subLogPart = 1;
                                     var propertyOld = typeof(OutputRow).GetProperty("Original" + convertionData.PropertyId);
                                     if (propertyOld != null)
                                     {
@@ -383,7 +382,12 @@ namespace ExelConverter.Core.Converter
                                 }
                                 catch(Exception ex)
                                 {
-                                    throw new Exception(string.Format("exception on update field '{0}' at sub step '{1}';", convertionData.PropertyId, subLogPart), ex);
+                                    if (additionalErrorAction != null)
+                                    {
+                                        Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
+                                        additionalErrorAction(ex, i);
+                                    } else
+                                        throw new Exception(string.Format("exception on update field '{0}' at sub step '{1}';", convertionData.PropertyId, subLogPart), ex);
                                 }
                             }
                             logPart++;
@@ -406,7 +410,13 @@ namespace ExelConverter.Core.Converter
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception(string.Format("exception at row line: '{0}', log part: '{1}';", i, logPart), ex);
+                            if (additionalErrorAction != null)
+                            {
+                                Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
+                                additionalErrorAction(ex, i);
+                            }
+                            else
+                                throw new Exception(string.Format("exception at row line: '{0}', log part: '{1}';", i, logPart), ex);
                         }
                 }
                 else

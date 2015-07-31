@@ -138,7 +138,8 @@ namespace ExelConverter.Core.ExelDataReader
                             range != null ? range.FirstRow + range.RowCount - 1 : cell.Row)
                         )
                     .ToArray();
-            return hLinksINCLD.Length > 0 ? hLinksINCLD : hLinksINSCT;
+            return hLinksINCLD.Union(hLinksINSCT).ToArray();
+            //return hLinksINCLD.Length > 0 ? hLinksINCLD : hLinksINSCT;
         }
 
         private static Hyperlink GetHyperlinkForCell(Cell cell, Worksheet sheet)
@@ -152,14 +153,13 @@ namespace ExelConverter.Core.ExelDataReader
                         res += Math.Abs(i1.Area.StartColumn - (range != null ? range.FirstColumn : cell.Column));
                         res += Math.Abs(i1.Area.EndColumn - (range != null ? (range.FirstColumn + range.ColumnCount - 1) : cell.Column));
                         res += Math.Abs(i1.Area.StartRow - (range != null ? range.FirstRow : cell.Row));
-                        res += Math.Abs(i1.Area.EndRow - (range != null ? (range.FirstRow + range.RowCount - 1) : cell.Column));
+                        res += Math.Abs(i1.Area.EndRow - (range != null ? (range.FirstRow + range.RowCount - 1) : cell.Row));
                         return new { Link = i1, Length = res / 4 };
                     }
                 )
                 .OrderBy(i1 => i1.Length)
-                .ToArray()
-                ;
-            return mgLinks != null && mgLinks.Count() > 0 ? mgLinks.First().Link : null;
+                .ToArray();
+            return mgLinks.Select(i => i.Link).FirstOrDefault();
         }
 
         public static List<ExelRow> LoadRows(Worksheet sheet, int count = 0, Action<int> progressReport = null, bool deleteEmptyRows = true)
@@ -208,7 +208,8 @@ namespace ExelConverter.Core.ExelDataReader
             {
                 var index = row.Index;
 
-                var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
+                //var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
+
                 var r = new ExelRow() { Index = index };
                 if (sheet.Cells.Count > 0)
                 {

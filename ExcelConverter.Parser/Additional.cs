@@ -712,7 +712,8 @@ namespace ExcelConverter.Parser
                 //control.Opacity = 0;
                 control.Width = 1024;
                 control.Height = 1024;
-                ParentControl.Children.Add(control);
+                if (control.Parent == null)
+                    ParentControl.Children.Add(control);
             }
         }
         protected static void RemoveControl(System.Windows.FrameworkElement control)

@@ -123,6 +123,7 @@ namespace ExelConverterLite.ViewModel
                     UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
 
                 Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.DocumentSheets.Count));
+                var addErr = new List<Error>();
 
                 foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
                 {
@@ -149,7 +150,10 @@ namespace ExelConverterLite.ViewModel
                                     .ToArray());
                         }
 
-                        var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds));
+                        var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds, additionalErrorAction: (e, r) => 
+                        {
+                            addErr.Add(new Error() { Description = e.GetExceptionText(), RowNumber = r});
+                        }));
                         Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
                         rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
 
@@ -183,7 +187,7 @@ namespace ExelConverterLite.ViewModel
                     UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
 
                 RowsToExport = rowsToExport;
-                UpdateErrors();   
+                UpdateErrors(addErr);   
             }
             catch(Exception ex)
             {
@@ -465,20 +469,28 @@ namespace ExelConverterLite.ViewModel
         }
 
         public RelayCommand UpdateErrorsCommand { get; private set; }
+
         private void UpdateErrors()
         {
+            UpdateErrors(null);
+        }
+        private void UpdateErrors(List<Error> addThisErrors = null)
+        {
             Errors.Clear();
+            var allErrors = addThisErrors ?? new List<Error>();
+
             foreach (var row in RowsToExport)
             {
                 var errors = CheckRowErrors(row);
                 if (errors.Length != 0)
                 {
                     foreach (var err in errors)
-                    {
-                        Errors.Add(err);
-                    }
+                        allErrors.Add(err);
                 }
             }
+
+            foreach (var e in allErrors.OrderBy(e => e.RowNumber))
+                Errors.Add(e);
         }
 
         private Error[] CheckRowErrors(OutputRow row)

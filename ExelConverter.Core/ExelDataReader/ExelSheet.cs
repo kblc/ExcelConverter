@@ -184,9 +184,12 @@ namespace ExelConverter.Core.ExelDataReader
                             Rows
                             .AsParallel()
                             .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
-                            .Where(r => r.UniqueWeight + (IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray()) ? 0.3 : -1) > 0.8)
+                            .Where(r => (decimal)r.UniqueWeight + IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray(), (decimal)-1) >= (decimal)0.8)
                             .Select(r => Rows.IndexOf(r))
                             .ToArray();
+
+                    //var r2 = Rows[3];
+                    //var b = IsIntersected(tags, Rows[3].UniqueNotEmptyCells.Select(c => c.Value).ToArray());
 
                     Log.Add(logSession, string.Format("founded '{0}' TAGGED rows for sheets candidate.", rowIndexesForHeadersWithTags.Length));
                     
@@ -255,16 +258,16 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #endregion
 
-                    List<int> res = new List<int>(
+                    var res =
                         rowIndexesForHeadersWithTags
                         .Union(rowIndexesForHeadersByValue)
                         .Union(rowIndexesForHeadersByWeight)
                         .Distinct()
                         .OrderBy(i => i)
-                        );
+                        .ToList();
 
                     Log.Add(logSession, string.Format("Calculation for '{0}' rows starts...", res.Count));
-                    SomeCalculations(res, endHeaderRowIndex, tags);
+                    SomeCalculations(res, endHeaderRowIndex, tags, strongIndexes: rowIndexesForHeadersWithTags);
                     Log.Add(logSession, string.Format("Calculation end with '{0}' rows.", res.Count));
                     result.AddRange(res);
                 }
@@ -276,9 +279,12 @@ namespace ExelConverter.Core.ExelDataReader
             return getAllHeadersData = result;
         }
 
-        private bool IsIntersected(string[] allTags, string[] items)
+        private decimal IsIntersected(string[] allTags, string[] items, decimal ifNotIntersectedDefaultValue = 0)
         {
-            return GetIntersectedCount(allTags, items) > 0;
+            if (items.Length == 0)
+                return ifNotIntersectedDefaultValue;
+            var val = GetIntersectedCount(allTags, items) / items.Length;
+            return val == 0 ? ifNotIntersectedDefaultValue : val;
         }
 
         private string DelStars(string str)
@@ -296,21 +302,25 @@ namespace ExelConverter.Core.ExelDataReader
         {
             return
                 allTags
-                .Where(t => !string.IsNullOrEmpty(t) && t[0] != '-')
-                .Select(i => i != null ? DelStars("*" + i.Trim().ToLower().Replace(' ', '*') + "*") : null)
-                .Where(i => !string.IsNullOrWhiteSpace(i) && i != "*")
-                .ToArray()
-                ;
+                .Where(t => !string.IsNullOrEmpty(t) && !t.StartsWith("-"))
+                .Select(t => t.Substring(1))
+                .Select(t => new { Strong = t.StartsWith("=") ? true : false, Tag = t.StartsWith("=") ? t.Substring(1) : t })
+                .Select(t => new { Strong = t.Strong, Tag = DelStars(t.Tag.Trim().ToLower().Replace(' ', '*')) })
+                .Select(t => t.Strong ? t.Tag : DelStars("*" + t.Tag + "*"))
+                .Where(t => t != "*")
+                .ToArray();
         }
 
         private string[] ExcludedTags(string[] allTags)
         {
             return
                 allTags
-                .Where(t => !string.IsNullOrEmpty(t) && t[0] == '-')
+                .Where(t => !string.IsNullOrEmpty(t) && t.StartsWith("-"))
                 .Select(t => t.Substring(1))
-                .Select(i => i != null ? DelStars("*" + i.Trim().ToLower().Replace(' ', '*') + "*") : null)
-                .Where(i => !string.IsNullOrWhiteSpace(i) && i != "*")
+                .Select(t => new { Strong = t.StartsWith("=") ? true : false, Tag = t.StartsWith("=") ? t.Substring(1) : t })
+                .Select(t => new { Strong = t.Strong, Tag = DelStars(t.Tag.Trim().ToLower().Replace(' ', '*')) })
+                .Select(t => t.Strong ? t.Tag : DelStars("*" + t.Tag + "*"))
+                .Where(t => t != "*")
                 .ToArray();
         }
 
@@ -335,13 +345,14 @@ namespace ExelConverter.Core.ExelDataReader
             return result;           
         }
 
-        private void SomeCalculations(List<int> result, int endHeaderRowIndex, string[] tags)
+        private void SomeCalculations(List<int> result, int endHeaderRowIndex, string[] tags, int[] strongIndexes)
         {
             var logSessiong = Log.SessionStart("ExelSheet.SomeCalculations()", true);
             bool wasException = false;
 
             try
-            { 
+            {
+                #region Log
                 string indexes = string.Empty;
                 string tags2 = string.Empty;
 
@@ -355,6 +366,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                 Log.Add(logSessiong, string.Format("Incoming indexes: '{0}'.", indexes));
                 Log.Add(logSessiong, string.Format("Incoming tags: '{0}'.", tags2));
+                #endregion
 
                 if (result != null)
                 { 
@@ -371,6 +383,7 @@ namespace ExelConverter.Core.ExelDataReader
                     });
 
                     #region remove headers if step by step > 2
+                    
                     for (int i = result.Count - 1; i >= 0; i--)
                     {
                         int n = 1;
@@ -391,7 +404,8 @@ namespace ExelConverter.Core.ExelDataReader
                             int deleted = 0;
                             for (int z = 0; z < n; z++)
                             {
-                                result.Remove(index - z);
+                                if (!strongIndexes.Contains(index - z))
+                                    result.Remove(index - z);
                                 deleted++;
                             }
                             i -= deleted - 1;
@@ -451,7 +465,8 @@ namespace ExelConverter.Core.ExelDataReader
                                                        || (similarityD * coeff > 0.65 && similarityD4 * coeff > 0.95)
                                                        || (Rows[similarityIndex].Cells.Count >= 10 && similarityD * coeff > 0.3 && similarityD4 * coeff > 0.8 && similarityHalf > 0.7)
                                                        ;
-                                            }))
+                                            })
+                                && !strongIndexes.Contains(index))
                                 result.Remove(index);
                         }
                     }
@@ -488,7 +503,7 @@ namespace ExelConverter.Core.ExelDataReader
                                 foreach (int similarityIndex in similarityIndexes)
                                 {
                                     double similarityD = Rows[index].Similarity(Rows[similarityIndex], (int)((double)Rows[index].Cells.Count / 4.0));
-                                    if (similarityD > 0.78)
+                                    if (similarityD > 0.78 && !strongIndexes.Contains(index))
                                     {
                                         result.Remove(index);
                                         break;

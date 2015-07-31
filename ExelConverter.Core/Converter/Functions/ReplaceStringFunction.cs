@@ -39,8 +39,8 @@ namespace ExelConverter.Core.Converter.Functions
         public override string Function(Dictionary<string, object> param)
         {
             var str = GetStringValue(param);
-            var find = Parameters.Where(p => p.Name == "Найти").Single().Value.ToString();
-            var replace = Parameters.Where(p => p.Name == "Заменить на").Single().Value.ToString();
+            var find = Parameters.Where(p => p.Name == "Найти").Single().StringValue;
+            var replace = Parameters.Where(p => p.Name == "Заменить на").Single().StringValue;
 
             return string.IsNullOrWhiteSpace(str) 
                 ? string.Empty 

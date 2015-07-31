@@ -43,7 +43,7 @@ namespace ExelConverter.Core.Converter.Functions
             }
             catch
             {
-                str = Parameters[0].Value.ToString();
+                str = Parameters[0].StringValue;
             }
             return str;
         }

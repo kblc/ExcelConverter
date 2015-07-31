@@ -102,17 +102,24 @@ namespace ExelConverter.Core.DataWriter
                         #endregion
                         #region Get Links
                         Log.Add(logSession, string.Format("Try to get links..."));
-                        List<ReExportData> idsToGet = new List<ReExportData>(
+                        
+                        var idsToGet = 
                             rowsToExport
                             .Select(i => new ReExportData(i.Code.Trim(), i.OriginalIndex, i.OriginalSheet))
                             .Cast<ReExportData>()
-                            );
+                            .ToList();
 
                         string outerMap;
                         string outerPdf;
 
-                        HttpDataClient.Default.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
-
+                        try
+                        { 
+                            HttpDataClient.Default.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
+                        } 
+                        catch(Exception ex)
+                        {
+                            throw new Exception(string.Format("Ошибка при получении ссылок для кодов (кол-во: {0})", idsToGet.Count), ex);
+                        }
                         //Log.Add(logSession, string.Format("Get CODES from server..."));
                         //foreach (var i in idsToGet)
                         //    Log.Add(logSession, string.Format("[Code:'{0}',Location:'{1}',Map:'{2}',Photo:'{3}']", i.Code, i.LinkLocation, i.LinkMap, i.LinkPhoto));
@@ -141,29 +148,36 @@ namespace ExelConverter.Core.DataWriter
                                     {
                                         var func = block.UsedFunctions.FirstOrDefault();
                                         if (func != null)
+                                        { 
                                             CodeColumnName = func.Function.ColumnName;
+                                            if (string.IsNullOrWhiteSpace(func.Function.ColumnName))
+                                                CodeColumnIndex = func.Function.ColumnNumber;
+                                        }
                                     }
                                 }
 
-                                if (!string.IsNullOrWhiteSpace(CodeColumnName))
+                                if (!string.IsNullOrWhiteSpace(CodeColumnName) || (CodeColumnIndex != -1))
                                 {
                                     var headerRow = sheet.Cells.Rows[r.Sheet.MainHeader.Index];
 
                                     int fHeader = headerRow.FirstCell == null ? 0 : headerRow.FirstCell.Column;
                                     int lHeader = headerRow.LastCell == null ? 0 : headerRow.LastCell.Column;
-                                    for (int i = fHeader; i <= lHeader; i++)
-                                    {
-                                        var cell = headerRow.GetCellOrNull(i);
-                                        if (cell != null)
+
+                                    if (CodeColumnIndex == -1)
+                                        for (int i = fHeader; i <= lHeader; i++)
                                         {
-                                            string cellValue = cell.StringValue;
-                                            if (!string.IsNullOrWhiteSpace(cellValue) && cellValue.ToLower().Trim() == CodeColumnName.ToLower().Trim())
+                                            var cell = headerRow.GetCellOrNull(i);
+                                            if (cell != null)
                                             {
-                                                CodeColumnIndex = i;
-                                                break;
+                                                string cellValue = cell.StringValue;
+                                                if (!string.IsNullOrWhiteSpace(cellValue) && cellValue.ToLower().Trim() == CodeColumnName.ToLower().Trim())
+                                                {
+                                                    CodeColumnIndex = i;
+                                                    break;
+                                                }
                                             }
                                         }
-                                    }
+
                                     #region Add cells to rows
                                     if (CodeColumnIndex >= 0)
                                     {
@@ -285,7 +299,7 @@ namespace ExelConverter.Core.DataWriter
                     catch (Exception ex)
                     {
                         wasException = true;
-                        Log.Add(ex);
+                        Log.Add(logSession, ex);
                         throw ex;
                     }
                     finally
