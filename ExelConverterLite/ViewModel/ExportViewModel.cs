@@ -387,37 +387,22 @@ namespace ExelConverterLite.ViewModel
                 using (var strm = new FileStream(fullPath, FileMode.OpenOrCreate)) { }
                 using (var writer = new StreamWriter(new FileStream(fullPath, FileMode.Truncate), Encoding.Default))
                 {
-                    List<string> props = new List<string>(OutputRow.ColumnOrder.OrderBy( i => i.Key).Select( i=> i.Value));
+                    var allowedFields = App.Locator.Import.ExportRules
+                        .Where(r => r.Rule != App.Locator.Import.NullRule)
+                        .Select(er => er.Rule)
+                        .SelectMany(r => r.ConvertionData)
+                        .Where(cd => cd.Blocks != null && cd.Blocks.Blocks.Count > 0)
+                        .Select(cd => cd.PropertyId)
+                        .Distinct();
 
-                    List<int> excludeColumns = new List<int>();
-                    for (int i = 0; i < props.Count; i++)
-                        excludeColumns.Add(i);
-
-                    Parallel.ForEach(RowsToExport, entry =>
-                    {
-                        var items = entry.ToItemsList(props);
-                        object lockParallel = new Object();
-                        Parallel.For(0, items.Count, i =>
-                            {
-                                try
-                                {
-                                    if (!string.IsNullOrWhiteSpace(items[i]))
-                                        lock (lockParallel)
-                                        {
-                                            excludeColumns.Remove(i);
-                                        }
-                                }
-                                catch { }
-                            }
-                        );
-                    }
-                    );
-
-                    foreach (var excludeIndex in excludeColumns.OrderByDescending(i => i))
-                        props.RemoveAt(excludeIndex);
+                    var props = OutputRow.ColumnOrder
+                            .Join(allowedFields, i => i.Value, a => a, (i, a) => i)
+                            .OrderBy(i => i.Key)
+                            .Select(i => i.Value)
+                            .ToArray();
 
                     string propLine = string.Empty;
-                    for (int i = 0; i < props.Count; i++)
+                    for (int i = 0; i < props.Length; i++)
                             propLine += (propLine.Length > 0 ? ";" : string.Empty) + string.Format("\"{0}\"", props[i]);
 
                     writer.WriteLine(propLine);

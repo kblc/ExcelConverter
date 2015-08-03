@@ -1858,7 +1858,7 @@ namespace ExcelConverter.Parser
                 string[] xpaths = nodesarr.Select(n => n.Node.XPath).ToArray();
                 mask1 = LongestMaskedPathBetween(xpaths);
                 mask2 = LongestMaskedStringBetween(xpaths);
-  
+
                 if (
                         nodesarr
                             .Select(n => new { Node = n.Node.OwnerDocument.DocumentNode, Url = n.Url })
@@ -1866,7 +1866,7 @@ namespace ExcelConverter.Parser
                                 {
                                     var links = Helper
                                                 .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
-                                                .Where(n => Helper.StringLikes(n.Url.AbsoluteUri, mask1));
+                                                .Where(n => Helper.StringLikes(n.Node.XPath, mask1));
                                     return
                                         minSize == null
                                         ? links.Count()
@@ -1889,7 +1889,7 @@ namespace ExcelConverter.Parser
                                 {
                                     var links = Helper
                                                 .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
-                                                .Where(n => Helper.StringLikes(n.Url.AbsoluteUri, mask2));
+                                                .Where(n => Helper.StringLikes(n.Node.XPath, mask2));
                                     return
                                         minSize == null
                                         ? links.Count()
@@ -1917,7 +1917,7 @@ namespace ExcelConverter.Parser
                                 {
                                     var links = Helper
                                             .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
-                                            .Where(i => Helper.StringLikes(i.Url.AbsoluteUri, betterMask));
+                                            .Where(i => Helper.StringLikes(i.Node.XPath, betterMask));
 
                                     string[] images =
                                         (minSize == null
