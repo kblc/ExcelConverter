@@ -94,6 +94,8 @@ namespace ExelConverter.Core.ExelDataReader
             } 
             MainHeader = Rows.FirstOrDefault();
             MainHeaderRowCount = 1;
+
+
         }
 
         private List<int> HeaderLineNumbers
@@ -474,16 +476,16 @@ namespace ExelConverter.Core.ExelDataReader
                     #region add
                     if (result.Count > 0)
                     {
-                        double averageWeight = result.Select(i => Rows[i].UniqueWeight).Average();
-                        double maxWeight = result.Select(i => Rows[i].UniqueWeight).Max();
-                        double minWeight = result.Select(i => Rows[i].UniqueWeight).Min();
-                        double moduleWeight = (maxWeight - minWeight) / 4;
+                        decimal averageWeight = result.Select(i => (decimal)Rows[i].UniqueWeight).Average();
+                        decimal maxWeight = result.Select(i => (decimal)Rows[i].UniqueWeight).Max();
+                        decimal minWeight = result.Select(i => (decimal)Rows[i].UniqueWeight).Min();
+                        decimal moduleWeight = (maxWeight - minWeight) / 4;
 
-                        if (moduleWeight == 0.0)
-                            moduleWeight = 0.001;
+                        if (moduleWeight == 0.0m)
+                            moduleWeight = 0.001m;
 
                         for (int i = result.Count - 1; i >= 0; i--)
-                            if (Rows[result[i]].UniqueWeight < averageWeight - moduleWeight)
+                            if ((decimal)Rows[result[i]].UniqueWeight < averageWeight - moduleWeight)
                             {
                                 int index = result[i];
 
@@ -502,6 +504,8 @@ namespace ExelConverter.Core.ExelDataReader
 
                                 foreach (int similarityIndex in similarityIndexes)
                                 {
+                                    Rows[index].Cells.IndexOf(Rows[index].UniqueNotEmptyCells.Last());
+
                                     double similarityD = Rows[index].Similarity(Rows[similarityIndex], (int)((double)Rows[index].Cells.Count / 4.0));
                                     if (similarityD > 0.78 && !strongIndexes.Contains(index))
                                     {

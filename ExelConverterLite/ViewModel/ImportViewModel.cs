@@ -306,7 +306,7 @@ namespace ExelConverterLite.ViewModel
 
             foreach (var header in SelectedSheet.MainHeader.Cells)
             {
-                SheetHeaders.Add(((ExelCell)header).Value);
+                SheetHeaders.Add(header.Value);
             }
 
             if (updateSharp)

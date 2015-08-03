@@ -278,7 +278,9 @@ namespace ExelConverter.Core.ExelDataReader
 
                     var lastStyle = (maxColumnIndex > 0) ? r.Cells[lastFilledColumnIndex].CellStyle : new Style();
 
-                    for (int i = r.Cells.Count; i <= lastFilledColumnIndex; i++)
+                    //for (int i = r.Cells.Count; i <= lastFilledColumnIndex; i++) 
+
+                    for (int i = r.Cells.Count; i <= maxColumnIndex; i++)
                         r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
 
                     result.Add(r);

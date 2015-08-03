@@ -118,11 +118,11 @@ namespace ExelConverter.Core.ExelDataReader
                 if (maxValue > 0)
                     for (int i = 0; i < maxValue; i++)
                     {
-                        result += exelRow.Cells[i].IsMerged == this.Cells[i].IsMerged ? 0.10 : 0;
-                        result += string.IsNullOrEmpty(exelRow.Cells[i].Value) == string.IsNullOrEmpty(this.Cells[i].Value) ? 0.45 : 0.0;
-                        result += Math.Abs(exelRow.Cells[i].UniqueWeight - this.Cells[i].UniqueWeight) < 0.07 ? 0.16 : 0.0;
-                        result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.ForegroundColor,this.Cells[i].CellStyle.ForegroundColor) ? 0.17 : 0.0;
-                        result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.BackgroundColor, this.Cells[i].CellStyle.BackgroundColor) ? 0.17 : 0.0;
+                        result += exelRow.Cells[i].IsMerged == this.Cells[i].IsMerged ? 0.09 : 0;
+                        result += string.IsNullOrEmpty(exelRow.Cells[i].Value) == string.IsNullOrEmpty(this.Cells[i].Value) ? 0.44 : 0.0;
+                        result += Math.Abs(exelRow.Cells[i].UniqueWeight - this.Cells[i].UniqueWeight) < 0.07 ? 0.15 : 0.0;
+                        result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.ForegroundColor,this.Cells[i].CellStyle.ForegroundColor) ? 0.16 : 0.0;
+                        result += AsyncDocumentLoader.ColorsEqual(exelRow.Cells[i].CellStyle.BackgroundColor, this.Cells[i].CellStyle.BackgroundColor) ? 0.16 : 0.0;
                     }
                 result = result / maxValue;
 
