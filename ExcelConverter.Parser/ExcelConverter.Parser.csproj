@@ -121,6 +121,10 @@
       <Private>True</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
+    <ProjectReference Include="..\libwebp\Imazen.WebP\Imazen.WebP.csproj">
+      <Project>{92f607a3-2f04-4536-8346-b6fef8b774ff}</Project>
+      <Name>Imazen.WebP</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -192,6 +196,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="x64\libwebp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="msvcp110.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -205,6 +212,9 @@
     <Resource Include="Icons\clipboard_16x16.png" />
     <Resource Include="Icons\database_16x16.png" />
     <Resource Include="Icons\check_mark_16x16.png" />
+    <None Include="x86\libwebp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="parsers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

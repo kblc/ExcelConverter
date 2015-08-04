@@ -16,6 +16,7 @@ using System.Windows.Input;
 using mshtml;
 using System.Reflection;
 using Helpers;
+using Imazen.WebP;
 
 namespace ExcelConverter.Parser
 {
@@ -984,6 +985,20 @@ namespace ExcelConverter.Parser
             return GetImageSize(directSourceLink, readBytesForDefault);
         }
 
+        public static byte[] ReadFully(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
+
         public static System.Drawing.Size GetImageSize(string directSourceLink, bool tryToDownloadImage = true)
         {
             var size = GetImageSize(directSourceLink);
@@ -994,6 +1009,38 @@ namespace ExcelConverter.Parser
                 try
                 {
                     SiteManager.GetFile(new Uri(directSourceLink), tempFileName);
+                    bool isWebPArchive = false;
+                    using (Stream inputStream = System.IO.File.Open(tempFileName, System.IO.FileMode.Open))
+                    {
+                        var webPcheck = new byte[4];
+                        int btsRead;
+                        if ((btsRead = inputStream.Read(webPcheck, 0, webPcheck.Length)) > 0)
+                        {
+                            var firstStr = Encoding.ASCII.GetString(webPcheck, 0, btsRead);
+                            if (firstStr.ToUpper() == "RIFF")
+                                isWebPArchive = true;
+                        }
+                    }
+
+                    if (isWebPArchive)
+                    {
+                        Imazen.WebP.Extern.LoadLibrary.LoadWebPOrFail();
+
+                        var decoder = new SimpleDecoder();
+                        var outFile = tempFileName + ".jpg";
+
+                        using (FileStream outStream = new FileStream(outFile, FileMode.Create))
+                        using (Stream inputStream = System.IO.File.Open(tempFileName, System.IO.FileMode.Open))
+                        {
+                            var bytes = ReadFully(inputStream);
+                            var outBitmap = decoder.DecodeFromBytes(bytes, bytes.LongLength);
+                            outBitmap.Save(outStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            outStream.Close();
+                        }
+
+                        tempFileName = outFile;
+                    }
+
                     using (System.Drawing.Image image = System.Drawing.Image.FromFile(tempFileName))
                     {
                         size.Height = image.Height;
@@ -1415,7 +1462,41 @@ namespace ExcelConverter.Parser
                                 string tempFileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + System.IO.Path.GetExtension(fileName);
 
                                 if (downloadImages)
+                                { 
                                     SiteManager.GetFile(type, fileUrl, tempFileName);
+                                   
+                                    bool isWebPArchive = false;
+                                    using (Stream inputStream = System.IO.File.Open(tempFileName, System.IO.FileMode.Open))
+                                    {
+                                        var webPcheck = new byte[4];
+                                        int btsRead;
+                                        if ((btsRead = inputStream.Read(webPcheck, 0, webPcheck.Length)) > 0)
+                                        {
+                                            var firstStr = Encoding.ASCII.GetString(webPcheck, 0, btsRead);
+                                            if (firstStr.ToUpper() == "RIFF")
+                                                isWebPArchive = true;
+                                        }
+                                    }
+
+                                    if (isWebPArchive)
+                                    {
+                                        Imazen.WebP.Extern.LoadLibrary.LoadWebPOrFail();
+
+                                        var decoder = new SimpleDecoder();
+                                        var outFile = tempFileName + ".jpg";
+
+                                        using (FileStream outStream = new FileStream(outFile, FileMode.Create))
+                                        using (Stream inputStream = System.IO.File.Open(tempFileName, System.IO.FileMode.Open))
+                                        {
+                                            var bytes = ReadFully(inputStream);
+                                            var outBitmap = decoder.DecodeFromBytes(bytes, bytes.LongLength);
+                                            outBitmap.Save(outStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            outStream.Close();
+                                        }
+
+                                        tempFileName = outFile;
+                                    }
+                                }
 
                                 System.Drawing.Image image = downloadImages ? System.Drawing.Image.FromFile(tempFileName) : null;
                                 try
