@@ -336,6 +336,7 @@
     </Compile>
     <Compile Include="Settings\SettingsObject.cs" />
     <Compile Include="Settings\SettingsProvider.cs" />
+    <Compile Include="Tag.cs" />
     <Compile Include="Validation\IsNumberValidationRule.cs" />
     <Compile Include="Validation\IValidationRule.cs" />
     <Compile Include="Validation\StringIsNotNullOrEmptyValidationRule.cs" />

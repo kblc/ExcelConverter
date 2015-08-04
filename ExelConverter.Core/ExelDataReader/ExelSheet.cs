@@ -49,15 +49,19 @@ namespace ExelConverter.Core.ExelDataReader
             {
                 var searchRowsCount = Rows.Count < 50 ? Rows.Count : 50;
 
+                var allTags = Tag.FromStrings(tags);
+                var exTags = allTags.Where(t => t.Direction == TagDirection.Exclude).ToArray();
+                var inTags = allTags.Where(t => t.Direction == TagDirection.Include).ToArray();
+
                 Dictionary<int, double> weightDict = new Dictionary<int, double>();
                 for (var i = searchRowsCount - 1; i >= 0; i--)
                     if (!Rows[i].IsEmpty)
                     {
                         double weight = 0.0;
                         var uniqueCells = Rows[i].UniqueNotEmptyCells.Select(c => c.Value.Trim().ToLower()).ToArray();
-                        weight = ExcludedTags(tags).Any(t => uniqueCells.Any(c => c.Like(t)) )
+                        weight = exTags.Any(t => uniqueCells.Any(c => c.Like(t.Value)))
                                 ? 0
-                                : uniqueCells.Count( c => IncludedTags(tags).Any(t => c.Like(t)) );
+                                : uniqueCells.Count(c => inTags.Any(t => c.Like(t.Value))) + uniqueCells.Count(c => inTags.Where(t => t.IsStrong).Any(t => c.Like(t.Value))) * 5;
                         weightDict.Add(i, weight);
                     }
 
@@ -186,8 +190,14 @@ namespace ExelConverter.Core.ExelDataReader
                             Rows
                             .AsParallel()
                             .Where(r => Rows.IndexOf(r) > endHeaderRowIndex)
-                            .Where(r => (decimal)r.UniqueWeight + IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray(), (decimal)-1) >= (decimal)0.8)
-                            .Select(r => Rows.IndexOf(r))
+                            .Select(r =>
+                                {
+                                    bool hasStrongIntersection;
+                                    var res = (decimal)r.UniqueWeight + Tag.IsIntersected(tags, r.UniqueNotEmptyCells.Select(c => c.Value).ToArray(), out hasStrongIntersection, (decimal)-1);
+                                    return new { Weight = res, HasStrongIntersection = hasStrongIntersection, Row = r };
+                                })
+                            .Where(r => r.Weight >= (decimal)0.8 || r.HasStrongIntersection)
+                            .Select(r => Rows.IndexOf(r.Row))
                             .ToArray();
 
                     //var r2 = Rows[3];
@@ -260,18 +270,17 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #endregion
 
-                    var res =
-                        rowIndexesForHeadersWithTags
+                    var res0 = rowIndexesForHeadersWithTags
                         .Union(rowIndexesForHeadersByValue)
                         .Union(rowIndexesForHeadersByWeight)
                         .Distinct()
                         .OrderBy(i => i)
                         .ToList();
 
-                    Log.Add(logSession, string.Format("Calculation for '{0}' rows starts...", res.Count));
-                    SomeCalculations(res, endHeaderRowIndex, tags, strongIndexes: rowIndexesForHeadersWithTags);
-                    Log.Add(logSession, string.Format("Calculation end with '{0}' rows.", res.Count));
-                    result.AddRange(res);
+                    Log.Add(logSession, string.Format("Calculation for '{0}' rows starts...", res0.Count));
+                    SomeCalculations(res0, endHeaderRowIndex, tags, strongIndexes: rowIndexesForHeadersWithTags);
+                    Log.Add(logSession, string.Format("Calculation end with '{0}' rows.", res0.Count));
+                    result.AddRange(res0);
                 }
             }
             finally
@@ -281,71 +290,71 @@ namespace ExelConverter.Core.ExelDataReader
             return getAllHeadersData = result;
         }
 
-        private decimal IsIntersected(string[] allTags, string[] items, decimal ifNotIntersectedDefaultValue = 0)
-        {
-            if (items.Length == 0)
-                return ifNotIntersectedDefaultValue;
-            var val = GetIntersectedCount(allTags, items) / items.Length;
-            return val == 0 ? ifNotIntersectedDefaultValue : val;
-        }
+        //private decimal IsIntersected(string[] allTags, string[] items, decimal ifNotIntersectedDefaultValue = 0)
+        //{
+        //    if (items.Length == 0)
+        //        return ifNotIntersectedDefaultValue;
+        //    var val = GetIntersectedCount(allTags, items) / items.Length;
 
-        private string DelStars(string str)
-        {
-            if (string.IsNullOrWhiteSpace(str)) 
-                return string.Empty; 
+        //    return val == 0 ? ifNotIntersectedDefaultValue : val;
+        //}
 
-            while (str.Contains("**")) 
-                str = str.Replace("**", "*"); 
+        //private string DelStars(string str)
+        //{
+        //    if (string.IsNullOrWhiteSpace(str)) 
+        //        return string.Empty; 
+
+        //    while (str.Contains("**")) 
+        //        str = str.Replace("**", "*"); 
             
-            return str;
-        }
+        //    return str;
+        //}
 
-        private string[] IncludedTags(string[] allTags)
-        {
-            return
-                allTags
-                .Where(t => !string.IsNullOrEmpty(t) && !t.StartsWith("-"))
-                .Select(t => t.Substring(1))
-                .Select(t => new { Strong = t.StartsWith("=") ? true : false, Tag = t.StartsWith("=") ? t.Substring(1) : t })
-                .Select(t => new { Strong = t.Strong, Tag = DelStars(t.Tag.Trim().ToLower().Replace(' ', '*')) })
-                .Select(t => t.Strong ? t.Tag : DelStars("*" + t.Tag + "*"))
-                .Where(t => t != "*")
-                .ToArray();
-        }
+        //private string[] GetTags(string[] allTags, bool excluded)
+        //{
+        //    var res = allTags
+        //        .Where(t => !string.IsNullOrEmpty(t) && (excluded ? t.StartsWith("-") : !t.StartsWith("-")))
+        //        .Select(t => excluded ? t.Substring(1) : t)
+        //        .Select(t => new { Strong = t.StartsWith("=") ? true : false, Tag = t.StartsWith("=") ? t.Substring(1) : t })
+        //        .Select(t => new { Strong = t.Strong, Tag = DelStars(t.Tag.Trim().ToLower().Replace(' ', '*')) })
+        //        .Select(t => t.Strong ? t.Tag : DelStars("*" + t.Tag + "*"))
+        //        .Where(t => t != "*")
+        //        .ToArray();
+        //    return res;
+        //}
 
-        private string[] ExcludedTags(string[] allTags)
-        {
-            return
-                allTags
-                .Where(t => !string.IsNullOrEmpty(t) && t.StartsWith("-"))
-                .Select(t => t.Substring(1))
-                .Select(t => new { Strong = t.StartsWith("=") ? true : false, Tag = t.StartsWith("=") ? t.Substring(1) : t })
-                .Select(t => new { Strong = t.Strong, Tag = DelStars(t.Tag.Trim().ToLower().Replace(' ', '*')) })
-                .Select(t => t.Strong ? t.Tag : DelStars("*" + t.Tag + "*"))
-                .Where(t => t != "*")
-                .ToArray();
-        }
+        //private string[] IncludedTags(string[] allTags)
+        //{
+        //    return GetTags(allTags, false);
+        //}
 
-        private int GetIntersectedCount(string[] allTags, string[] items)
-        {
-            if (allTags == null || items == null)
-                return 0;
+        //private string[] ExcludedTags(string[] allTags)
+        //{
+        //    return GetTags(allTags, true);
+        //}
 
-            items = items
-                .Select(i => i != null ? DelStars(i.Trim().ToLower()).Replace("*", " ").Trim() : null)
-                .Where(i => i != null)
-                .ToArray();
+        //private int GetIntersectedCount(string[] allTags, string[] items)
+        //{
+        //    if (allTags == null || items == null)
+        //        return 0;
 
-            int result = 0;
+        //    items = items
+        //        .Select(i => i != null ? Tag.ClearStringFromDoubleChars(i.Trim().ToLower(),' ').Trim() : null)
+        //        .Where(i => i != null)
+        //        .ToArray();
 
-            if (!ExcludedTags(allTags).Any(t => items.Any(i => i.Like(t)))) //if find excluded tag, then return zero
-                foreach (var i0 in IncludedTags(allTags))
-                    foreach(var i1 in items)
-                        if (i1.Like(i0))
-                            result++;
+        //    int result = 0;
 
-            return result;           
-        }
+        //    var allTg = Tag.FromStrings(allTags);
+
+        //    var exTags = allTg.Where(t => t.Direction == TagDirection.Exclude);
+        //    var inTags = allTg.Where(t => t.Direction == TagDirection.Include);
+
+        //    if (!exTags.Any(t => items.Any(i => i.Like(t.Value)))) //if find excluded tag, then return zero
+        //        result = items.Select(i => inTags.Count(t => i.Like(t.Value))).DefaultIfEmpty(0).Sum();
+
+        //    return result;           
+        //}
 
         private void SomeCalculations(List<int> result, int endHeaderRowIndex, string[] tags, int[] strongIndexes)
         {
@@ -377,9 +386,12 @@ namespace ExelConverter.Core.ExelDataReader
                         var cnt = row.UniqueNotEmptyCells.Count();
                         var defCoeff = 1.0;
                         if (cnt > 0)
+                        {
+                            bool hasStrongIntersection;
+                            var subRes = (Tag.GetIntersectedCount(tags, row.UniqueNotEmptyCells.Select(c => c.Value).ToArray(), out hasStrongIntersection) / row.UniqueNotEmptyCells.Count());
                             return
-                                defCoeff -
-                                (GetIntersectedCount(tags, row.UniqueNotEmptyCells.Select(c => c.Value).ToArray()) / row.UniqueNotEmptyCells.Count()) * 0.3;
+                                defCoeff - subRes * 0.3;
+                        }
                         else
                             return defCoeff;
                     });
@@ -521,14 +533,13 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #region remove excluded tags
 
-                    string[] excludedTags = ExcludedTags(tags);
-
+                    var excludedTags = Tag.FromStrings(tags).Where(t => t.Direction == TagDirection.Exclude).ToArray();
                     if (result.Count > 0 && excludedTags.Length > 0)
                     {
                         var excludeHeaderIndexes =
                                 Rows
                                     .Where(r => result.Contains(Rows.IndexOf(r)))
-                                    .Where(r => r.Cells.Any(c => excludedTags.Any(t => c.Value.Like(t))))
+                                    .Where(r => r.Cells.Any(c => excludedTags.Any(t => c.Value.Like(t.Value))))
                                     .Select(r => Rows.IndexOf(r));
 
                         foreach (int ex in excludeHeaderIndexes)
