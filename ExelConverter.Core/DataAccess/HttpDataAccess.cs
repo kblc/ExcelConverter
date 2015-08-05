@@ -253,12 +253,12 @@ namespace ExelConverter.Core.DataAccess
             {
                 string items = string.Empty;
                 foreach (string item in idsToGet.Select(i => i.Code).Distinct())
-                    items += string.Format("&codes[]={0}", item);
+                    items += string.Format("&codes[]={0}", Uri.EscapeDataString(item));
 
                 var strRequest = string.Format("{0}&companyId={1}{2}", GetLoginPasswordCouple(), companyId, items);
                 Helpers.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
                 //var result = Post(GetUrl(PathGetResourceList), strRequest, Cookies, Proxy);
-                var result = Post(GetUrl(PathGetResourceList), Uri.EscapeUriString(strRequest), Cookies, Proxy);
+                var result = Post(GetUrl(PathGetResourceList), strRequest, Cookies, Proxy);
                 Helpers.Log.Add(logSession, "Server answer: " + result);
 
                 var serializer = new JavaScriptSerializer();

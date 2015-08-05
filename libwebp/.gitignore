@@ -1,0 +1,9 @@
+Imazen.WebP.dll
+Imazen.WebP.pdb
+Imazen.WebP.xml
+*.FileListAbsolute.txt
+*.cache
+bin/
+obj/
+*.suo
+packages/**/*
