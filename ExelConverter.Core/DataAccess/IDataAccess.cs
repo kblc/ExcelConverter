@@ -52,6 +52,8 @@ namespace ExelConverter.Core.DataAccess
         /// <returns>Lock result. If <b>false</b>, than this operator is currently locked by another user. Use <b>GetOperatorLocker</b> for know who</returns>
         bool SetOperatorLocker(Operator op, User user, bool _lock);
 
+        TimeSpan GetOperatorLockerTimeout();
+
         Parser[] ParsersGet(Guid[] ids = null);
         Guid[] ParsersRemove(Parser[] parsers);
         Guid[] ParsersRemove(Guid[] ids);

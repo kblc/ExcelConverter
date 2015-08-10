@@ -127,7 +127,9 @@ namespace ExelConverterLite.ViewModel
             };
             _locksUpdater.Start();
 
-            _repeatLocksUpdater = new System.Timers.Timer(60 * 1000);
+
+            
+            _repeatLocksUpdater = new System.Timers.Timer((int)((decimal)_appSettingsDataAccess.GetOperatorLockerTimeout().TotalMilliseconds / 5m));
             _repeatLocksUpdater.Elapsed += (s, e) =>
             {
                 _repeatLocksUpdater.Stop();

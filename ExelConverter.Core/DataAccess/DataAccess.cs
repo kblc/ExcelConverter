@@ -797,7 +797,7 @@ namespace ExelConverter.Core.DataAccess
         public User GetOperatorLocker(Operator op)
         {
             var res = GetOperatorLockers(op);
-            return res.Count() > 0 ? res.Single().Value : null;
+            return res.Select(o => o.Value).FirstOrDefault();
         }
 
         private DateTime GetServerDateTime()
@@ -816,9 +816,14 @@ namespace ExelConverter.Core.DataAccess
             return curDate;
         }
 
+        public TimeSpan GetOperatorLockerTimeout()
+        {
+            return TimeSpan.FromSeconds(30);
+        }
+
         private DateTime GetDateTimeToLock(DateTime? curDateTime = null)
         {
-            return (curDateTime ?? GetServerDateTime()) + TimeSpan.FromMinutes(5);
+            return (curDateTime ?? GetServerDateTime()) + GetOperatorLockerTimeout();
         }
 
         public bool SetOperatorLocker(Operator op, User user, bool _lock)
