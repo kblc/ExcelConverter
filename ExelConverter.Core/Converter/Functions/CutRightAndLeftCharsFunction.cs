@@ -19,7 +19,7 @@ namespace ExelConverter.Core.Converter.Functions
             SelectedParameter = FunctionParameters.CellName;
             Parameters = new System.Collections.ObjectModel.ObservableCollection<CommonTypes.Parameter>
             {
-                new Parameter{Name="Слева",Value="0", ExpectedValueType = typeof(int)},
+                new Parameter{Name="Слева", Value="0", ExpectedValueType = typeof(int)},
                 new Parameter{Name="Справа", Value="0", ExpectedValueType = typeof(int)}
             };
         }
@@ -38,18 +38,26 @@ namespace ExelConverter.Core.Converter.Functions
         }
 
         public override string Function(Dictionary<string, object> param)
-        {
+    {
             var str = GetStringValue(param);
             if (str.Length > 0)
             {
                 var left = int.Parse((string)Parameters.Where(p => p.Name == "Слева").Single().Value);
                 var right = int.Parse((string)Parameters.Where(p => p.Name == "Справа").Single().Value);
+                if (str.Length > left + right)
+                {
+                    if (right > 0)
+                        str = str.Remove(str.Length - right);
 
-                str = str.Remove(str.Length - right).Remove(0, left);
+                    if (left > 0)
+                        str = str.Remove(0, left);
+                }
+                else
+                    str = string.Empty;
             }
             else
             {
-                str = "";
+                str = string.Empty;
             }
             return str;
         }
