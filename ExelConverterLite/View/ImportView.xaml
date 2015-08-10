@@ -62,7 +62,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Файл" Margin="2" 
                        VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                <TextBox Text="{Binding Path}" Margin="2" IsEnabled="False"  Grid.Column="1" />
+                <TextBox Text="{Binding Document.Path}" Margin="2" IsEnabled="False"  Grid.Column="1" />
                 <Button Command="{Binding SelectFileCommand}"
                     Margin="2" Content="Обзор..." Grid.Column="2"/>
 
@@ -142,9 +142,9 @@
                 <TextBlock VerticalAlignment="Center" Margin="2" HorizontalAlignment="Left"
                        Text="Вкладка" Grid.Row="2"/>
                 <ComboBox
-                      ItemsSource="{Binding DocumentSheets}" Margin="2"
-                      SelectedItem="{Binding SelectedSheet}"
-                      IsEnabled="{Binding DocumentSheets.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
+                      ItemsSource="{Binding Document.DocumentSheets}" Margin="2"
+                      SelectedItem="{Binding Document.SelectedSheet}"
+                      IsEnabled="{Binding Document.DocumentSheets.Count, Converter={StaticResource IsNotEqualsConverter}, ConverterParameter=0}"
                       Grid.Row="2" Grid.Column="1"/>
                 <Button
                     Grid.Row="2" 
@@ -171,7 +171,7 @@
                     <RowDefinition />
                     <RowDefinition Height="10" />
                     <RowDefinition />
-                    <RowDefinition Height="15" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
                 <Rectangle Fill="Black"  Height="2" Margin="3,3,0,3" />
@@ -539,7 +539,7 @@
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Text="Верхние заголовки" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" />
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=SelectedSheet.SheetHeaders.Headers}" AutoGenerateColumns="False" >
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Document.SelectedSheet.SheetHeaders.Headers}" AutoGenerateColumns="False" >
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Номер строки" Binding="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged}"/>
                                             <DataGridTextColumn Header="Заголовок" Binding="{Binding Header, UpdateSourceTrigger=PropertyChanged}"/>
@@ -552,7 +552,7 @@
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Text="Заголовки" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2" />
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=SelectedSheet.SheetHeaders.Subheaders}" AutoGenerateColumns="False" >
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Document.SelectedSheet.SheetHeaders.Subheaders}" AutoGenerateColumns="False" >
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Номер строки" Binding="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged}"/>
                                             <DataGridTextColumn Header="Заголовок" Binding="{Binding Header, UpdateSourceTrigger=PropertyChanged}"/>
@@ -756,7 +756,28 @@
                     </TabItem>
                 </TabControl>
 
-                <ProgressBar Grid.Row="4" Minimum="0" Maximum="100" Value="{Binding LoadingProgress}" Foreground="#00FF00" Height="5" Margin="3" />
+                <Grid Grid.Row="4" HorizontalAlignment="Stretch" Margin="4,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Visibility="{Binding Document.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Path=Document.LoadingProgress, StringFormat={}{0}%}" Margin="0,0,4,0"/>
+                        <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Path=Document.LoadingProgress}" Foreground="#00FF00" Height="5" Margin="3"/>
+                        <TextBlock Grid.ColumnSpan="99" Grid.Row="1" Text="{Binding Document.Status, StringFormat=Статус: {0}}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch" LineStackingStrategy="MaxHeight"/>
+                    </Grid>
+                    <TextBlock Grid.Row="1" Text="{Binding Document.Error, StringFormat=Ошибка: {0}}" Visibility="{Binding Document.HasError, Converter={StaticResource BooleanToVisibilityConverter}}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch" LineStackingStrategy="MaxHeight" Foreground="Red"/>
+                </Grid>
+                
                 <StackPanel Grid.Row="5"  Orientation="Horizontal" Margin="2" >
                     <Button 
                         Margin="2" 

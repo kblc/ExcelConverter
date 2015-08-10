@@ -19,20 +19,20 @@ namespace ExelConverterLite.ValueConverters
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             DataTable result = null;
-            if (App.Locator.Import.SelectedSheet != null)
+            if (App.Locator.Import.Document.SelectedSheet != null)
             {
                 var expectedValueFrom = (string)values[0];
                 var convertionData = (FieldConvertionData)values[1];
                 var tempRes = new List<SearchResult>();
 
-                for (var i = 0; i < App.Locator.Import.SelectedSheet.Rows.Count; i++)
+                for (var i = 0; i < App.Locator.Import.Document.SelectedSheet.Rows.Count; i++)
                 {
                     var str = string.Empty;
                     foreach (var block in convertionData.Blocks.Blocks)
                     {
-                        if (block.CheckCanExecute(App.Locator.Import.SelectedSheet, i, convertionData))
+                        if (block.CheckCanExecute(App.Locator.Import.Document.SelectedSheet, i, convertionData))
                         {
-                            str += block.Execute(App.Locator.Import.SelectedSheet, i, convertionData);
+                            str += block.Execute(App.Locator.Import.Document.SelectedSheet, i, convertionData);
                             if (block.ReturnAfterExecute)
                             {
                                 break;
@@ -43,7 +43,7 @@ namespace ExelConverterLite.ValueConverters
                 }
                 var indexes = tempRes.Where(s => s.Result == expectedValueFrom).Select(s => tempRes.IndexOf(s)).ToArray();
 
-                result = App.Locator.Import.SelectedSheet.AsDataTable(indexes);
+                result = App.Locator.Import.Document.SelectedSheet.AsDataTable(indexes);
             }
 
             return result != null ? result.Rows.Count > 0 ? result.DefaultView : null : null;

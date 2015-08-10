@@ -61,7 +61,37 @@ namespace ExelConverterLite.ViewModel
         private System.Timers.Timer _locksUpdater;
         private System.Timers.Timer _repeatLocksUpdater;
 
-        public ExelDocument document;
+        private ExelDocument document = null;
+        public ExelDocument Document
+        {
+            get
+            {
+                if (document == null)
+                {
+                    document = new ExelDocument();
+                    document.PropertyChanged += (s,e) =>
+                    {
+                        if (e.PropertyName == nameof(Document.IsDocumentLoaded))
+                        {
+                            UpdateMappingsTableCommand.RaiseCanExecuteChanged();
+                            ClearMappingsTableCommand.RaiseCanExecuteChanged();
+                            //LoadDocumentCommand.RaiseCanExecuteChanged();
+                            ToCsvCommand.RaiseCanExecuteChanged();
+                            ReExportFileCommand.RaiseCanExecuteChanged();
+                        }
+                        if (e.PropertyName == nameof(Document.SelectedSheet))
+                        {
+                            SheetChanging();
+                            UpdateSheetHeaders();
+                            UpdateFoundedHeadersCommand.RaiseCanExecuteChanged();
+                            IsSharpLoading = true;
+                        }
+                    };
+                }
+                return document;
+            }
+        }
+
         public List<Operator> OperatorsList { get; set; }
         private IDataAccess _appSettingsDataAccess;
 
@@ -163,11 +193,11 @@ namespace ExelConverterLite.ViewModel
             SelectFileCommand = new RelayCommand(SelectFile);
             //LoadDocumentCommand = new RelayCommand(LoadDocument, () => { return IsDocumentLoaded && IsViewModelValid; });
             UpdateOperatorCommand = new RelayCommand(UpdateOperator, () => { return IsViewModelValid; });
-            UpdateMappingsTableCommand = new RelayCommand<string>(UpdateMappingsTable, (s) => { return IsDocumentLoaded; });
+            UpdateMappingsTableCommand = new RelayCommand<string>(UpdateMappingsTable, (s) => { return Document.IsDocumentLoaded; });
             ClearMappingsTableCommand = new RelayCommand<string>(ClearMappingsTable);
-            ToCsvCommand = new RelayCommand(ToCsv, () => { return IsDocumentLoaded && IsViewModelValid; });
+            ToCsvCommand = new RelayCommand(ToCsv, () => { return Document.IsDocumentLoaded && IsViewModelValid; });
             ExportSetupCommand = new RelayCommand(ExportSetup, () => { return IsViewModelValid && SelectedOperator != null; });
-            ReExportFileCommand = new RelayCommand(ReExportFile, () => IsDocumentLoaded && IsViewModelValid);
+            ReExportFileCommand = new RelayCommand(ReExportFile, () => Document.IsDocumentLoaded && IsViewModelValid);
             AddMappingCommand = new RelayCommand<string>(AddMapping);
             EditOperatorCommand = new RelayCommand(EditOperator);
             AddBlockCommand = new RelayCommand(AddBlock, () => SelectedField != null );
@@ -180,7 +210,7 @@ namespace ExelConverterLite.ViewModel
             DeleteStartRuleCommand = new RelayCommand<Guid>(DeleteStartRule);
             SaveOperatorCommand = new RelayCommand(SaveOperator);
             UpdateOperatorCommand = new RelayCommand(UpdateOperator);
-            UpdateFoundedHeadersCommand = new RelayCommand(UpdateFoundedHeaders, () => SelectedSheet != null);
+            UpdateFoundedHeadersCommand = new RelayCommand(UpdateFoundedHeaders, () => Document.SelectedSheet != null);
             AddRuleCommand =
                 new RelayCommand<object>(
                     (b) => 
@@ -190,7 +220,7 @@ namespace ExelConverterLite.ViewModel
                         },
                     (b2) =>
                         {
-                            return SelectedSheet != null && SelectedOperator != null && SelectedOperator.MappingRules != null;
+                            return Document.SelectedSheet != null && SelectedOperator != null && SelectedOperator.MappingRules != null;
                         });
             SaveRuleCommand = new RelayCommand(() => SaveRulesToFile(true), () => SelectedOperator != null && SelectedOperator.MappingRule != null);
             LoadRuleCommand = new RelayCommand(() => LoadRulesFromFile(true));
@@ -248,7 +278,7 @@ namespace ExelConverterLite.ViewModel
 
         private void UpdateAllowedColumns()
         {
-            if (SelectedSheet == null || SelectedSheet.Rows.Count == 0)
+            if (Document.SelectedSheet == null || Document.SelectedSheet.Rows.Count == 0)
             {
                 SheetHeaders.Clear();
                 foreach (var rule in SelectedOperator.MappingRules)
@@ -264,7 +294,7 @@ namespace ExelConverterLite.ViewModel
                                     SheetHeaders.Add(srule.Rule.ColumnName);
                         }
             }
-            else if (SelectedSheet != null)
+            else if (Document.SelectedSheet != null)
                 UpdateSheetHeaders();
         }
 
@@ -296,7 +326,7 @@ namespace ExelConverterLite.ViewModel
         {
             SheetHeaders.Clear();
 
-            SelectedSheet.UpdateMainHeaderRow(
+            Document.SelectedSheet.UpdateMainHeaderRow(
                 SelectedOperator.MappingRule.MainHeaderSearchTags
                     .Select(h => h.Tag)
                     .Union(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -306,7 +336,7 @@ namespace ExelConverterLite.ViewModel
                     .ToArray()
                     );
 
-            foreach (var header in SelectedSheet.MainHeader.Cells)
+            foreach (var header in Document.SelectedSheet.MainHeader.Cells)
             {
                 SheetHeaders.Add(header.Value);
             }
@@ -317,7 +347,7 @@ namespace ExelConverterLite.ViewModel
 
         public void UpdateSheetHeaderRow(bool updateSharp)
         {
-            SelectedSheet.UpdateHeaders(
+            Document.SelectedSheet.UpdateHeaders(
                     SelectedOperator.MappingRule.SheetHeadersSearchTags
                     .Select(h => (h != null && h.Tag != null) ? h.Tag.Trim() : null)
                     .Where(i => !string.IsNullOrEmpty(i))
@@ -330,21 +360,21 @@ namespace ExelConverterLite.ViewModel
 
         private void UpdateSheetHeaders()
         {
-            if (SelectedSheet != null)
+            if (Document.SelectedSheet != null)
             {
-                if (SelectedSheet.Rows.Count > 0)
+                if (Document.SelectedSheet.Rows.Count > 0)
                 {
-                    if (SelectedSheet != null)
+                    if (Document.SelectedSheet != null)
                     {
                         var savedExportRule = ExportRules
                             .Where(r => r.Rule != null && r.Rule != NullRule)
-                            .FirstOrDefault(r => SelectedSheet.Name.ToLower().Contains(r.SheetName.ToLower()));
+                            .FirstOrDefault(r => Document.SelectedSheet.Name.ToLower().Contains(r.SheetName.ToLower()));
                         
                         if (savedExportRule != null)
                             SelectedOperator.MappingRule = savedExportRule.Rule; 
                         else
                             SelectedOperator.MappingRule = 
-                                SelectedOperator.MappingRules.FirstOrDefault(r => SelectedSheet.Name.ToLower().Contains(r.Name.ToLower()))
+                                SelectedOperator.MappingRules.FirstOrDefault(r => Document.SelectedSheet.Name.ToLower().Contains(r.Name.ToLower()))
                                 ?? SelectedOperator.MappingRule
                                 ?? SelectedOperator.MappingRules.FirstOrDefault();
                     }
@@ -774,49 +804,11 @@ namespace ExelConverterLite.ViewModel
             {
                 var filePath = ExelConverterFileDialog.Show();
                 if (filePath != null)
-                {
-                    Path = filePath;
-
-                    IsDocumentLoaded = false;
-                    if (document != null && document.Loader.FileLoader.IsBusy)
-                    {
-                        document.Loader.FileLoader.CancelAsync();
-                    }
-                    
-                    LoadingProgress = 5;
-                    document = new ExelDocument(Path, ExelConverterLite.Properties.Settings.Default.Import_DeleteEmptyRows);
-                    document.Loader.FileLoader.ProgressChanged += (s, e) =>
-                    {
-                        LoadingProgress = 10 + (int)((float)e.ProgressPercentage * 0.8);
-                    };
-
-                    document.Loader.FileLoader.RunWorkerCompleted += (s, e) =>
-                    {
-                        DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
-                        SelectedSheet =
-                            SelectedSheet == null
-                            ? DocumentSheets.FirstOrDefault()
-                            : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
-
-                        IsDocumentLoaded = true;
-                        LoadingProgress = 100;
-                    };
-
-                    LoadingProgress = 10;
-
-                    //Берем уже первые предзагруженные строки
-                    DocumentSheets = new ObservableCollection<ExelSheet>(document.Sheets);
-                    SelectedSheet =
-                            SelectedSheet == null
-                            ? DocumentSheets.FirstOrDefault()
-                            : DocumentSheets.Where(sht => sht.Name == SelectedSheet.Name).Single();
-
-                    document.FullLoad();
-                }
+                    Document.Path = filePath;
             }
             catch(Exception e)
             {
-                Path = string.Empty;
+                Document.Path = string.Empty;
                 System.Windows.MessageBox.Show(App.Current.MainWindow, string.Format("Exception: {0}{2}{1}",e.Message,e.StackTrace, Environment.NewLine));
             }
         }
@@ -847,12 +839,12 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand<string> UpdateMappingsTableCommand { get; private set; }
         private void UpdateMappingsTable(string parameter)
         {
-            if (SelectedSheet != null)
+            if (Document.SelectedSheet != null)
                 try                
                 {
                     var data = SelectedOperator.MappingRule.ConvertionData.Where(f => f.FieldName == parameter).Single();
                     var initialRow = 0;
-                    var sheet = SelectedSheet;
+                    var sheet = Document.SelectedSheet;
                     initialRow = sheet.Rows.IndexOf(sheet.MainHeader) + sheet.MainHeaderRowCount;
 
                     if (sheet != null)
@@ -922,18 +914,18 @@ namespace ExelConverterLite.ViewModel
                 if (exportRules != null)
                     return exportRules;
 
-                var savedRules = _appSettingsDataAccess.GetExportRulesIdByOperator(SelectedOperator, DocumentSheets == null ? null : DocumentSheets.AsQueryable());
+                var savedRules = _appSettingsDataAccess.GetExportRulesIdByOperator(SelectedOperator, Document.DocumentSheets == null ? null : Document.DocumentSheets.AsQueryable());
                 foreach (var r in savedRules.Where(r2 => r2.Rule == null))
                     r.Rule = App.Locator.Import.NullRule;
                 
                 exportRules = new ObservableCollection<SheetRulePair>(savedRules);
 
-                if (DocumentSheets != null)
-                    foreach (var sheet in DocumentSheets)
+                if (Document.DocumentSheets != null)
+                    foreach (var sheet in Document.DocumentSheets)
                     {
                         if (!exportRules.Select(s => s.SheetName.ToLower().Trim()).Contains(sheet.Name.ToLower().Trim()))
                             exportRules.Add(
-                                new SheetRulePair(DocumentSheets.AsQueryable()) 
+                                new SheetRulePair(Document.DocumentSheets.AsQueryable()) 
                                 {
                                     Sheet = sheet,
                                     Rule = SelectedOperator.MappingRules.FirstOrDefault(r => r.Name.ToLower() == sheet.Name.ToLower()) 
@@ -958,7 +950,7 @@ namespace ExelConverterLite.ViewModel
             if (res != null && res.Value)
             {
                 foreach (var rule in ExportRules.Where(r => r.AllowedSheets == null))
-                    rule.AllowedSheets = DocumentSheets.AsQueryable();
+                    rule.AllowedSheets = Document.DocumentSheets.AsQueryable();
                 SaveExportRules(ExportRules.ToArray());
             } else
                 ExportRules = null;
@@ -985,15 +977,15 @@ namespace ExelConverterLite.ViewModel
         {
             SaveFileDialog dlg = null;
 
-            if (!File.Exists(Path))
+            if (!File.Exists(Document.Path))
                 MessageBox.Show("Исходный файл перемещен или не существует", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             else
-                if ((dlg = new SaveFileDialog() { FileName = System.IO.Path.GetFileName(Path), Filter = "Файлы экспорта (*" + System.IO.Path.GetExtension(Path) + ")|*" + System.IO.Path.GetExtension(Path) }).ShowDialog() == DialogResult.OK)
+                if ((dlg = new SaveFileDialog() { FileName = System.IO.Path.GetFileName(Document.Path), Filter = "Файлы экспорта (*" + System.IO.Path.GetExtension(Document.Path) + ")|*" + System.IO.Path.GetExtension(Document.Path) }).ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
                         var dlgWnd = View.ViewLocator.ReExportProgressView;
-                        File.Copy(Path, dlg.FileName, true);
+                        File.Copy(Document.Path, dlg.FileName, true);
                         BackgroundWorker bw = ReExport.Start(dlg.FileName, SelectedOperator.Id, ExportRules.ToArray());
                         bw.RunWorkerCompleted += (s, e) => 
                         {
@@ -1128,7 +1120,7 @@ namespace ExelConverterLite.ViewModel
         {
             var rule = basedOnCurrentRule ? ExelConvertionRule.DeserializeFromB64String(SelectedOperator.MappingRule.Serialize()) : new ExelConvertionRule();
             rule.FkOperatorId = (int)SelectedOperator.Id;
-            rule.Name = SelectedSheet.Name;
+            rule.Name = Document.SelectedSheet.Name;
             rule.Id = 0;
             SelectedOperator.MappingRules.Add(rule);
             SelectedOperator.MappingRule = rule;
@@ -1150,7 +1142,7 @@ namespace ExelConverterLite.ViewModel
         public RelayCommand ShowImageParsingWindowCommand { get; private set; }
         private void ShowImageParsingWindow()
         {
-            if (SelectedSheet != null)
+            if (Document.SelectedSheet != null)
             {
                 LoadPhotos();
                 LoadMaps();
@@ -1162,14 +1154,14 @@ namespace ExelConverterLite.ViewModel
 
         private void LoadPhotos()
         {
-            if (SelectedSheet != null)
+            if (Document.SelectedSheet != null)
             {
                 var photoConvertionData = SelectedOperator.MappingRule.ConvertionData.Single(cd => cd.PropertyId == "Photo_img");
                 var mapConvertionData = SelectedOperator.MappingRule.ConvertionData.Single(cd => cd.PropertyId == "Location_img");
 
-                var i = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + SelectedSheet.MainHeaderRowCount;
+                var i = Document.SelectedSheet.Rows.IndexOf(Document.SelectedSheet.MainHeader) + Document.SelectedSheet.MainHeaderRowCount;
 
-                var url = photoConvertionData.Blocks.Run(SelectedSheet, i, photoConvertionData);
+                var url = photoConvertionData.Blocks.Run(Document.SelectedSheet, i, photoConvertionData);
 
                 if (!string.IsNullOrWhiteSpace(url) && Uri.IsWellFormedUriString(url, UriKind.Absolute))
                 { 
@@ -1203,11 +1195,11 @@ namespace ExelConverterLite.ViewModel
 
         private void LoadMaps()
         {
-            if (SelectedSheet != null)
+            if (Document.SelectedSheet != null)
             {
                 var mapConvertionData = SelectedOperator.MappingRule.ConvertionData.Single(cd => cd.PropertyId == "Location_img");
-                var i = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + SelectedSheet.MainHeaderRowCount;
-                var url = mapConvertionData.Blocks.Run(SelectedSheet, i, mapConvertionData);
+                var i = Document.SelectedSheet.Rows.IndexOf(Document.SelectedSheet.MainHeader) + Document.SelectedSheet.MainHeaderRowCount;
+                var url = mapConvertionData.Blocks.Run(Document.SelectedSheet, i, mapConvertionData);
 
                 if (!string.IsNullOrWhiteSpace(url) && Uri.IsWellFormedUriString(url, UriKind.Absolute))
                 { 
@@ -1274,35 +1266,6 @@ namespace ExelConverterLite.ViewModel
                     //LoadDocumentCommand.RaiseCanExecuteChanged();
                     ToCsvCommand.RaiseCanExecuteChanged();
                     ReExportFileCommand.RaiseCanExecuteChanged();
-                }
-            }
-        }
-
-        private string _path;
-        public string Path
-        {
-            get { return _path; }
-            set
-            {
-                if (_path != value)
-                {
-                    _path = value;
-                    RaisePropertyChanged("Path");
-                }
-            }
-        }
-
-        private int _loadingProgress;
-        public int LoadingProgress
-        {
-            get { return _loadingProgress; }
-            set
-            {
-                if (_loadingProgress != value)
-                {
-                    
-                    _loadingProgress = value;
-                    RaisePropertyChanged("LoadingProgress");
                 }
             }
         }
@@ -1386,38 +1349,6 @@ namespace ExelConverterLite.ViewModel
                     Log.SessionEnd(logSession, wasException);
                     RaisePropertyChanged("SelectedOperator");
                     _repeatLocksUpdater.Start();
-                }
-            }
-        }
-
-        private ObservableCollection<ExelSheet> _documentSheets = new ObservableCollection<ExelSheet>();
-        public ObservableCollection<ExelSheet> DocumentSheets
-        {
-            get { return _documentSheets; }
-            set
-            {
-                ExportRules = null;
-                if (_documentSheets != value)
-                {
-                    _documentSheets = value;
-                    RaisePropertyChanged("DocumentSheets");
-                }
-            }
-        }
-
-        private ExelSheet _selectedSheet;
-        public ExelSheet SelectedSheet
-        {
-            get { return _selectedSheet; }
-            set
-            {
-                if (_selectedSheet != value)
-                {
-                    SheetChanging();
-                    _selectedSheet = value;
-                    UpdateSheetHeaders();
-                    UpdateFoundedHeadersCommand.RaiseCanExecuteChanged();
-                    RaisePropertyChanged("SelectedSheet");
                 }
             }
         }
@@ -1558,11 +1489,11 @@ namespace ExelConverterLite.ViewModel
 
         private void UpdateSharp(bool reInit)
         {
-            int[] headers = SelectedSheet.SheetHeaders.Headers.Select(s => s.RowNumber).ToArray();
-            int[] subHeaders = SelectedSheet.SheetHeaders.Subheaders.Select(s => s.RowNumber).ToArray(); 
-            int[] main = new int[SelectedSheet.MainHeaderRowCount];   
-            for(int i = 0; i<SelectedSheet.MainHeaderRowCount; i++)
-                main[i] = SelectedSheet.Rows.IndexOf(SelectedSheet.MainHeader) + i;
+            int[] headers = Document.SelectedSheet.SheetHeaders.Headers.Select(s => s.RowNumber).ToArray();
+            int[] subHeaders = Document.SelectedSheet.SheetHeaders.Subheaders.Select(s => s.RowNumber).ToArray(); 
+            int[] main = new int[Document.SelectedSheet.MainHeaderRowCount];   
+            for(int i = 0; i< Document.SelectedSheet.MainHeaderRowCount; i++)
+                main[i] = Document.SelectedSheet.Rows.IndexOf(Document.SelectedSheet.MainHeader) + i;
 
             var UpdateSharpWorker = new BackgroundWorker();
             UpdateSharpWorker.WorkerSupportsCancellation = false;
@@ -1609,7 +1540,7 @@ namespace ExelConverterLite.ViewModel
                 Headers = headers,
                 SubHeaders = subHeaders,
                 MainHeaders = main,
-                Sheet = SelectedSheet,
+                Sheet = Document.SelectedSheet,
                 CurrentData = (reInit) ? null : Sharp
             };
 

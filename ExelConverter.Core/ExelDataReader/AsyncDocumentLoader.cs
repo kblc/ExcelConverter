@@ -4,90 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-/*using NPOI;
-using NPOI.HSSF.Extractor;
-using NPOI.OpenXml4Net;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.HSSF.Util;
-using NPOI.XSSF.Util;
-using NPOI.XSSF.UserModel;*/
-
+using Helpers;
 using Aspose.Cells;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace ExelConverter.Core.ExelDataReader
 {
     public class AsyncDocumentLoader
     {
-        private BackgroundWorker fileLoader = null;
-        public BackgroundWorker FileLoader
-        {
-            get 
-            {
-                if (fileLoader == null)
-                {
-                    fileLoader = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
-                    fileLoader.DoWork += FileLoader_DoWork;
-                }
-                return fileLoader; 
-            }
-        }
-
-        public Workbook WorkBook { get; set; }
-
-        private void FileLoader_DoWork(object sender, DoWorkEventArgs e)
-        {
-            BackgroundWorker bw = sender as BackgroundWorker;
-            e.Result = LoadSheets(WorkBook, 0, new Action<int>((i) => bw.ReportProgress(i)), true);
-        }
-
-        public List<ExelSheet> LoadSheets(int count = 0)
-        {
-            return LoadSheets(WorkBook, count, null, DeleteEmptyRows);
-        }
-
-        public static List<ExelSheet> LoadSheets(Workbook workbook, int count = 0, Action<int> progressReport = null, bool deleteEmptyRows = true)
-        {
-            var result = new List<ExelSheet>();
-            //var totalRowsCount = 0;
-            //var loaded = 0;
-            //totalRowsCount = workbook.Worksheets.Cast<Worksheet>().Select(i => i.Cells.Rows.Count).Sum();
-
-            Helpers.PercentageProgress prg = new Helpers.PercentageProgress();
-            prg.Change += (s, e) =>
-                {
-                    if (progressReport != null)
-                        progressReport((int)e.Value);
-                };
-
-            foreach (var sheetItem in 
-                            workbook
-                            .Worksheets
-                            .Cast<Worksheet>()
-                            .Where(s => s.Cells.Rows.Count > 1)
-                            .Select(s => new 
-                            { 
-                                Sheet = s, 
-                                ProgressInfo = prg.GetChild()
-                            })
-                            .ToArray()
-                            )
-            {
-                ExelSheet sht = new ExelSheet() { Name = sheetItem.Sheet.Name };
-                sht.Rows.AddRange(
-                    LoadRows(sheetItem.Sheet, count, new Action<int>((i) => { sheetItem.ProgressInfo.Value = i; }), deleteEmptyRows)
-                    );
-                if (sht.Rows.Count > 0)
-                    result.Add(sht);
-            }
-
-            return result;
-        }
-
+        #region Additional
         private static bool IsIntersected(int x1, int x2, int y1, int y2)
         {
             return
@@ -162,7 +90,103 @@ namespace ExelConverter.Core.ExelDataReader
             return mgLinks.Select(i => i.Link).FirstOrDefault();
         }
 
-        public static List<ExelRow> LoadRows(Worksheet sheet, int count = 0, Action<int> progressReport = null, bool deleteEmptyRows = true)
+        private static Color GetBrush(string color)
+        {
+
+            double coef = 255.0 / 65535.0;
+            var rgbArray = color.Split(new char[] { ':' });
+
+            var r = (byte)(GetDec(rgbArray[0]) * coef);
+            var g = (byte)(GetDec(rgbArray[1]) * coef);
+            var b = (byte)(GetDec(rgbArray[2]) * coef);
+
+            return Color.FromRgb(r, g, b);
+
+        }
+        private static Color GetBrush(byte[] color)
+        {
+            return Color.FromArgb(color[0], color[1], color[2], color[3]);
+        }
+        private static int GetDec(string hex)
+        {
+            var result = 0;
+            for (var i = 0; i < hex.Length; i++)
+            {
+                var num = 0;
+                if (hex[i] == 'F')
+                {
+                    num = 15;
+                }
+                else if (hex[i] == 'E')
+                {
+                    num = 14;
+                }
+                else if (hex[i] == 'D')
+                {
+                    num = 13;
+                }
+                else if (hex[i] == 'C')
+                {
+                    num = 12;
+                }
+                else if (hex[i] == 'B')
+                {
+                    num = 11;
+                }
+                else if (hex[i] == 'A')
+                {
+                    num = 10;
+                }
+                else
+                {
+                    num = int.Parse(hex[i].ToString());
+                }
+                result += num * (int)Math.Pow(16, hex.Length - i - 1);
+            }
+            return result;
+        }
+        #endregion
+
+        public static ExelSheet[] LoadSheets(Workbook workbook, int count = 0, Action<int> progressReport = null, bool deleteEmptyRows = true)
+        {
+            var result = new List<ExelSheet>();
+            //var totalRowsCount = 0;
+            //var loaded = 0;
+            //totalRowsCount = workbook.Worksheets.Cast<Worksheet>().Select(i => i.Cells.Rows.Count).Sum();
+
+            Helpers.PercentageProgress prg = new Helpers.PercentageProgress();
+            prg.Change += (s, e) =>
+            {
+                if (progressReport != null)
+                    progressReport((int)e.Value);
+            };
+
+            foreach (var sheetItem in
+                            workbook
+                            .Worksheets
+                            .Cast<Worksheet>()
+                            .Where(s => s.Cells.Rows.Count > 1)
+                            .Select(s => new
+                            {
+                                Sheet = s,
+                                ProgressInfo = prg.GetChild()
+                            })
+                            .ToArray()
+                            )
+            {
+                ExelSheet sht = new ExelSheet() { Name = sheetItem.Sheet.Name };
+                
+                sht.Rows.AddRange(
+                    LoadRows(sheetItem.Sheet, count, new Action<int>((i) => { sheetItem.ProgressInfo.Value = i; }), deleteEmptyRows)
+                    );
+                if (sht.Rows.Count > 0)
+                    result.Add(sht);
+            }
+
+            return result.ToArray();
+        }
+
+        public static ExelRow[] LoadRows(Worksheet sheet, int count = 0, Action<int> progressReport = null, bool deleteEmptyRows = true)
         {
             var result = new List<ExelRow>();
             var totalRowsCount = 0;
@@ -204,92 +228,187 @@ namespace ExelConverter.Core.ExelDataReader
                 .Max();
             #endregion
             #region Read rows
-            foreach (Row row in sheet.Cells.Rows.Cast<Row>().Where(r => r.Index < count))
+
+            if (sheet.Cells.Count > 0)
             {
-                var index = row.Index;
+                var lockObj = new Object();
+                var lockCell = new Object();
 
-                //var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
+                //sheet.Cells.MultiThreadReading = true;
 
-                var r = new ExelRow() { Index = index };
-                if (sheet.Cells.Count > 0)
-                {
-                    var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
-
-                    int lastFilledColumnIndex = Math.Min(currMaxColumnsIndex, maxColumnIndex);
-
-                    #region Read data from cells
-
-                    for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
-                    {
-                        var cell = sheet.Cells[index, k];
-                        var c = new ExelCell();
-
-                        c.FormatedValue = cell.StringValue;
-
-                        var link = GetHyperlinkForCell(cell, sheet);
-                        if (link != null)
-                            c.HyperLink = link.Address;
-                        
-                        else if (cell.Formula != null)
-                        {
-                            var formula = cell.Formula;
-                            if (formula != null)
+                var items =
+                        sheet.Cells.Rows.Cast<Row>()
+                            .Where(r => r.Index < count)
+                            //.AsParallel()
+                            .Select(row =>
                             {
-                                c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
-                            }
-                        }
+                                var r = new ExelRow() { Index = row.Index };
+                                var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
 
-                        if (cell.IsMerged)
-                        {
-                            c.IsMerged = true;
+                                int lastFilledColumnIndex = Math.Min(currMaxColumnsIndex, maxColumnIndex);
 
-                            var hLink = GetHyperlinkForCell(cell, sheet);
-                            c.HyperLink = hLink == null ? string.Empty : hLink.Address;
-                            
-                            var content = string.Empty;
-                            var values = (IEnumerable)cell.GetMergedRange().Value;
-                            if (values != null)
-                                foreach (var value in values)
+                                #region Read data from cells
+
+                                for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
                                 {
-                                    content += value;
+                                    Cell cell =  row.GetCellByIndex(k);
+                                    var c = new ExelCell();
+
+                                    c.FormatedValue = cell.StringValue;
+
+                                    var link = GetHyperlinkForCell(cell, sheet);
+                                    if (link != null)
+                                        c.HyperLink = link.Address;
+
+                                    else if (cell.Formula != null)
+                                    {
+                                        var formula = cell.Formula;
+                                        if (formula != null)
+                                        {
+                                            c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
+                                        }
+                                    }
+
+                                    if (cell.IsMerged)
+                                    {
+                                        c.IsMerged = true;
+
+                                        var hLink = GetHyperlinkForCell(cell, sheet);
+                                        c.HyperLink = hLink == null ? string.Empty : hLink.Address;
+
+                                        var content = string.Empty;
+                                        var values = (IEnumerable)cell.GetMergedRange().Value;
+                                        if (values != null)
+                                            foreach (var value in values)
+                                            {
+                                                content += value;
+                                            }
+
+                                        c.Value = content;
+                                    }
+                                    else if (cell.Value != null)
+                                    {
+                                        c.Value = cell.Value.ToString();
+                                    }
+                                    else
+                                    {
+                                        c.Value = string.Empty;
+                                    }
+
+                                    var style = cell.GetStyle();
+                                    c.CellStyle = style;
+                                    c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
+
+                                    c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
+
+                                    r.Cells.Add(c);
                                 }
 
-                            c.Value = content;
-                        }
-                        else if (cell.Value != null)
-                        {
-                            c.Value = cell.Value.ToString();
-                        }
-                        else
-                        {
-                            c.Value = string.Empty;
-                        }
+                                #endregion
 
-                        var style = cell.GetStyle();
-                        c.CellStyle = style;
-                        c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
+                                var lastStyle = (maxColumnIndex > 0) ? r.Cells[lastFilledColumnIndex].CellStyle : new Style();
 
-                        c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
+                                for (int i = r.Cells.Count; i <= maxColumnIndex; i++)
+                                    r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
 
-                        r.Cells.Add(c);
-                    }
+                                lock (lockObj)
+                                {
+                                    loaded++;
+                                    if (progressReport != null)
+                                        progressReport((int)((double)loaded * 100 / (double)totalRowsCount));
+                                }
 
-                    #endregion
-
-                    var lastStyle = (maxColumnIndex > 0) ? r.Cells[lastFilledColumnIndex].CellStyle : new Style();
-
-                    //for (int i = r.Cells.Count; i <= lastFilledColumnIndex; i++) 
-
-                    for (int i = r.Cells.Count; i <= maxColumnIndex; i++)
-                        r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
-
-                    result.Add(r);
-                    loaded++;
-                    if (progressReport != null)
-                        progressReport((int)((double)loaded * 100 / (double)totalRowsCount));
-                }
-
+                                return r;
+                            });
+                result.AddRange(items);
             }
+
+            //foreach (Row row in sheet.Cells.Rows.Cast<Row>().Where(r => r.Index < count))
+            //{
+            //    var index = row.Index;
+
+            //    //var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
+
+            //    var r = new ExelRow() { Index = index };
+            //    if (sheet.Cells.Count > 0)
+            //    {
+            //        var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
+
+            //        int lastFilledColumnIndex = Math.Min(currMaxColumnsIndex, maxColumnIndex);
+
+            //        #region Read data from cells
+
+            //        for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
+            //        {
+            //            var cell = sheet.Cells[index, k];
+            //            var c = new ExelCell();
+
+            //            c.FormatedValue = cell.StringValue;
+
+            //            var link = GetHyperlinkForCell(cell, sheet);
+            //            if (link != null)
+            //                c.HyperLink = link.Address;
+                        
+            //            else if (cell.Formula != null)
+            //            {
+            //                var formula = cell.Formula;
+            //                if (formula != null)
+            //                {
+            //                    c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
+            //                }
+            //            }
+
+            //            if (cell.IsMerged)
+            //            {
+            //                c.IsMerged = true;
+
+            //                var hLink = GetHyperlinkForCell(cell, sheet);
+            //                c.HyperLink = hLink == null ? string.Empty : hLink.Address;
+                            
+            //                var content = string.Empty;
+            //                var values = (IEnumerable)cell.GetMergedRange().Value;
+            //                if (values != null)
+            //                    foreach (var value in values)
+            //                    {
+            //                        content += value;
+            //                    }
+
+            //                c.Value = content;
+            //            }
+            //            else if (cell.Value != null)
+            //            {
+            //                c.Value = cell.Value.ToString();
+            //            }
+            //            else
+            //            {
+            //                c.Value = string.Empty;
+            //            }
+
+            //            var style = cell.GetStyle();
+            //            c.CellStyle = style;
+            //            c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
+
+            //            c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
+
+            //            r.Cells.Add(c);
+            //        }
+
+            //        #endregion
+
+            //        var lastStyle = (maxColumnIndex > 0) ? r.Cells[lastFilledColumnIndex].CellStyle : new Style();
+
+            //        //for (int i = r.Cells.Count; i <= lastFilledColumnIndex; i++) 
+
+            //        for (int i = r.Cells.Count; i <= maxColumnIndex; i++)
+            //            r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
+
+            //        result.Add(r);
+            //        loaded++;
+            //        if (progressReport != null)
+            //            progressReport((int)((double)loaded * 100 / (double)totalRowsCount));
+            //    }
+
+            //}
             #endregion
 
             //FillMergedCells(sht);
@@ -353,7 +472,7 @@ namespace ExelConverter.Core.ExelDataReader
                     }
             }
 
-            return result;
+            return result.ToArray();
         }
 
         private static System.Drawing.Color DefColor0 = System.Drawing.Color.FromArgb(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
@@ -370,61 +489,5 @@ namespace ExelConverter.Core.ExelDataReader
         {
             return c1.A == c2.A && c1.R == c2.R && c1.G == c2.G && c1.B == c2.B;
         }
-        private static Color GetBrush(string color)
-        {
-
-            double coef = 255.0 / 65535.0;
-            var rgbArray = color.Split(new char[] { ':' });
-
-            var r = (byte)(GetDec(rgbArray[0]) * coef);
-            var g = (byte)(GetDec(rgbArray[1]) * coef);
-            var b = (byte)(GetDec(rgbArray[2]) * coef);
-
-            return Color.FromRgb(r, g, b);
-
-        }
-        private static Color GetBrush(byte[] color)
-        {
-            return Color.FromArgb(color[0], color[1], color[2], color[3]);
-        }
-        private static int GetDec(string hex)
-        {
-            var result = 0;
-            for (var i = 0; i < hex.Length; i++)
-            {
-                var num = 0;
-                if (hex[i] == 'F')
-                {
-                    num = 15;
-                }
-                else if (hex[i] == 'E')
-                {
-                    num = 14;
-                }
-                else if (hex[i] == 'D')
-                {
-                    num = 13;
-                }
-                else if (hex[i] == 'C')
-                {
-                    num = 12;
-                }
-                else if (hex[i] == 'B')
-                {
-                    num = 11;
-                }
-                else if (hex[i] == 'A')
-                {
-                    num = 10;
-                }
-                else
-                {
-                    num = int.Parse(hex[i].ToString());
-                }
-                result += num * (int)Math.Pow(16, hex.Length - i - 1);
-            }
-            return result;
-        }
-        public bool DeleteEmptyRows { get; set; }
     }
 }

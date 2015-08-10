@@ -122,7 +122,7 @@ namespace ExelConverterLite.ViewModel
                 if (UpdateSelectedWarningCommand == null)
                     UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
 
-                Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.DocumentSheets.Count));
+                Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.Document.DocumentSheets.Count));
                 var addErr = new List<Error>();
 
                 foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
@@ -321,7 +321,7 @@ namespace ExelConverterLite.ViewModel
             if (prm != null)
             {
                 prm.OperatorID = App.Locator.Import.SelectedOperator.Id;
-                prm.FilePath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.document.Name + ".csv";
+                prm.FilePath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.Document.Name + ".csv";
                 Export2Csv();
                 try
                 {
@@ -381,8 +381,8 @@ namespace ExelConverterLite.ViewModel
         {
             try
             {
-                var fileName = App.Locator.Import.document.Name + ".csv";
-                var fullPath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.document.Name + ".csv";
+                var fileName = App.Locator.Import.Document.Name + ".csv";
+                var fullPath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.Document.Name + ".csv";
 
                 using (var strm = new FileStream(fullPath, FileMode.OpenOrCreate)) { }
                 using (var writer = new StreamWriter(new FileStream(fullPath, FileMode.Truncate), Encoding.Default))
