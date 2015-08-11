@@ -92,6 +92,12 @@ namespace ExelConverter.Core.Settings
             FunctionDescriptions.Add("Замена подстроки в строке", @"Функция заменяет один набор символов на другой");
 
             FunctionDescriptions.Add(GetFormatedValueFunction.FunctionName, @"Функция извлекает форматированное значение из выбранной ячейки");
+
+            FunctionDescriptions.Add(StringLengthFunction.FunctionName, "Функция возвращает '+' если длинна строки удовлетворяет условиям. Если нет, то функция возвращает '-'");
+
+            FunctionDescriptions.Add(UpperCaseFunction.FunctionName, "Функция возвращает значение в верхнем регистре");
+            FunctionDescriptions.Add(LowerCaseFunction.FunctionName, "Функция возвращает значение в нижнем регистре");
+            FunctionDescriptions.Add(CamelCaseFunction.FunctionName, "Функция возвращает возвращает значение, где каждое слово с заглавной буквы");
         }
 
         public static ILogIn Login { get; set; }

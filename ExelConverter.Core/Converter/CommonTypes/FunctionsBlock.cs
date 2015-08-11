@@ -10,6 +10,7 @@ using ExelConverter.Core.Converter.Functions;
 using ExelConverter.Core.ExelDataReader;
 using System.Windows.Input;
 using System.Xml.Serialization;
+using Helpers;
 
 namespace ExelConverter.Core.Converter.CommonTypes
 {
@@ -261,33 +262,29 @@ namespace ExelConverter.Core.Converter.CommonTypes
                     parameters.Add("row", rowNumber);
                 }
                 cellResultContent = rule.Rule.Function(parameters);
-                bool subResult = false;
-                if (rule.AbsoluteCoincidence)
-                {
-                    subResult = 
-                        rule
-                        .ExpectedValues
-                        .Any(s => 
-                                s != null 
-                                && 
-                                (
-                                    s.Value == cellResultContent 
-                                    || string.IsNullOrWhiteSpace(s.Value) == string.IsNullOrWhiteSpace(cellResultContent) == true
-                                )
-                            );
-                }
-                else
-                {
-                    subResult = 
-                        rule
-                        .ExpectedValues
-                        .Any(s => 
-                                s != null 
-                                && s.Value != null 
-                                && cellResultContent.ToLower().Contains(s.Value.ToLower()
-                        )
-                    );
-                }
+                bool subResult = rule.ExpectedValues
+                        .Select(s => (s?.Value ?? string.Empty))
+                        .Distinct()
+                        .Any(s => cellResultContent.Like(rule.AbsoluteCoincidence ? s : Tag.ClearStringFromDoubleChars(string.Format("*{0}*", s.Replace(' ','*')),'*')));
+                //bool subResult = false;
+                //if (rule.AbsoluteCoincidence)
+                //{
+                //    subResult = rule.ExpectedValues
+                //        .Select(s => (s?.Value ?? string.Empty))
+                //        .Distinct()
+                //        .Any(s =>                                  
+                //                    s == cellResultContent 
+                //                    //|| string.IsNullOrWhiteSpace(s.Value) == string.IsNullOrWhiteSpace(cellResultContent) == true
+                //            );
+                //}
+                //else
+                //{
+                //    subResult = rule.ExpectedValues
+                //        .Select(s => (s?.Value ?? string.Empty))
+                //        .Distinct()
+                //        .Any(s => cellResultContent.Like(s));
+                //}
+
                 if (IsAllStartRulesNeeded)
                     result &= subResult;
                 else

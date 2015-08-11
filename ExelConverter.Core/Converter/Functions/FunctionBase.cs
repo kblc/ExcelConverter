@@ -32,7 +32,11 @@ namespace ExelConverter.Core.Converter.Functions
     [XmlInclude(typeof(GetRightCharFunction))]
     [XmlInclude(typeof(FindStringFunction))]
     [XmlInclude(typeof(SizeFunction))]
+    [XmlInclude(typeof(StringLengthFunction))]
     [XmlInclude(typeof(SplitFunction))]
+    [XmlInclude(typeof(UpperCaseFunction))]
+    [XmlInclude(typeof(LowerCaseFunction))]
+    [XmlInclude(typeof(CamelCaseFunction))]
     [XmlInclude(typeof(AddTextFunction))]
     [XmlInclude(typeof(GetColorFunction))]
     [XmlInclude(typeof(GetHyperlinkFunction))]
@@ -320,6 +324,7 @@ namespace ExelConverter.Core.Converter.Functions
                 new GetRightCharFunction(),
                 new FindStringFunction(),
                 new SizeFunction(),
+                new StringLengthFunction(),
                 new SplitFunction(),
                 new AddTextFunction(),
                 new GetColorFunction(),
@@ -327,7 +332,10 @@ namespace ExelConverter.Core.Converter.Functions
                 new GetFormatedValueFunction(),
                 new FindNumFunction(),
                 new StringReverseFunction(),
-                new ReplaceStringFunction()
+                new ReplaceStringFunction(),
+                new UpperCaseFunction(),
+                new LowerCaseFunction(),
+                new CamelCaseFunction()
             };
         }
 

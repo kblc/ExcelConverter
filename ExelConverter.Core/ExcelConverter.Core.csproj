@@ -113,6 +113,8 @@
     <Compile Include="Converter\Functions\GetHyperlinkFunction.cs" />
     <Compile Include="Converter\Functions\GetLeftCharFunction.cs" />
     <Compile Include="Converter\Functions\GetRightCharFunction.cs" />
+    <Compile Include="Converter\Functions\SomeCaseFunction.cs" />
+    <Compile Include="Converter\Functions\StringLengthFunction.cs" />
     <Compile Include="Converter\Functions\SizeFunction.cs" />
     <Compile Include="Converter\Functions\SplitFunction.cs" />
     <Compile Include="Converter\Functions\StringPositionFunction.cs" />
