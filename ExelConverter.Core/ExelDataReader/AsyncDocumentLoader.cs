@@ -249,60 +249,110 @@ namespace ExelConverter.Core.ExelDataReader
 
                                 #region Read data from cells
 
-                                for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
-                                {
-                                    Cell cell =  row.GetCellByIndex(k);
-                                    var c = new ExelCell();
-
-                                    c.FormatedValue = cell.StringValue;
-
-                                    var link = GetHyperlinkForCell(cell, sheet);
-                                    if (link != null)
-                                        c.HyperLink = link.Address;
-
-                                    else if (cell.Formula != null)
-                                    {
-                                        var formula = cell.Formula;
-                                        if (formula != null)
+                                var cells = Enumerable.Range(0, lastFilledColumnIndex + 1)
+                                    .Select(cellIndex => row.GetCellOrNull(cellIndex))
+                                    .Select(c => new { OriginalCell = c, ResultCell = new ExelCell() { Value = string.Empty, FormatedValue = string.Empty, CellStyle = new Style() } })
+                                    .Select(i =>
                                         {
-                                            c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
-                                        }
-                                    }
-
-                                    if (cell.IsMerged)
-                                    {
-                                        c.IsMerged = true;
-
-                                        var hLink = GetHyperlinkForCell(cell, sheet);
-                                        c.HyperLink = hLink == null ? string.Empty : hLink.Address;
-
-                                        var content = string.Empty;
-                                        var values = (IEnumerable)cell.GetMergedRange().Value;
-                                        if (values != null)
-                                            foreach (var value in values)
+                                            if (i.OriginalCell != null)
                                             {
-                                                content += value;
+                                                i.ResultCell.FormatedValue = i.OriginalCell.StringValue;
+
+                                                var link = GetHyperlinkForCell(i.OriginalCell, sheet);
+                                                if (link != null)
+                                                    i.ResultCell.HyperLink = link.Address;
+
+                                                else if (i.OriginalCell.Formula != null)
+                                                {
+                                                    var formula = i.OriginalCell.Formula;
+                                                    if (formula != null)
+                                                        i.ResultCell.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
+                                                }
+
+                                                if (i.OriginalCell.IsMerged)
+                                                {
+                                                    i.ResultCell.IsMerged = true;
+
+                                                    var content = string.Empty;
+                                                    var values = (IEnumerable)i.OriginalCell.GetMergedRange().Value;
+                                                    if (values != null)
+                                                        foreach (var value in values)
+                                                            content += value;
+
+                                                    i.ResultCell.Value = content;
+                                                }
+                                                else if (i.OriginalCell.Value != null)
+                                                {
+                                                    i.ResultCell.Value = i.OriginalCell.Value.ToString();
+                                                }
+                                                else
+                                                {
+                                                    i.ResultCell.Value = string.Empty;
+                                                }
+
+                                                var style = i.OriginalCell.GetStyle();
+                                                i.ResultCell.CellStyle = style;
+                                                i.ResultCell.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
+                                                i.ResultCell.Color = System.Drawing.Color.FromArgb((i.ResultCell.Color.R > byte.MinValue || i.ResultCell.Color.G > byte.MinValue || i.ResultCell.Color.B > byte.MinValue) && i.ResultCell.Color.A == byte.MinValue ? byte.MaxValue : i.ResultCell.Color.A, i.ResultCell.Color.R, i.ResultCell.Color.G, i.ResultCell.Color.B);
                                             }
+                                            return i.ResultCell;
+                                        });
+                                r.Cells.AddRange(cells);
 
-                                        c.Value = content;
-                                    }
-                                    else if (cell.Value != null)
-                                    {
-                                        c.Value = cell.Value.ToString();
-                                    }
-                                    else
-                                    {
-                                        c.Value = string.Empty;
-                                    }
+                                //for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
+                                //{
+                                //    Cell cell =  row.GetCellByIndex(k);
+                                //    var c = new ExelCell();
 
-                                    var style = cell.GetStyle();
-                                    c.CellStyle = style;
-                                    c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
+                                //    c.FormatedValue = cell.StringValue;
 
-                                    c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
+                                //    var link = GetHyperlinkForCell(cell, sheet);
+                                //    if (link != null)
+                                //        c.HyperLink = link.Address;
 
-                                    r.Cells.Add(c);
-                                }
+                                //    else if (cell.Formula != null)
+                                //    {
+                                //        var formula = cell.Formula;
+                                //        if (formula != null)
+                                //        {
+                                //            c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
+                                //        }
+                                //    }
+
+                                //    if (cell.IsMerged)
+                                //    {
+                                //        c.IsMerged = true;
+
+                                //        var hLink = GetHyperlinkForCell(cell, sheet);
+                                //        c.HyperLink = hLink == null ? string.Empty : hLink.Address;
+
+                                //        var content = string.Empty;
+                                //        var values = (IEnumerable)cell.GetMergedRange().Value;
+                                //        if (values != null)
+                                //            foreach (var value in values)
+                                //            {
+                                //                content += value;
+                                //            }
+
+                                //        c.Value = content;
+                                //    }
+                                //    else if (cell.Value != null)
+                                //    {
+                                //        c.Value = cell.Value.ToString();
+                                //    }
+                                //    else
+                                //    {
+                                //        c.Value = string.Empty;
+                                //    }
+
+                                //    var style = cell.GetStyle();
+                                //    c.CellStyle = style;
+                                //    c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
+
+                                //    c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
+
+                                //    r.Cells.Add(c);
+                                //}
 
                                 #endregion
 
