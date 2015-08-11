@@ -55,6 +55,31 @@ namespace ExelConverter.Core.ExelDataReader
             }
         }
 
+        private ExelCell[] headerCells = null;
+        public ExelCell[] HeaderCells
+        {
+            get
+            {
+                if (headerCells == null)
+                {
+                    var headerCells = Cells.ToList();
+                    for (int i = headerCells.Count() - 1; i >= 0; i--)
+                    {
+                        var cnt = 0;
+                        for (int n = i - 1; n >= 0; n--)
+                        {
+                            if (string.Compare(headerCells[n].Value, headerCells[i].Value, true) == 0)
+                                cnt++;
+                        }
+                        if (cnt > 0)
+                            headerCells[i].Value = string.Format("{0}[{1}]", headerCells[i].Value, cnt);
+                    }
+                    this.headerCells = headerCells.ToArray();
+                }
+                return headerCells;
+            }
+        }
+
         public bool IsEmpty
         {
             get

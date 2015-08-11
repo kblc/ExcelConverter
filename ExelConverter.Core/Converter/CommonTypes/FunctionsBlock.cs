@@ -240,7 +240,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 {
                     if (sheet.MainHeader != null)
                     {
-                        var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].Cells.Select(c => c.Value).ToList();
+                        var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].HeaderCells.Select(c => c.Value).ToList();
                         var columnNumber = header.IndexOf(header.Where(s => s.Trim().ToLower() == rule.Rule.ColumnName.Trim().ToLower()).FirstOrDefault());
                         if (columnNumber >= 0 && sheet.Rows.ElementAt(rowNumber).Cells.Count > columnNumber)
                         {
@@ -321,7 +321,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 {
                     if (sheet.MainHeader != null)
                     {
-                        var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].Cells.Select(c => c.Value).ToList();
+                        var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].HeaderCells.Select(c => c.Value).ToList();
                         var columnNumber = header.IndexOf(header.Where(s => s.Trim().ToLower() == (function.Function.ColumnName ?? string.Empty).Trim().ToLower()).FirstOrDefault());
                         if (columnNumber >= 0 && sheet.Rows.ElementAt(rowNumber).Cells.Count > columnNumber)
                         {

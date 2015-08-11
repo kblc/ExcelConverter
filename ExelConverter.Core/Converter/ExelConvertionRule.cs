@@ -349,7 +349,7 @@ namespace ExelConverter.Core.Converter
                                                 if (startFunc.Function.SelectedParameter == FunctionParameters.CellName)
                                                 {
                                                     subLogPart++;
-                                                    var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].Cells.Select(c => c.Value).ToList();
+                                                    var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].HeaderCells.Select(c => c.Value).ToList();
                                                     var columnNumber = header.IndexOf(header.Where(s => s.Trim().ToLower() == startFunc.Function.ColumnName.Trim().ToLower()).FirstOrDefault());
                                                     if (columnNumber >= 0 && sheet.Rows.ElementAt(i).Cells.Count > columnNumber)
                                                     {

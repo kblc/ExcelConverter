@@ -336,10 +336,8 @@ namespace ExelConverterLite.ViewModel
                     .ToArray()
                     );
 
-            foreach (var header in Document.SelectedSheet.MainHeader.Cells)
-            {
-                SheetHeaders.Add(header.Value);
-            }
+            foreach (var header in Document.SelectedSheet.MainHeader.HeaderCells.Select(c => c.Value))
+                SheetHeaders.Add(header);
 
             if (updateSharp)
                 UpdateSharp(false);

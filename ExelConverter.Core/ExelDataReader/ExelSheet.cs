@@ -80,26 +80,9 @@ namespace ExelConverter.Core.ExelDataReader
                     MainHeader = Rows.ElementAt(mainHeaderIndex);
                     return;
                 }
-
-                //for (var i = searchRowsCount - 1; i >= 0; i--)
-                //{
-                //    if (Rows.ElementAt(i).Cells.Count != 0)
-                //    {
-                //        for (var j = 0; j < Rows.ElementAt(i).Cells.Count; j++)
-                //        {
-                //            if (tags.Any(s => Rows.ElementAt(i).Cells.ElementAt(j).Value.ToLower().Contains(s.ToLower())))
-                //            {
-                //                MainHeader = Rows.ElementAt(i);
-                //                return;
-                //            }
-                //        }
-                //    }
-                //}
             } 
             MainHeader = Rows.FirstOrDefault();
             MainHeaderRowCount = 1;
-
-
         }
 
         private List<int> HeaderLineNumbers
@@ -156,16 +139,8 @@ namespace ExelConverter.Core.ExelDataReader
                     }
                 ).ToArray());
 
-            //if (headersLevel1.Count > 0 || 1 == 1) //always
-            //{
             SheetHeaders.Headers = headersLevel1;
             SheetHeaders.Subheaders = headersLevel2;
-            //}
-            //else
-            //{
-            //    SheetHeaders.Headers = headersLevel2;
-            //    SheetHeaders.Subheaders = new ObservableCollection<SheetHeader>();
-            //}
         }
 
         private List<int> getAllHeadersData = null;
@@ -289,72 +264,6 @@ namespace ExelConverter.Core.ExelDataReader
             }
             return getAllHeadersData = result;
         }
-
-        //private decimal IsIntersected(string[] allTags, string[] items, decimal ifNotIntersectedDefaultValue = 0)
-        //{
-        //    if (items.Length == 0)
-        //        return ifNotIntersectedDefaultValue;
-        //    var val = GetIntersectedCount(allTags, items) / items.Length;
-
-        //    return val == 0 ? ifNotIntersectedDefaultValue : val;
-        //}
-
-        //private string DelStars(string str)
-        //{
-        //    if (string.IsNullOrWhiteSpace(str)) 
-        //        return string.Empty; 
-
-        //    while (str.Contains("**")) 
-        //        str = str.Replace("**", "*"); 
-            
-        //    return str;
-        //}
-
-        //private string[] GetTags(string[] allTags, bool excluded)
-        //{
-        //    var res = allTags
-        //        .Where(t => !string.IsNullOrEmpty(t) && (excluded ? t.StartsWith("-") : !t.StartsWith("-")))
-        //        .Select(t => excluded ? t.Substring(1) : t)
-        //        .Select(t => new { Strong = t.StartsWith("=") ? true : false, Tag = t.StartsWith("=") ? t.Substring(1) : t })
-        //        .Select(t => new { Strong = t.Strong, Tag = DelStars(t.Tag.Trim().ToLower().Replace(' ', '*')) })
-        //        .Select(t => t.Strong ? t.Tag : DelStars("*" + t.Tag + "*"))
-        //        .Where(t => t != "*")
-        //        .ToArray();
-        //    return res;
-        //}
-
-        //private string[] IncludedTags(string[] allTags)
-        //{
-        //    return GetTags(allTags, false);
-        //}
-
-        //private string[] ExcludedTags(string[] allTags)
-        //{
-        //    return GetTags(allTags, true);
-        //}
-
-        //private int GetIntersectedCount(string[] allTags, string[] items)
-        //{
-        //    if (allTags == null || items == null)
-        //        return 0;
-
-        //    items = items
-        //        .Select(i => i != null ? Tag.ClearStringFromDoubleChars(i.Trim().ToLower(),' ').Trim() : null)
-        //        .Where(i => i != null)
-        //        .ToArray();
-
-        //    int result = 0;
-
-        //    var allTg = Tag.FromStrings(allTags);
-
-        //    var exTags = allTg.Where(t => t.Direction == TagDirection.Exclude);
-        //    var inTags = allTg.Where(t => t.Direction == TagDirection.Include);
-
-        //    if (!exTags.Any(t => items.Any(i => i.Like(t.Value)))) //if find excluded tag, then return zero
-        //        result = items.Select(i => inTags.Count(t => i.Like(t.Value))).DefaultIfEmpty(0).Sum();
-
-        //    return result;           
-        //}
 
         private void SomeCalculations(List<int> result, int endHeaderRowIndex, string[] tags, int[] strongIndexes)
         {

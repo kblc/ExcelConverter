@@ -205,7 +205,6 @@ namespace ExelConverter.Core.ExelDataReader
             if (count <= 0)
                count = totalRowsCount;
 
-            var hLinks = sheet.Hyperlinks.Cast<Hyperlink>();
             #region Select max column index for sheet
             int maxColumnIndex = sheet.Cells.Rows.Cast<Row>().Take(count).Select(c =>
             {
@@ -233,13 +232,12 @@ namespace ExelConverter.Core.ExelDataReader
             {
                 var lockObj = new Object();
                 var lockCell = new Object();
-
-                //sheet.Cells.MultiThreadReading = true;
+                sheet.Cells.MultiThreadReading = true;
 
                 var items =
                         sheet.Cells.Rows.Cast<Row>()
                             .Where(r => r.Index < count)
-                            //.AsParallel()
+                            .AsParallel()
                             .Select(row =>
                             {
                                 var r = new ExelRow() { Index = row.Index };
@@ -250,13 +248,14 @@ namespace ExelConverter.Core.ExelDataReader
                                 #region Read data from cells
 
                                 var cells = Enumerable.Range(0, lastFilledColumnIndex + 1)
-                                    .Select(cellIndex => row.GetCellOrNull(cellIndex))
-                                    .Select(c => new { OriginalCell = c, ResultCell = new ExelCell() { Value = string.Empty, FormatedValue = string.Empty, CellStyle = new Style() } })
+                                    .Select(cellIndex => new { OriginalCell = row.GetCellOrNull(cellIndex), Index = cellIndex })
+                                    .Select(c => new { OriginalCell = c.OriginalCell, ResultCell = new ExelCell() { Value = string.Empty, FormatedValue = string.Empty, CellStyle = new Style() }, Index = c.Index })
                                     .Select(i =>
                                         {
                                             if (i.OriginalCell != null)
                                             {
-                                                i.ResultCell.FormatedValue = i.OriginalCell.StringValue;
+                                                lock(lockCell)
+                                                    i.ResultCell.FormatedValue = i.OriginalCell.StringValue;
 
                                                 var link = GetHyperlinkForCell(i.OriginalCell, sheet);
                                                 if (link != null)
@@ -295,64 +294,12 @@ namespace ExelConverter.Core.ExelDataReader
                                                 i.ResultCell.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
                                                 i.ResultCell.Color = System.Drawing.Color.FromArgb((i.ResultCell.Color.R > byte.MinValue || i.ResultCell.Color.G > byte.MinValue || i.ResultCell.Color.B > byte.MinValue) && i.ResultCell.Color.A == byte.MinValue ? byte.MaxValue : i.ResultCell.Color.A, i.ResultCell.Color.R, i.ResultCell.Color.G, i.ResultCell.Color.B);
                                             }
-                                            return i.ResultCell;
-                                        });
+                                            return new { ResultCell = i.ResultCell, Index = i.Index };
+                                        })
+                                    .OrderBy(i => i.Index)
+                                    .Select(i => i.ResultCell)
+                                    .ToArray();
                                 r.Cells.AddRange(cells);
-
-                                //for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
-                                //{
-                                //    Cell cell =  row.GetCellByIndex(k);
-                                //    var c = new ExelCell();
-
-                                //    c.FormatedValue = cell.StringValue;
-
-                                //    var link = GetHyperlinkForCell(cell, sheet);
-                                //    if (link != null)
-                                //        c.HyperLink = link.Address;
-
-                                //    else if (cell.Formula != null)
-                                //    {
-                                //        var formula = cell.Formula;
-                                //        if (formula != null)
-                                //        {
-                                //            c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
-                                //        }
-                                //    }
-
-                                //    if (cell.IsMerged)
-                                //    {
-                                //        c.IsMerged = true;
-
-                                //        var hLink = GetHyperlinkForCell(cell, sheet);
-                                //        c.HyperLink = hLink == null ? string.Empty : hLink.Address;
-
-                                //        var content = string.Empty;
-                                //        var values = (IEnumerable)cell.GetMergedRange().Value;
-                                //        if (values != null)
-                                //            foreach (var value in values)
-                                //            {
-                                //                content += value;
-                                //            }
-
-                                //        c.Value = content;
-                                //    }
-                                //    else if (cell.Value != null)
-                                //    {
-                                //        c.Value = cell.Value.ToString();
-                                //    }
-                                //    else
-                                //    {
-                                //        c.Value = string.Empty;
-                                //    }
-
-                                //    var style = cell.GetStyle();
-                                //    c.CellStyle = style;
-                                //    c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
-
-                                //    c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
-
-                                //    r.Cells.Add(c);
-                                //}
 
                                 #endregion
 
@@ -369,110 +316,14 @@ namespace ExelConverter.Core.ExelDataReader
                                 }
 
                                 return r;
-                            });
+                            })
+                            .OrderBy(r => r.Index)
+                            .Where(r => !deleteEmptyRows || !r.IsEmpty) // delete empty rows
+                            .ToArray();
                 result.AddRange(items);
             }
-
-            //foreach (Row row in sheet.Cells.Rows.Cast<Row>().Where(r => r.Index < count))
-            //{
-            //    var index = row.Index;
-
-            //    //var rowHyperLinks = hLinks.Where(hl => hl.Area.StartRow <= index && hl.Area.EndRow >= index).ToArray();
-
-            //    var r = new ExelRow() { Index = index };
-            //    if (sheet.Cells.Count > 0)
-            //    {
-            //        var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
-
-            //        int lastFilledColumnIndex = Math.Min(currMaxColumnsIndex, maxColumnIndex);
-
-            //        #region Read data from cells
-
-            //        for (var k = 0; k <= lastFilledColumnIndex; k++) //sheet.Cells.Columns.Count
-            //        {
-            //            var cell = sheet.Cells[index, k];
-            //            var c = new ExelCell();
-
-            //            c.FormatedValue = cell.StringValue;
-
-            //            var link = GetHyperlinkForCell(cell, sheet);
-            //            if (link != null)
-            //                c.HyperLink = link.Address;
-                        
-            //            else if (cell.Formula != null)
-            //            {
-            //                var formula = cell.Formula;
-            //                if (formula != null)
-            //                {
-            //                    c.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
-            //                }
-            //            }
-
-            //            if (cell.IsMerged)
-            //            {
-            //                c.IsMerged = true;
-
-            //                var hLink = GetHyperlinkForCell(cell, sheet);
-            //                c.HyperLink = hLink == null ? string.Empty : hLink.Address;
-                            
-            //                var content = string.Empty;
-            //                var values = (IEnumerable)cell.GetMergedRange().Value;
-            //                if (values != null)
-            //                    foreach (var value in values)
-            //                    {
-            //                        content += value;
-            //                    }
-
-            //                c.Value = content;
-            //            }
-            //            else if (cell.Value != null)
-            //            {
-            //                c.Value = cell.Value.ToString();
-            //            }
-            //            else
-            //            {
-            //                c.Value = string.Empty;
-            //            }
-
-            //            var style = cell.GetStyle();
-            //            c.CellStyle = style;
-            //            c.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
-
-            //            c.Color = System.Drawing.Color.FromArgb((c.Color.R > byte.MinValue || c.Color.G > byte.MinValue || c.Color.B > byte.MinValue) && c.Color.A == byte.MinValue ? byte.MaxValue : c.Color.A, c.Color.R, c.Color.G, c.Color.B);
-
-            //            r.Cells.Add(c);
-            //        }
-
-            //        #endregion
-
-            //        var lastStyle = (maxColumnIndex > 0) ? r.Cells[lastFilledColumnIndex].CellStyle : new Style();
-
-            //        //for (int i = r.Cells.Count; i <= lastFilledColumnIndex; i++) 
-
-            //        for (int i = r.Cells.Count; i <= maxColumnIndex; i++)
-            //            r.Cells.Add(new ExelCell() { Value = string.Empty, CellStyle = lastStyle });
-
-            //        result.Add(r);
-            //        loaded++;
-            //        if (progressReport != null)
-            //            progressReport((int)((double)loaded * 100 / (double)totalRowsCount));
-            //    }
-
-            //}
+            
             #endregion
-
-            //FillMergedCells(sht);
-
-            //Delete empty rows from end
-            if (deleteEmptyRows)
-                for (int z = result.Count - 1; z >= 0; z--)
-                {
-                    var r1 = result[z];
-                    if (r1.IsEmpty)
-                        result.RemoveAt(z);
-                    else
-                        break;
-                }
 
             if (result.Count > 0)
             {
