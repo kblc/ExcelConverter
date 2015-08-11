@@ -120,27 +120,53 @@ namespace ExelConverter.Core.ExelDataReader
         {
             getAllHeadersData = null;
             GetAllHeadersData(tags);
-            
-            var headersLevel1 = new ObservableCollection<SheetHeader>(
-                HeaderLineNumbers.Select(
-                    i => new SheetHeader
-                    {
-                        Header = Rows[i].Cells.Where(r => ((ExelCell)r).Value.Length == Rows[i].Cells.Max(rw => ((ExelCell)rw).Value.Length)).Select(c => (ExelCell)c).First().Value,
-                        RowNumber = i
-                    }
-                ).ToArray());
 
-            var headersLevel2 = new ObservableCollection<SheetHeader>(
-                SubheaderLineNumbers.Select(
-                    i => new SheetHeader
-                    {
-                        Header = Rows[i].Cells.Where(r => ((ExelCell)r).Value.Length == Rows[i].Cells.Max(rw => ((ExelCell)rw).Value.Length)).Select(c => (ExelCell)c).First().Value,
-                        RowNumber = i
-                    }
-                ).ToArray());
+            var getHeaders = new Func<int[], SheetHeader[]>((rowNumbers) => 
+            {
+                var sHeaders = new List<SheetHeader>();
+                var deepLevel = 0;
+                while (true)
+                {
+                    deepLevel++;
 
-            SheetHeaders.Headers = headersLevel1;
-            SheetHeaders.Subheaders = headersLevel2;
+                    var hdrs =
+                        rowNumbers
+                        .Except(sHeaders.Select(r => r.RowNumber))
+                        .Select(i => new { Row = Rows[i], LineNumber = i })
+                        .Select(
+                            row =>
+                            {
+                                var headers = row.Row.Cells.Where(c => c.Value.Length > 0).OrderByDescending(c => c.Value.Length).Take(deepLevel).Select(c => c.Value);
+                                var header = string.Empty;
+                                foreach (var h in headers)
+                                    header += (string.IsNullOrWhiteSpace(header) ? string.Empty : "_") + h;
+                                return new SheetHeader { Header = header, RowNumber = row.LineNumber };
+                            }
+                        ).ToArray();
+
+                    if (hdrs.Count() == 0)
+                        break;
+
+                    if (deepLevel >= 5)
+                    {
+                        sHeaders.AddRange(hdrs);
+                        break;
+                    }
+                    else
+                    {
+                        sHeaders.AddRange(hdrs
+                            .GroupBy(h => h.Header)
+                            .Select(g => new { Header = g.First(), Count = g.Count() })
+                            .Where(i => i.Count == 1)
+                            .Select(i => i.Header)
+                            );
+                    }
+                }
+                return sHeaders.OrderBy(h => h.RowNumber).ToArray();
+            });
+
+            SheetHeaders.Headers = new ObservableCollection<SheetHeader>(getHeaders(HeaderLineNumbers.ToArray()));
+            SheetHeaders.Subheaders = new ObservableCollection<SheetHeader>(getHeaders(SubheaderLineNumbers.ToArray()));
         }
 
         private List<int> getAllHeadersData = null;

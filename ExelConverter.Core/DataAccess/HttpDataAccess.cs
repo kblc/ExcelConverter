@@ -330,16 +330,23 @@ namespace ExelConverter.Core.DataAccess
                 if (!IsWebLogined)
                     WebLogin();
 
-                NameValueCollection nvc = new NameValueCollection();
+                NameValueCollection nvc = new NameValueCollection() {
+                    { "companyId", operatorId.ToString() },  //Оператор
+                    { "params[activate]", activate ? "1" : "0" }, //автоматически активировать плоскости после импорта
+                    { "params[coordinatesApproved]", coordinatesApproved ? "1" : "0" }, //загружать координаты как оператор (если нет - как РА)
+                    { "params[useQueue]", useQueue ? "1" : "0" }, //Грузить в очереди
+                    { "params[curlTimeout]", curlTimeout.ToString() }, //Таймаут
+                    { "addToQueue", "Добавить в очередь" }
+                };
 
                 //nvc.Add("login", UserLogin); //Имя пользователя
                 //nvc.Add("password", UserPassword); //Пароль
-                nvc.Add("companyId", operatorId.ToString()); //Оператор
-                nvc.Add("params[activate]", activate ? "1" : "0"); //автоматически активировать плоскости после импорта
-                nvc.Add("params[coordinatesApproved]", coordinatesApproved ? "1" : "0"); //загружать координаты как оператор (если нет - как РА)
-                nvc.Add("params[useQueue]", useQueue ? "1" : "0"); //Грузить в очереди
-                nvc.Add("params[curlTimeout]", curlTimeout.ToString()); //Таймаут
-                nvc.Add("addToQueue", "Добавить в очередь");
+                //nvc.Add("companyId", operatorId.ToString()); //Оператор
+                //nvc.Add("params[activate]", activate ? "1" : "0"); //автоматически активировать плоскости после импорта
+                //nvc.Add("params[coordinatesApproved]", coordinatesApproved ? "1" : "0"); //загружать координаты как оператор (если нет - как РА)
+                //nvc.Add("params[useQueue]", useQueue ? "1" : "0"); //Грузить в очереди
+                //nvc.Add("params[curlTimeout]", curlTimeout.ToString()); //Таймаут
+                //nvc.Add("addToQueue", "Добавить в очередь");
                 HttpUploadFile(
                     GetUrl(PathUploadToQueue),
                     filePath,
