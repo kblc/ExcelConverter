@@ -463,13 +463,32 @@ namespace ExcelConverter.Parser
             {
                 CefSharp.Wpf.WebView result = Views.GetObject();
                 PutControl(result);
+
+                int views = 0;
+                if (webViewViews.TryGetValue(result, out views))
+                    webViewViews.TryUpdate(result, views + 1, views);
+                else
+                    webViewViews.TryAdd(result, views + 1);
                 return result;
             }
 
+            private static System.Collections.Concurrent.ConcurrentDictionary<CefSharp.Wpf.WebView, int> webViewViews = new System.Collections.Concurrent.ConcurrentDictionary<CefSharp.Wpf.WebView, int>();
+
             private static void ReturnWebView(CefSharp.Wpf.WebView view)
             {
-                view.ClearHistory();
-                Views.ReturnObject(view);
+                int views;
+                if (webViewViews.TryGetValue(view, out views) && views >= 10)
+                {
+                    Views.RemoveObject(view);
+                    RemoveControl(view);
+                    GC.Collect();
+                    //view.Dispose();
+                } else
+                {
+                    view.Back();
+                    view.ClearHistory();
+                    Views.ReturnObject(view);
+                }
             }
 
             private static bool inited = false;
