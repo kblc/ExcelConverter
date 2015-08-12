@@ -468,6 +468,7 @@ namespace ExcelConverter.Parser
 
             private static void ReturnWebView(CefSharp.Wpf.WebView view)
             {
+                view.ClearHistory();
                 Views.ReturnObject(view);
             }
 
@@ -630,6 +631,7 @@ namespace ExcelConverter.Parser
                             finally
                             {
                                 ReturnWebView(wv);
+                                //wv.Dispose();
                             }
                     }));
                 #endregion
@@ -1531,7 +1533,7 @@ namespace ExcelConverter.Parser
                                 lock (currLoadedLock)
                                 {
                                     currLoaded++;
-                                    prgItemImg.Value = ((float)currLoaded / (float)fullCnt) * (float)100;
+                                    prgItemImg.Value = ((decimal)currLoaded / (decimal)fullCnt) * 100m;
                                 }
                         }
                     }
@@ -1582,7 +1584,7 @@ namespace ExcelConverter.Parser
                 bool result = (Regex.IsMatch(source, str, RegexOptions.IgnoreCase));
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

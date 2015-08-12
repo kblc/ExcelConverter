@@ -137,8 +137,11 @@ namespace ExelConverter.Core.ExelDataReader
                 pp.Change += (sP, eP) => { bw.ReportProgress((int)eP.Value); };
 
                 var pp0 = pp.GetChild();
+                pp0.Weight = 1;
                 var pp1 = pp.GetChild();
+                pp1.Weight = 3;
                 var pp2 = pp.GetChild();
+                pp2.Weight = 6;
 
                 bw.ReportProgress((int)pp.Value, "Открытие документа...");
 

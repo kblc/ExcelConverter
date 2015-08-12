@@ -95,7 +95,7 @@ namespace ExelConverter.Core.DataWriter
                             }
 
                             ind++;
-                            readRulesProgress.Value = ((float)ind / (float)rulesToSheets) * 100;
+                            readRulesProgress.Value = ((decimal)ind / (decimal)rulesToSheets) * 100m;
                         }
                         Log.Add(logSession, string.Format("total row count to export: '{0}'", rowsToExport.Count));
 
