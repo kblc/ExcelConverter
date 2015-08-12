@@ -98,6 +98,11 @@ namespace ExelConverter.Core.Settings
             FunctionDescriptions.Add(UpperCaseFunction.FunctionName, "Функция возвращает значение в верхнем регистре");
             FunctionDescriptions.Add(LowerCaseFunction.FunctionName, "Функция возвращает значение в нижнем регистре");
             FunctionDescriptions.Add(CamelCaseFunction.FunctionName, "Функция возвращает возвращает значение, где каждое слово с заглавной буквы");
+            FunctionDescriptions.Add(GetCommentFunction.FunctionName, "Функция возвращает строковый комментарий в ячейке");
+
+            FunctionDescriptions.Add(StringContainsFunction.FunctionName, "Функция возвращает '+', если значение в ячейке содержит искомую строку, иначе возвращает '-'");
+
+            FunctionDescriptions.Add(TrimFunction.FunctionName, "Функция возвращает значение без пробелов в начале и конце");
         }
 
         public static ILogIn Login { get; set; }

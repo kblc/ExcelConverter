@@ -19,6 +19,8 @@ namespace ExelConverter.Core.ExelDataReader
 
         public string Value { get; set; }
 
+        public string Comment { get; set; }
+
         public System.Drawing.Color Color { get; set; }
 
         private string hyperLink = string.Empty;

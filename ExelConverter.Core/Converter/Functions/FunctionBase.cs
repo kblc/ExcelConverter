@@ -33,6 +33,8 @@ namespace ExelConverter.Core.Converter.Functions
     [XmlInclude(typeof(FindStringFunction))]
     [XmlInclude(typeof(SizeFunction))]
     [XmlInclude(typeof(StringLengthFunction))]
+    [XmlInclude(typeof(StringContainsFunction))]
+    [XmlInclude(typeof(TrimFunction))]
     [XmlInclude(typeof(SplitFunction))]
     [XmlInclude(typeof(UpperCaseFunction))]
     [XmlInclude(typeof(LowerCaseFunction))]
@@ -335,7 +337,10 @@ namespace ExelConverter.Core.Converter.Functions
                 new ReplaceStringFunction(),
                 new UpperCaseFunction(),
                 new LowerCaseFunction(),
-                new CamelCaseFunction()
+                new CamelCaseFunction(),
+                new GetCommentFunction(),
+                new StringContainsFunction(),
+                new TrimFunction(),
             };
         }
 

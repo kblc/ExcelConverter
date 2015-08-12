@@ -260,12 +260,14 @@ namespace ExelConverter.Core.ExelDataReader
                                                 var link = GetHyperlinkForCell(i.OriginalCell, sheet);
                                                 if (link != null)
                                                     i.ResultCell.HyperLink = link.Address;
-
-                                                else if (i.OriginalCell.Formula != null)
+                                                else
                                                 {
-                                                    var formula = i.OriginalCell.Formula;
-                                                    if (formula != null)
-                                                        i.ResultCell.HyperLink = formula.Split(new char[] { '\"' }).Where(str => str.Contains("http")).FirstOrDefault();
+                                                    var formula = string.Empty;
+                                                    lock(lockCell)
+                                                        formula = i.OriginalCell.Formula;
+
+                                                    if (!string.IsNullOrWhiteSpace(formula))
+                                                        i.ResultCell.HyperLink = formula.Split(new char[] { '\"' }).FirstOrDefault(str => str.Contains("http"));
                                                 }
 
                                                 if (i.OriginalCell.IsMerged)
@@ -288,6 +290,14 @@ namespace ExelConverter.Core.ExelDataReader
                                                 {
                                                     i.ResultCell.Value = string.Empty;
                                                 }
+
+                                                try
+                                                {
+                                                    var comment = sheet.Comments[i.OriginalCell.Row, i.Index];
+                                                    if (comment != null)
+                                                        i.ResultCell.Comment = comment.Note;
+                                                }
+                                                catch { }
 
                                                 var style = i.OriginalCell.GetStyle();
                                                 i.ResultCell.CellStyle = style;
@@ -312,7 +322,7 @@ namespace ExelConverter.Core.ExelDataReader
                                 {
                                     loaded++;
                                     if (progressReport != null)
-                                        progressReport((int)((double)loaded * 100 / (double)totalRowsCount));
+                                        progressReport((int)((double)loaded * 100 / (double)count));
                                 }
 
                                 return r;

@@ -108,12 +108,15 @@
     <Compile Include="Converter\Functions\FindPriceFunction.cs" />
     <Compile Include="Converter\Functions\FindStringFunction.cs" />
     <Compile Include="Converter\Functions\FunctionBase.cs" />
+    <Compile Include="Converter\Functions\GetCommentFunction.cs" />
     <Compile Include="Converter\Functions\GetColorFunction.cs" />
     <Compile Include="Converter\Functions\GetFormatedValueFunction.cs" />
     <Compile Include="Converter\Functions\GetHyperlinkFunction.cs" />
     <Compile Include="Converter\Functions\GetLeftCharFunction.cs" />
     <Compile Include="Converter\Functions\GetRightCharFunction.cs" />
     <Compile Include="Converter\Functions\SomeCaseFunction.cs" />
+    <Compile Include="Converter\Functions\TrimFunction.cs" />
+    <Compile Include="Converter\Functions\StringContainsFunction.cs" />
     <Compile Include="Converter\Functions\StringLengthFunction.cs" />
     <Compile Include="Converter\Functions\SizeFunction.cs" />
     <Compile Include="Converter\Functions\SplitFunction.cs" />
