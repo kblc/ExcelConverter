@@ -62,19 +62,19 @@ namespace ExelConverter.Core.ExelDataReader
             {
                 if (headerCells == null)
                 {
-                    var headerCells = Cells.ToList();
-                    for (int i = headerCells.Count() - 1; i >= 0; i--)
+                    var headerCells2 = Cells.ToList();
+                    for (int i = headerCells2.Count() - 1; i >= 0; i--)
                     {
                         var cnt = 0;
                         for (int n = i - 1; n >= 0; n--)
                         {
-                            if (string.Compare(headerCells[n].Value, headerCells[i].Value, true) == 0)
+                            if (string.Compare(headerCells2[n].Value, headerCells2[i].Value, true) == 0)
                                 cnt++;
                         }
                         if (cnt > 0)
-                            headerCells[i].Value = string.Format("{0}[{1}]", headerCells[i].Value, cnt);
+                            headerCells2[i].Value = string.Format("{0}[{1}]", headerCells2[i].Value, cnt);
                     }
-                    this.headerCells = headerCells.ToArray();
+                    this.headerCells = headerCells2.ToArray();
                 }
                 return headerCells;
             }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,7 +20,6 @@ namespace ExcelConverter.Parser.Test
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             //System.Windows.Forms.Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
 
-
             Log.LogFileName = "log.txt";
             Log.Clear();
             Log.Add("Application is starting up...");
@@ -28,6 +28,7 @@ namespace ExcelConverter.Parser.Test
 
             //App.Current.MainWindow.Show();
 
+            App.Current.Exit += (s,e2) => { Process.GetCurrentProcess().Kill(); };
 
             base.OnStartup(e);
         }

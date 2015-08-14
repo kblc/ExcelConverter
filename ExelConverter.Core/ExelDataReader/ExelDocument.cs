@@ -34,20 +34,20 @@ namespace ExelConverter.Core.ExelDataReader
         public ExelDocument() { }
 
         private string path = string.Empty;
-        public string Path { get { return path; } set { path = value; RaisePropertyChanged(nameof(Path)); RaisePropertyChanged(nameof(Name)); Load(); } }
+        public string Path { get { return path; } set { path = value; RaisePropertyChanged("Path"); RaisePropertyChanged("Name"); Load(); } }
 
         public string Name { get { return System.IO.Path.GetFileName(Path); } }
 
         private string error = string.Empty;
-        public string Error { get { return error; } set { if (error == value) return; error = value; RaisePropertyChanged(nameof(Error)); RaisePropertyChanged(nameof(HasError)); } }
+        public string Error { get { return error; } set { if (error == value) return; error = value; RaisePropertyChanged("Error"); RaisePropertyChanged("HasError"); } }
 
         public bool HasError { get { return !string.IsNullOrWhiteSpace(error); } }
 
         private bool deleteEmptyRows = true;
-        public bool DeleteEmptyRows { get { return deleteEmptyRows; } set { if (deleteEmptyRows == value) return; deleteEmptyRows = value; RaisePropertyChanged(nameof(DeleteEmptyRows)); } }
+        public bool DeleteEmptyRows { get { return deleteEmptyRows; } set { if (deleteEmptyRows == value) return; deleteEmptyRows = value; RaisePropertyChanged("DeleteEmptyRows"); } }
 
         private Workbook workBook = null;
-        public Workbook WorkBook { get { return workBook; } private set { if (workBook == value) return; workBook = value; RaisePropertyChanged(nameof(WorkBook)); } }
+        public Workbook WorkBook { get { return workBook; } private set { if (workBook == value) return; workBook = value; RaisePropertyChanged("WorkBook"); } }
 
         private ObservableCollection<ExelSheet> documentSheets = new ObservableCollection<ExelSheet>();
         public ObservableCollection<ExelSheet> DocumentSheets { get { return documentSheets; } }
@@ -64,25 +64,25 @@ namespace ExelConverter.Core.ExelDataReader
                 if (selectedSheet == value)
                     return;
                 selectedSheet = value;
-                RaisePropertyChanged(nameof(SelectedSheet));
+                RaisePropertyChanged("SelectedSheet");
             }
         }
 
         private bool isDocumentLoaded = false;
-        public bool IsDocumentLoaded { get { return isDocumentLoaded; } private set { if (isDocumentLoaded == value) return; isDocumentLoaded = value; RaisePropertyChanged(nameof(IsDocumentLoaded)); } }
+        public bool IsDocumentLoaded { get { return isDocumentLoaded; } private set { if (isDocumentLoaded == value) return; isDocumentLoaded = value; RaisePropertyChanged("IsDocumentLoaded"); } }
 
         private bool isBusy = false;
-        public bool IsBusy { get { return isBusy; } private set { if (isBusy == value) return; isBusy = value; RaisePropertyChanged(nameof(IsBusy)); } }
+        public bool IsBusy { get { return isBusy; } private set { if (isBusy == value) return; isBusy = value; RaisePropertyChanged("IsBusy"); } }
 
         private string status = string.Empty;
         public string Status
         {
             get { return status; }
-            private set { if (status == value) return; status = value; RaisePropertyChanged(nameof(Status)); }
+            private set { if (status == value) return; status = value; RaisePropertyChanged("Status"); }
         }
 
         private int loadingProgress = 0;
-        public int LoadingProgress { get { return loadingProgress; } set { if (loadingProgress == value) return; loadingProgress = value; RaisePropertyChanged(nameof(LoadingProgress)); } }
+        public int LoadingProgress { get { return loadingProgress; } set { if (loadingProgress == value) return; loadingProgress = value; RaisePropertyChanged("LoadingProgress"); } }
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -121,7 +121,7 @@ namespace ExelConverter.Core.ExelDataReader
             {
                 WorkBook = w;
                 DocumentSheets.Clear();
-                var oldSheetName = SelectedSheet?.Name ?? string.Empty;
+                var oldSheetName = (SelectedSheet == null ? string.Empty : SelectedSheet.Name) ?? string.Empty;
                 foreach (var s2 in s)
                     DocumentSheets.Add(s2);
                 SelectedSheet = DocumentSheets.FirstOrDefault(ss => ss.Name == oldSheetName) ?? DocumentSheets.FirstOrDefault();

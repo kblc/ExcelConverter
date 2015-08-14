@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -31,6 +32,7 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -41,14 +43,6 @@
   <ItemGroup>
     <Reference Include="Aspose.Cells">
       <HintPath>..\ExelConverter.Core\bin\Aspose.Cells.dll</HintPath>
-    </Reference>
-    <Reference Include="CefSharp, Version=1.25.7.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\CefSharp-1.25.7\CefSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="CefSharp.Wpf, Version=1.25.7.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\CefSharp-1.25.7\CefSharp.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Helpers, Version=1.0.5.10, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -81,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Additional.cs" />
+    <Compile Include="CEFLoader.cs" />
     <Compile Include="Controls\ParsersControl.xaml.cs">
       <DependentUpon>ParsersControl.xaml</DependentUpon>
     </Compile>
@@ -115,6 +110,10 @@
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CEFLoader\CEFLoader.csproj">
+      <Project>{2f9ee23c-8fa6-4f6d-a043-a457ac2079b4}</Project>
+      <Name>CEFLoader</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Exiflib\ExifLib.csproj">
       <Project>{c878a95f-e695-42fc-a714-e47df6515679}</Project>
       <Name>ExifLib</Name>
@@ -129,9 +128,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="ExcelConverter.sln.snk" />
-    <None Include="locales\ru.pak">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -184,14 +180,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="msvcp110d.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="icudt.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="libcef.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

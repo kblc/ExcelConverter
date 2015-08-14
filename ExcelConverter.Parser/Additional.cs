@@ -451,210 +451,253 @@ namespace ExcelConverter.Parser
         {
             #region Static
 
-            private static ConcurrencyObjects<CefSharp.Wpf.WebView> Views = null;
-            static SiteManagerCHR()
-            {
-                Views = new ConcurrencyObjects<CefSharp.Wpf.WebView>();
-                Views.Max = 20;
-                Views.TimeToGetObject = new TimeSpan(0, 0, 10, 0);
-            }
+            //private static ConcurrencyObjects<CefSharp.OffScreen.ChromiumWebBrowser> Views = null;
+            //static SiteManagerCHR()
+            //{
+            //    Views = new ConcurrencyObjects<CefSharp.OffScreen.ChromiumWebBrowser>();
+            //    Views.Max = 20;
+            //    Views.TimeToGetObject = new TimeSpan(0, 0, 10, 0);
+            //}
 
-            private static CefSharp.Wpf.WebView GetWebView()
-            {
-                CefSharp.Wpf.WebView result = Views.GetObject();
-                PutControl(result);
+            //private static CefSharp.OffScreen.ChromiumWebBrowser GetWebView()
+            //{
+            //    CefSharp.OffScreen.ChromiumWebBrowser result = Views.GetObject();
+            //    //PutControl(result);
+            //    return result;
+            //}
 
-                int views = 0;
-                if (webViewViews.TryGetValue(result, out views))
-                    webViewViews.TryUpdate(result, views + 1, views);
-                else
-                    webViewViews.TryAdd(result, views + 1);
-                return result;
-            }
+            //private static void ReturnWebView(CefSharp.OffScreen.ChromiumWebBrowser view)
+            //{
+            //    Views.ReturnObject(view);  
+            //}
 
-            private static System.Collections.Concurrent.ConcurrentDictionary<CefSharp.Wpf.WebView, int> webViewViews = new System.Collections.Concurrent.ConcurrentDictionary<CefSharp.Wpf.WebView, int>();
+            //private static bool inited = false;
+            public static void Init() { }
+            //public static void InitTh()
+            //{
+            //    if (!inited)
+            //        try
+            //        {
+            //            string resources = Path.Combine(Directory.GetCurrentDirectory(), "cache");
+            //            if (Directory.Exists(resources))
+            //                try
+            //                {
+            //                    Directory.Delete(resources, true);
+            //                    Directory.CreateDirectory(resources);
+            //                }
+            //                catch { }
 
-            private static void ReturnWebView(CefSharp.Wpf.WebView view)
-            {
-                int views;
-                if (webViewViews.TryGetValue(view, out views) && views >= 10)
-                {
-                    Views.RemoveObject(view);
-                    RemoveControl(view);
-                    GC.Collect();
-                    //view.Dispose();
-                } else
-                {
-                    view.Back();
-                    view.ClearHistory();
-                    Views.ReturnObject(view);
-                }
-            }
+            //            //string cookies = Path.Combine(Directory.GetCurrentDirectory(), "cookies");
+            //            //if (Directory.Exists(cookies))
+            //            //    Directory.Delete(cookies, true);
+            //            //Directory.CreateDirectory(cookies);
 
-            private static bool inited = false;
-            public static void Init()
-            {
-                if (!inited)
-                    try
-                    {
-                        string resources = Path.Combine(Directory.GetCurrentDirectory(), "cache");
+            //            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "chromelog.txt");
+            //            if (File.Exists(logFile))
+            //                try
+            //                {
+            //                    File.Delete(logFile);
+            //                }
+            //                catch
+            //                {
+            //                    logFile = Path.Combine(Directory.GetCurrentDirectory(), DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_chromelog.txt");
+            //                }
 
-                        if (Directory.Exists(resources))
-                            Directory.Delete(resources, true);
+            //            CefSharp.CefSettings settings = new CefSharp.CefSettings()
+            //            {
+            //                CachePath = resources,
+            //                //RemoteDebuggingPort = 8088,
+            //                //LogSeverity = CefSharp.LogSeverity.Error,
+            //                Locale = "ru",
+            //                LogFile = logFile,
+            //                //BrowserSubprocessPath = Path.Combine(Directory.GetCurrentDirectory(), "CefSharp.BrowserSubprocess.exe"),
+            //            };
 
-                        Directory.CreateDirectory(resources);
+            //            inited = CefSharp.Cef.Initialize(settings, shutdownOnProcessExit: true, performDependencyCheck: !System.Diagnostics.Debugger.IsAttached);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Log.Add(ex, "SiteManagerCHR.Init()");
+            //        }
+            //}
 
-                        string logFile = Path.Combine(Directory.GetCurrentDirectory(), "chromelog.txt");
-                        if (File.Exists(logFile))
-                            File.Delete(logFile);
-
-                        CefSharp.Settings settings = new CefSharp.Settings()
-                        {
-                            CachePath = resources,
-                            Locale = "ru",
-                            LogFile = logFile
-                        };
-                        inited = CefSharp.CEF.Initialize(settings);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Add(ex, "SiteManagerCHR.Init()");
-                    }
-            }
-
-            private static readonly string BlankPage = "about:blank";
+            //private static readonly string BlankPage = "dummy:";
 
             #endregion
 
             public SiteManagerCompletedEventArgs Navigate(Uri url, int wait = 0)
             {
-                if (!inited)
-                    throw new Exception("SiteManagerCHR not initialized");
-
                 SiteManagerCompletedEventArgs result = new SiteManagerCompletedEventArgs() { ResponseUri = url };
-                bool done = false;
-                bool canDone = false;
+                try
+                {
+                    var url2 = url.AbsoluteUri;
+                    result.Content = CEFLoader.CEFLoader.GetHTML(ref url2, wait);
+                    result.ResponseUri = new Uri(url2);
+                }
+                catch (Exception ex)
+                {
+                    Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().GetHTML()"));
+                }
+                return result;
+                
+                //if (!inited)
+                //    throw new Exception("SiteManagerCHR not initialized");
 
-                CefSharp.Wpf.WebView wv = null;
+                //SiteManagerCompletedEventArgs result = new SiteManagerCompletedEventArgs() { ResponseUri = url };
+                //bool done = false;
+                //bool canDone = false;
 
-                #region Create WebView
+                //CefSharp.OffScreen.ChromiumWebBrowser wv = null;
 
-                Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                    new Action(() =>
-                    {
-                        wv = GetWebView();
-                    }));
+                //#region Activate
 
-                #endregion
+                //#region LoadCompleteEvent
 
-                #region Activate
-
-                #region BrowserInitializedEvent
-
-                PropertyChangedEventHandler BrowserInitialized = new PropertyChangedEventHandler(
-                    (s, e) =>
-                    {
-                        CefSharp.BrowserCore bc = s as CefSharp.BrowserCore;
-                        if (bc != null && e.PropertyName == "IsBrowserInitialized" && bc.IsBrowserInitialized)
-                            wv.Load(BlankPage);
-                    }
-                );
-
-                #endregion
-                #region LoadCompleteEvent
-
-                CefSharp.LoadCompletedEventHandler LoadCompleteEvent = new CefSharp.LoadCompletedEventHandler(
-                    (s, e) =>
-                    {
-                        if (wv.Address == e.Url && e.Url != BlankPage && canDone)
-                        {
-                            done = true;
-                        }
-                        else if (wv.Address == e.Url && e.Url == BlankPage && !canDone)
-                        {
-                            canDone = true;
-                            wv.Load(url.AbsoluteUri);
-                        }
-                    }
-                );
-
-                #endregion
-
-                Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                    new Action(() =>
-                    {
-                        try
-                        {
-                            wv.LoadCompleted += LoadCompleteEvent;
-                            if (!wv.IsBrowserInitialized)
-                                wv.PropertyChanged += BrowserInitialized;
-                            else
-                                wv.Load(BlankPage);
-                        }
-                        catch (Exception ex)
-                        {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().#Activate"));
-                        }
-                    }));
-
-                #endregion
-
-                #region Wait (done and pause) or 30 sec
-                DateTime endTime = DateTime.Now.AddSeconds(30);
-                while (!done && (DateTime.Now < endTime))
-                    Thread.Sleep(100);
-
-                if (done)
-                    Wait(wait);
-
-                #endregion
-
-                #region Disconect
-                //Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
-                //    new Action(() =>
+                //EventHandler<CefSharp.FrameLoadEndEventArgs> FrameLoadEndEvent = new EventHandler<CefSharp.FrameLoadEndEventArgs>(
+                //    (s, e) =>
                 //    {
-                //        wv.PropertyChanged -= BrowserInitialized;
-                //        wv.Stop();
-                //    }));
+                //        if (wv.Address == e.Url && e.Url != BlankPage && canDone)
+                //        {
+                //            done = true;
+                //        }
+                //        else if (wv.Address == e.Url && e.Url == BlankPage && !canDone)
+                //        {
+                //            canDone = true;
+                //            wv.Load(url.AbsoluteUri);
+                //        }
+                //    }
+                //);
 
-                //#region Wait (done) or 5 sec
-                //endTime = DateTime.Now.AddSeconds(5);
-                //while (!done && (DateTime.Now < endTime))
-                //    Thread.Sleep(100);
+                //EventHandler<LoadingStateChangedEventArgs> LoadingStateChange = new EventHandler<LoadingStateChangedEventArgs>(
+                //    (s,e) =>
+                //    {
+                //        if (e.IsLoading)
+                //            return;
+
+                //        string addr = string.Empty;
+                //        Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                //            new Action(() =>
+                //            {
+                //                addr = wv.Address;
+                //            }));
+
+                //        if (addr != BlankPage && canDone)
+                //        {
+                //            done = true;
+                //        }
+                //        else if (addr == BlankPage && !canDone)
+                //        {
+                //            canDone = true;
+                //            wv.Load(url.AbsoluteUri);
+                //            Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                //                new Action(() =>
+                //                {
+                //                    wv.Load(url.AbsoluteUri);
+                //                    //wv.Address = url.AbsoluteUri;
+                //                }));
+                //            //wv.Load(url.AbsoluteUri);
+                //        }
+                //    }
+
+                //    );
 
                 //#endregion
 
-                #endregion
+                //Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Background,
+                //    new Action(() =>
+                //    {
+                //        try
+                //        {
+                //            //wv = GetWebView();
+                //            wv = new CefSharp.OffScreen.ChromiumWebBrowser();
+                //            //PutControl(wv);
+                //            //wv.IsBrowserInitializedChanged += BrowserInitialized;
+                //            wv.FrameLoadEnd += FrameLoadEndEvent;
+                //            //wv.FrameLoadStart += LoadStartEvent;
+                //            wv.Load(BlankPage);
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().#Activate"));
+                //        }
+                //    }));
 
-                #region GetHTML
-                Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
-                    new Action(() =>
-                    {
-                        if (wv != null)
-                            try
-                            {
-                                wv.PropertyChanged -= BrowserInitialized;
-                                wv.LoadCompleted -= LoadCompleteEvent;
-                                if (done)
-                                {
-                                    result.ResponseUri = new Uri(wv.Address);
-                                    object contentScriptResult = wv.EvaluateScript(@"document.getElementsByTagName ('html')[0].innerHTML");
-                                    if (contentScriptResult != null)
-                                        result.Content = contentScriptResult.ToString();
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().GetHTML()"));
-                            }
-                            finally
-                            {
-                                ReturnWebView(wv);
-                                //wv.Dispose();
-                            }
-                    }));
-                #endregion
-                return result;
+                //#endregion
+
+                //#region Wait (done and pause) or 30 sec
+                //DateTime endTime = DateTime.Now.AddSeconds(30);
+                //while (!done && (DateTime.Now < endTime))
+                //    Thread.Sleep(100);
+
+                //if (done)
+                //    Wait(wait);
+
+                //#endregion
+
+                //#region Disconect
+                ////Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+                ////    new Action(() =>
+                ////    {
+                ////        wv.PropertyChanged -= BrowserInitialized;
+                ////        wv.Stop();
+                ////    }));
+
+                ////#region Wait (done) or 5 sec
+                ////endTime = DateTime.Now.AddSeconds(5);
+                ////while (!done && (DateTime.Now < endTime))
+                ////    Thread.Sleep(100);
+
+                ////#endregion
+
+                //#endregion
+
+                //#region GetHTML
+
+                //Task<JavascriptResponse> resTask = null;
+                //Task<string> resTask2 = null;
+
+                //Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,
+                //    new Action(() =>
+                //    {
+                //        if (wv != null)
+                //            try
+                //            {
+                //                wv.LoadingStateChanged -= LoadingStateChange;
+                //                wv.FrameLoadEnd -= FrameLoadEndEvent;
+                //                if (done)
+                //                {
+                //                    result.ResponseUri = new Uri(wv.Address);
+                //                    resTask2 = wv.GetSourceAsync();
+                //                    //wv.Content
+                //                    //wv.GetMainFrame().EvaluateScript("123");
+                //                    //resTask = wv.EvaluateScriptAsync(@"document.getElementsByTagName ('html')[0].innerHTML");
+                //                    //if (evalScriptTask.Status == TaskStatus.RanToCompletion)
+                //                    //{ 
+                //                    //    var evalScript = wv.EvaluateScriptAsync(@"document.getElementsByTagName ('html')[0].innerHTML").Result;
+                //                    //    result.Content = evalScript?.Result?.ToString() ?? string.Empty;
+                //                    //}
+                //                }
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().GetHTML()"));
+                //            }
+                //            finally
+                //            {
+                //                ReturnWebView(wv);
+                //            }
+                //    }));
+
+                //if (resTask2 != null)
+                //{ 
+                //    resTask2.Wait();
+                //    result.Content = resTask2.Result;
+                //}
+                ////resTask.Wait((int)new TimeSpan(0,0,5).TotalMilliseconds);
+                ////result.Content = resTask?.Result?.ToString() ?? string.Empty;
+
+                //#endregion
+                //return result;
             }
         }
 
@@ -714,7 +757,7 @@ namespace ExcelConverter.Parser
                     if (int.TryParse(waitSeconds, out wait))
                     {
                         SiteManagerCHR mgr = new SiteManagerCHR();
-                        var res = mgr.Navigate(new Uri(url), wait);
+                        var res = mgr.Navigate(new Uri(url), wait * 1000);
                         document = new HtmlDocument();
                         document.LoadHtml(res.Content ?? string.Empty);
                         urlResponse = res.ResponseUri.AbsoluteUri;
@@ -730,10 +773,13 @@ namespace ExcelConverter.Parser
         {
             if (ParentControl != null && !ParentControl.Children.Contains(control))
             {
-                control.Visibility = System.Windows.Visibility.Hidden;
+                //control.Visibility = System.Windows.Visibility.Hidden;
+                control.Visibility = System.Windows.Visibility.Visible;
                 //control.Opacity = 0;
-                control.Width = 1024;
-                control.Height = 1024;
+                control.Width = 300;
+                control.Height = 200;
+                //control.Width = 1024;
+                //control.Height = 1024;
                 if (control.Parent == null)
                     ParentControl.Children.Add(control);
             }

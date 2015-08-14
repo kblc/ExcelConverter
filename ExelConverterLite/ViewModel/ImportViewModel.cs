@@ -71,7 +71,7 @@ namespace ExelConverterLite.ViewModel
                     document = new ExelDocument();
                     document.PropertyChanged += (s,e) =>
                     {
-                        if (e.PropertyName == nameof(Document.IsDocumentLoaded))
+                        if (e.PropertyName == "IsDocumentLoaded")
                         {
                             UpdateMappingsTableCommand.RaiseCanExecuteChanged();
                             ClearMappingsTableCommand.RaiseCanExecuteChanged();
@@ -79,7 +79,7 @@ namespace ExelConverterLite.ViewModel
                             ToCsvCommand.RaiseCanExecuteChanged();
                             ReExportFileCommand.RaiseCanExecuteChanged();
                         }
-                        if (e.PropertyName == nameof(Document.SelectedSheet))
+                        if (e.PropertyName == "SelectedSheet")
                         {
                             SheetChanging();
                             UpdateSheetHeaders();

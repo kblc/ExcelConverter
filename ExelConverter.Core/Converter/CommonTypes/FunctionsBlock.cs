@@ -263,7 +263,7 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 }
                 cellResultContent = rule.Rule.Function(parameters);
                 bool subResult = rule.ExpectedValues
-                        .Select(s => (s?.Value ?? string.Empty))
+                    .Select(s => ((s == null ? string.Empty : s.Value) ?? string.Empty))
                         .Distinct()
                         .Any(s => cellResultContent.Like(rule.AbsoluteCoincidence ? s : Tag.ClearStringFromDoubleChars(string.Format("*{0}*", s.Replace(' ','*')),'*')));
                 //bool subResult = false;

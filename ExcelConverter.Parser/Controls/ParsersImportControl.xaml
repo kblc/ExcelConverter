@@ -24,6 +24,10 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid x:Name="GridMain">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <helpers:IsNotEqualsConverter x:Key="IsNotEqualsConverter"/>

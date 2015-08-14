@@ -68,6 +68,10 @@
     <Compile Include="ExcelSheetTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CEFLoader\CEFLoader.csproj">
+      <Project>{2f9ee23c-8fa6-4f6d-a043-a457ac2079b4}</Project>
+      <Name>CEFLoader</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExelConverter.Core\ExcelConverter.Core.csproj">
       <Project>{fd5887b1-3b28-4470-b9db-19c5c0acdfd4}</Project>
       <Name>ExcelConverter.Core</Name>
