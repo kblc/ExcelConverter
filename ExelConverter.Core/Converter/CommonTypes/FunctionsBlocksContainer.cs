@@ -42,20 +42,26 @@ namespace ExelConverter.Core.Converter.CommonTypes
         {
             var result = string.Empty;
             foreach (var block in Blocks)
-            {
-                if (block.CheckCanExecute(sheet,rowNumber,convertionData))
+                try
                 {
-                    result += block.Execute(sheet, rowNumber, convertionData);
-                    if (block.ReturnAfterExecute)
+                    if (block.CheckCanExecute(sheet, rowNumber, convertionData))
                     {
-                        if (convertionData.MappingNeeded)
+                        result += block.Execute(sheet, rowNumber, convertionData);
+                        if (block.ReturnAfterExecute)
                         {
-                            return MappingTable(result, convertionData);
+                            if (convertionData.MappingNeeded)
+                            {
+                                return MappingTable(result, convertionData);
+                            }
+                            return result;
                         }
-                        return result;
                     }
                 }
-            }
+                catch
+                {
+                    
+                    throw;
+                }
             if (convertionData.MappingNeeded)
             {
                 return MappingTable(result, convertionData);

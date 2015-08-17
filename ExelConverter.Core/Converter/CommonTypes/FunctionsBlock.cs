@@ -241,12 +241,21 @@ namespace ExelConverter.Core.Converter.CommonTypes
                 {
                     if (sheet.MainHeader != null)
                     {
-                        var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].HeaderCells.Select(c => c.Value).ToList();
-                        var columnNumber = header.IndexOf(header.Where(s => s.Trim().ToLower() == rule.Rule.ColumnName.Trim().ToLower()).FirstOrDefault());
-                        if (columnNumber >= 0 && sheet.Rows.ElementAt(rowNumber).Cells.Count > columnNumber)
+                        var header = sheet
+                                .Rows[sheet.Rows.IndexOf(sheet.MainHeader)]
+                                .HeaderCells.Select(c => c.Value)
+                                .ToList(); //for IndexOf function call in next statetment
+                        var column = header.FirstOrDefault(h => string.Compare(h, rule.Rule.ColumnName) == 0);
+                        if (column != null)
                         {
-                            parameters.Add("value", sheet.Rows.ElementAt(rowNumber).Cells.ElementAt(columnNumber));
+                            var columnNumber = header.IndexOf(column);
+                            if (sheet.Rows.ElementAt(rowNumber).Cells.Count > columnNumber)
+                                parameters.Add("value", sheet.Rows.ElementAt(rowNumber).Cells.ElementAt(columnNumber));
+                            else
+                                throw new Exception(string.Format("Колонки с названием '{0}' не существует в данной сетке [0]", rule.Rule.ColumnName));
                         }
+                        else
+                            throw new Exception(string.Format("Колонки с названием '{0}' не существует в данной сетке [1]", rule.Rule.ColumnName));
                     }
                 }
                 else if (rule.Rule.SelectedParameter == FunctionParameters.CellNumber)

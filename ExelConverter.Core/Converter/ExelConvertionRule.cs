@@ -406,10 +406,17 @@ namespace ExelConverter.Core.Converter
                                             propertyOld.SetValue(outputRow, oldValue.Trim(), null);
                                     }
 
-                                    cellResultContent = convertionData.Blocks.Run(sheet, i, convertionData);
-                                    if (cellResultContent != null)
+                                    try
                                     {
-                                        cellResultContent = cellResultContent.Trim();
+                                        cellResultContent = convertionData.Blocks.Run(sheet, i, convertionData);
+                                        if (cellResultContent != null)
+                                        {
+                                            cellResultContent = cellResultContent.Trim();
+                                        }
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        throw new Exception(string.Format("Ошибка для правил столбца '{0}' ('{1}')", convertionData.FieldName, convertionData.PropertyId), ex);
                                     }
 
                                     var property = typeof(OutputRow).GetProperty(convertionData.PropertyId);
@@ -421,7 +428,7 @@ namespace ExelConverter.Core.Converter
                                     if (additionalErrorAction != null)
                                     {
                                         Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
-                                        additionalErrorAction(ex, i);
+                                        additionalErrorAction(ex, i - initialRow - 1);
                                     } else
                                         throw new Exception(string.Format("exception on update field '{0}' at sub step '{1}';", convertionData.PropertyId, subLogPart), ex);
                                 }
@@ -449,7 +456,7 @@ namespace ExelConverter.Core.Converter
                             if (additionalErrorAction != null)
                             {
                                 Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
-                                additionalErrorAction(ex, i);
+                                additionalErrorAction(ex, i - initialRow - 1);
                             }
                             else
                                 throw new Exception(string.Format("exception at row line: '{0}', log part: '{1}';", i, logPart), ex);
