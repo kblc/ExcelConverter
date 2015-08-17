@@ -93,7 +93,7 @@ namespace ExelConverter.Core.Settings
 
             FunctionDescriptions.Add(GetFormatedValueFunction.FunctionName, @"Функция извлекает форматированное значение из выбранной ячейки");
 
-            FunctionDescriptions.Add(StringLengthFunction.FunctionName, "Функция возвращает '+' если длинна строки удовлетворяет условиям. Если нет, то функция возвращает '-'");
+            FunctionDescriptions.Add(StringLengthFunction.FunctionName, "Функция возвращает '+' если длина строки удовлетворяет условиям. Если нет, то функция возвращает '-'");
 
             FunctionDescriptions.Add(UpperCaseFunction.FunctionName, "Функция возвращает значение в верхнем регистре");
             FunctionDescriptions.Add(LowerCaseFunction.FunctionName, "Функция возвращает значение в нижнем регистре");

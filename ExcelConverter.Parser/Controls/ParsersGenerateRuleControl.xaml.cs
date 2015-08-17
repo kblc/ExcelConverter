@@ -555,6 +555,13 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
+        public void StartNew()
+        {
+            ShowRuleMode = false;
+            ShowImageMode = false;
+            UpdateStep(1, false);
+        }
+
         private DelegateCommand hideRuleModeCommand = null;
         public ICommand HideRuleModeCommand
         {

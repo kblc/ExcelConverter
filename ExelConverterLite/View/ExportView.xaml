@@ -34,7 +34,10 @@
                     </DataGrid>
                     <Rectangle Fill="Black" Height="3" Grid.Row="1" />
                     <TabControl Grid.Row="2" Margin="2" >
-                        <TabItem Header="Ошибки">
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock Text="{Binding Errors.Count, StringFormat=Ошибки ({0})}"/>
+                            </TabItem.Header>
                             <DataGrid Grid.Row="1" ItemsSource="{Binding Errors}" AutoGenerateColumns="False" CanUserAddRows="False" 
                           CanUserDeleteRows="False" CanUserReorderColumns="False" SelectionMode="Single" 
                           SelectedItem="{Binding SelectedError}" >
@@ -53,7 +56,24 @@
                                 </DataGrid.Resources>
                             </DataGrid>
                         </TabItem>
-                        <TabItem Header="Предупреждения">
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock Text="{Binding GlobalErrors.Count, StringFormat=Глобальные ошибки ({0})}"/>
+                            </TabItem.Header>
+                            <DataGrid Grid.Row="1" ItemsSource="{Binding GlobalErrors}" AutoGenerateColumns="False" CanUserAddRows="False" 
+                                      CanUserDeleteRows="False" CanUserReorderColumns="False" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Description}" Header="Описание" Width="100*" IsReadOnly="True" />
+                                </DataGrid.Columns>
+                                <DataGrid.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Red"/>
+                                </DataGrid.Resources>
+                            </DataGrid>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock Text="{Binding Warnings.Count, StringFormat=Предупреждения ({0})}"/>
+                            </TabItem.Header>
                             <DataGrid Grid.Row="1" ItemsSource="{Binding Warnings}" AutoGenerateColumns="False" CanUserAddRows="False" 
                           CanUserDeleteRows="False" CanUserReorderColumns="False" SelectionMode="Single"
                           SelectedItem="{Binding SelectedWarning}">
@@ -67,8 +87,7 @@
                                     <DataGridTextColumn Binding="{Binding Description}" Width="100*" Header="Описание" IsReadOnly="True" />
                                 </DataGrid.Columns>
                                 <DataGrid.Resources>
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                            Color="DarkOrange"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="DarkOrange"/>
                                 </DataGrid.Resources>
                             </DataGrid>
                         </TabItem>

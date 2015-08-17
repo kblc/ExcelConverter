@@ -397,7 +397,7 @@
                                 Command="{Binding SelectGenerateRuleTabCommand}" Grid.ColumnSpan="2">
                                 <WrapPanel>
                                     <Image Source="/ExcelConverter.Parser;component/Icons/clipboard_16x16.png"/>
-                                    <TextBlock Text="Сгеренировать правило..." VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    <TextBlock Text="Сгенерировать правило..." VerticalAlignment="Center" Margin="4,0,0,0"/>
                                 </WrapPanel>
                             </Button>
                         </Grid>

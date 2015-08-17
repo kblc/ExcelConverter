@@ -12,7 +12,7 @@ namespace ExelConverter.Core.Converter.Functions
     [Serializable]
     public class StringLengthFunction : FunctionBase
     {
-        public static string FunctionName = "Длинна строки";
+        public static string FunctionName = "Длина строки";
 
         public StringLengthFunction()
         {

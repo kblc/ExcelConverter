@@ -6,6 +6,7 @@ using ExelConverterLite.ViewModel;
 using GalaSoft.MvvmLight.Threading;
 using Helpers;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 
@@ -21,6 +22,8 @@ namespace ExelConverterLite
             if (HttpDataClient.Default != null && HttpDataClient.Default.IsWebLogined)
                 HttpDataClient.Default.WebLogout();
             base.OnExit(e);
+
+            Process.GetCurrentProcess().Kill();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)

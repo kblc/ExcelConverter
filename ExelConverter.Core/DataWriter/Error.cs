@@ -11,4 +11,9 @@ namespace ExelConverter.Core.DataWriter
 
         public string Description { get; set; }
     }
+
+    public class GlobalError
+    {
+        public string Description { get; set; }
+    }
 }

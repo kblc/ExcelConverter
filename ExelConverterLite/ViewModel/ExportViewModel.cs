@@ -124,12 +124,20 @@ namespace ExelConverterLite.ViewModel
 
                 Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.Document.DocumentSheets.Count));
                 var addErr = new List<Error>();
+                var addGErr = new List<GlobalError>();
 
                 foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
                 {
                     var mappingRule = item.Rule;
                     var ds = item.Sheet;
-                    if (mappingRule != null)
+
+                    if (mappingRule == null || ds == null)
+                    { 
+                        if (!string.IsNullOrWhiteSpace(item.Status))
+                            addGErr.Add(new GlobalError() { Description = item.Status });
+                        continue;
+                    }
+                    else
                     {
                         if (ds.MainHeader == null)
                         {
@@ -156,7 +164,6 @@ namespace ExelConverterLite.ViewModel
                         }));
                         Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
                         rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
-
                         Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
                     }
                 }
@@ -187,7 +194,7 @@ namespace ExelConverterLite.ViewModel
                     UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
 
                 RowsToExport = rowsToExport;
-                UpdateErrors(addErr);   
+                UpdateErrors(addErr, addGErr);
             }
             catch(Exception ex)
             {
@@ -285,6 +292,23 @@ namespace ExelConverterLite.ViewModel
                         foreach (var i in value)
                             Errors.Add(i);
                     RaisePropertyChanged("Errors");
+                }
+            }
+        }
+
+        private ObservableCollection<GlobalError> _globalErrors = new ObservableCollection<GlobalError>();
+        public ObservableCollection<GlobalError> GlobalErrors
+        {
+            get { return _globalErrors; }
+            set
+            {
+                if (_globalErrors != value)
+                {
+                    _globalErrors.Clear();
+                    if (value != null)
+                        foreach (var i in value)
+                            _globalErrors.Add(i);
+                    RaisePropertyChanged("GlobalErrors");
                 }
             }
         }
@@ -459,9 +483,15 @@ namespace ExelConverterLite.ViewModel
         {
             UpdateErrors(null);
         }
-        private void UpdateErrors(List<Error> addThisErrors = null)
+        private void UpdateErrors(List<Error> addThisErrors = null, List<GlobalError> addThisGlobalErrors = null)
         {
             Errors.Clear();
+            GlobalErrors.Clear();
+
+            if (addThisGlobalErrors != null)
+                foreach (var e in addThisGlobalErrors)
+                    GlobalErrors.Add(e);
+
             var allErrors = addThisErrors ?? new List<Error>();
 
             foreach (var row in RowsToExport)

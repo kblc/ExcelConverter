@@ -502,6 +502,7 @@ namespace ExcelConverter.Parser.Controls
                     (o) =>
                     {
                         TabControl.SelectedIndex = 1;
+                        ParsersGenerateRuleControl.StartNew();
                     }
                 ));
             }

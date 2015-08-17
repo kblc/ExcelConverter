@@ -21,6 +21,17 @@ namespace ExelConverterLite.ViewModel
         {
             SaveCommand = new RelayCommand(Save);
             CancelCommand = new RelayCommand(Cancel);
+
+            exportRules = App.Locator.Import.ExportRules;
+            exportRules.CollectionChanged += (s, e) =>
+            {
+                if (e.NewItems != null)
+                    foreach(var i in e.NewItems.Cast<SheetRulePair>())
+                    {
+                        i.AllowedSheets = App.Locator.Import.Document.DocumentSheets.AsQueryable();
+                    }
+            };
+
         }
 
         private ObservableCollection<SheetRulePair> exportRules = null;
@@ -37,7 +48,7 @@ namespace ExelConverterLite.ViewModel
         {
             for (int i = exportRules.Count - 1; i >= 0; i--)
             { 
-                if (string.IsNullOrWhiteSpace(exportRules[i].SheetName))
+                if (string.IsNullOrWhiteSpace(exportRules[i].SheetName) && string.IsNullOrWhiteSpace(exportRules[i].Rule?.Name))
                     exportRules.RemoveAt(i);
             }
 

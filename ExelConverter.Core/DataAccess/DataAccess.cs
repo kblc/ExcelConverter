@@ -482,7 +482,7 @@ namespace ExelConverter.Core.DataAccess
 
                     foreach(var itemToSave in 
                                     exportRules
-                                        .Where(i => i.Sheet != null && !string.IsNullOrWhiteSpace(i.Sheet.Name))
+                                        .Where(i => !string.IsNullOrWhiteSpace(i.Sheet?.Name) || !string.IsNullOrWhiteSpace(i.Rule?.Name))
                                         .Select(i => string.Format("{0}:{1}",i.Rule.Id,i.SheetName))
                                         )
                         ruleString += itemToSave + ";";

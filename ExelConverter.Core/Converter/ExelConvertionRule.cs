@@ -27,14 +27,24 @@ using System.Xml.Serialization;
 
 namespace ExelConverter.Core.Converter
 {
-    public class SheetRulePair
+    public class SheetRulePair : INotifyPropertyChanged
     {
-        public IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> AllowedSheets { get; set; }
-        public SheetRulePair(IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> allowedSheets) : this()
+        private IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> allowedSheets = null;
+        public IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> AllowedSheets
+        {
+            get { return allowedSheets; }
+            set { if (allowedSheets == value) return; allowedSheets = value; RaisePropertyChanged(nameof(AllowedSheets)); }
+        }
+
+        public SheetRulePair(IQueryable<ExelConverter.Core.ExelDataReader.ExelSheet> allowedSheets): this()
         {
             this.AllowedSheets = allowedSheets;
         }
-        public SheetRulePair() { }
+        public SheetRulePair()
+        {
+
+        }
+
         public ExelConverter.Core.ExelDataReader.ExelSheet Sheet
         {
             get
@@ -46,11 +56,37 @@ namespace ExelConverter.Core.Converter
             }
             set
             {
-                SheetName = value == null ? string.Empty : value.Name;
+                SheetName = value?.Name ?? string.Empty;
             }
         }
-        public ExelConverter.Core.Converter.ExelConvertionRule Rule { get; set; }
-        public string SheetName { get; set; }
+        private ExelConverter.Core.Converter.ExelConvertionRule rule = null;
+        public ExelConverter.Core.Converter.ExelConvertionRule Rule { get { return rule; } set { if (rule == value) return; rule = value;  RaisePropertyChanged(nameof(Rule)); RaisePropertyChanged(nameof(Status)); } }
+
+        private string sheetName = string.Empty;
+        public string SheetName { get { return sheetName; } set { if (sheetName == value) return; sheetName = value;  RaisePropertyChanged(nameof(SheetName)); RaisePropertyChanged(nameof(Sheet)); RaisePropertyChanged(nameof(Status)); } }
+
+        public string Status
+        {
+            get
+            {
+                if (Sheet == null && (Rule == null || string.IsNullOrWhiteSpace(Rule.Name)))
+                    return string.Empty;
+                if (Sheet == null)
+                    return string.Format("Отсутствует лист в сетке для правила '{0}'", Rule.Name);
+                if (Rule == null || string.IsNullOrWhiteSpace(Rule.Name))
+                    return string.Format("Отсутствует правило для листа '{0}'", Sheet.Name);
+                return string.Empty;
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            var e = PropertyChanged;
+            if (e != null)
+                e(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public interface ICopyFrom<T>

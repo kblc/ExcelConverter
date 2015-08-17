@@ -40,13 +40,15 @@ namespace ExelConverter.Core.Converter.Functions
 
         public override string Function(Dictionary<string, object> param)
         {
-            var res = true;
+            var res = false;
             var str = GetStringValue(param) ?? string.Empty;
-
             var textPrm = Parameters.Where(p => p.Name == "Текст").Single();
             if (textPrm != null && !string.IsNullOrWhiteSpace(textPrm.StringValue))
-                res = str.Like(Tag.ClearStringFromDoubleChars("*"+textPrm.StringValue.Replace(" ", "*")+"*",'*'));
-            
+                foreach(var prm in textPrm
+                    .StringValue
+                    .Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(i => Tag.ClearStringFromDoubleChars("*" + i.Replace(" ", "*") + "*", '*')))
+                        res |= str.Like(prm);
             return res ? "+" : "-";
         }
     }

@@ -37,6 +37,9 @@
                                         SelectedItemBinding="{Binding Rule}" 
                                         DisplayMemberPath="Name" 
                                         ItemsSource="{StaticResource AviableRulesCollection}"/>
+                <DataGridTextColumn  Header="Дополнительно"
+                                     IsReadOnly="True"
+                                     Binding="{Binding Status}"/>
             </DataGrid.Columns>
         </DataGrid>       
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="2" >
