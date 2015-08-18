@@ -20,6 +20,8 @@ using ExcelConverter.Parser.Controls;
 using ExelConverter.Core.DataAccess;
 using ExelConverter.Core.Converter;
 using ExelConverterLite.View;
+using System.ComponentModel;
+using System.Threading;
 
 namespace ExelConverterLite.ViewModel
 {
@@ -101,111 +103,212 @@ namespace ExelConverterLite.ViewModel
             }
         }
 
+
         public ExportViewModel() { }
+
+        private string initializeError = string.Empty;
+        public string InitializeError
+        {
+            get
+            {
+                return initializeError;
+            }
+            private set
+            {
+                if (initializeError == value)
+                    return;
+                initializeError = value;
+                RaisePropertyChanged(nameof(InitializeError));
+                RaisePropertyChanged(nameof(HasError));
+            }
+        }
+
+        public bool HasError { get { return !string.IsNullOrWhiteSpace(InitializeError); } }
+
+        private bool isLoading = false;
+        public bool IsLoading {
+            get { return isLoading; }
+            private set { if (isLoading == value) return; isLoading = value; RaisePropertyChanged(nameof(IsLoading)); }
+        }
+
+        private int loadProgress = 0;
+        public int LoadProgress
+        {
+            get { return loadProgress; }
+            private set { if (loadProgress == value) return; loadProgress = value; RaisePropertyChanged(nameof(LoadProgress)); }
+        }
+
+        private BackgroundWorker loadWorker = null;
+
+        private RelayCommand cancelCommand = null;
+        public RelayCommand CancelCommand
+        {
+            get { return (cancelCommand ?? (cancelCommand = new RelayCommand(() => 
+            {
+                if (loadWorker != null)
+                    loadWorker.CancelAsync();                
+            }, () => { return IsLoading; }))); }
+        }
 
         public void Initialize()
         {
-            //RowsToExport = new ObservableCollection<OutputRow>(App.Locator.Import.SelectedOperator.MappingRule.Convert(App.Locator.Import.SelectedSheet));
-            ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
+            InitializeError = string.Empty;
+            if (Export2CsvCommand == null)
+                Export2CsvCommand = new RelayCommand(Export2Csv);
+            if (Export2DbCommand == null)
+                Export2DbCommand = new RelayCommand(Export2Db);
+            if (UpdateErrorsCommand == null)
+                UpdateErrorsCommand = new RelayCommand(UpdateErrors);
+            if (UpdateSelectedErrorCommand == null)
+                UpdateSelectedErrorCommand = new RelayCommand(UpdateSelectedError);
+            if (UpdateSelectedWarningCommand == null)
+                UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
+            UrlCollection.Clear();
 
-            Guid logSession = Log.SessionStart("ExportViewModel.Initialize()");
-            try
+            loadWorker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
+            loadWorker.DoWork += (s, prm) => 
             {
-                if (Export2CsvCommand == null)
-                    Export2CsvCommand = new RelayCommand(Export2Csv);
-                if (Export2DbCommand == null)
-                    Export2DbCommand = new RelayCommand(Export2Db);
-                if (UpdateErrorsCommand == null)
-                    UpdateErrorsCommand = new RelayCommand(UpdateErrors);
-                if (UpdateSelectedErrorCommand == null)
-                    UpdateSelectedErrorCommand = new RelayCommand(UpdateSelectedError);
-                if (UpdateSelectedWarningCommand == null)
-                    UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
+                var Disp = prm.Argument as System.Windows.Threading.Dispatcher;
 
-                Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.Document.DocumentSheets.Count));
-                var addErr = new List<Error>();
-                var addGErr = new List<GlobalError>();
-
-                foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
+                ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
+                Guid logSession = Log.SessionStart("ExportViewModel.Initialize()");
+                try
                 {
-                    var mappingRule = item.Rule;
-                    var ds = item.Sheet;
+                    Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.Document.DocumentSheets.Count));
+                    var addErr = new List<Error>();
+                    var addGErr = new List<GlobalError>();
 
-                    if (mappingRule == null || ds == null)
-                    { 
-                        if (!string.IsNullOrWhiteSpace(item.Status))
-                            addGErr.Add(new GlobalError() { Description = item.Status });
-                        continue;
-                    }
-                    else
+                    foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
                     {
-                        if (ds.MainHeader == null)
+                        if (((BackgroundWorker)s).CancellationPending || s != loadWorker)
+                            break;
+
+                        var mappingRule = item.Rule;
+                        var ds = item.Sheet;
+
+                        if (mappingRule == null || ds == null)
                         {
-                            Log.Add(string.Format("should update main header row..."));
-
-                            ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags
-                                    .Select(h => h.Tag)
-                                    .Union(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }))
-                                    .Select(i => i.Trim())
-                                    .Where(i => !string.IsNullOrEmpty(i))
-                                    .Distinct()
-                                    .ToArray());
-
-                            ds.UpdateHeaders(mappingRule.SheetHeadersSearchTags
-                                    .Select(h => h.Tag.Trim())
-                                    .Where(i => !string.IsNullOrEmpty(i))
-                                    .Distinct()
-                                    .ToArray());
+                            if (!string.IsNullOrWhiteSpace(item.Status))
+                                addGErr.Add(new GlobalError() { Description = item.Status });
+                            continue;
                         }
-
-                        var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds, additionalErrorAction: (e, r) => 
+                        else
                         {
-                            addErr.Add(new Error() { Description = e.GetExceptionText(), RowNumber = r});
+                            if (ds.MainHeader == null)
+                            {
+                                Log.Add(string.Format("should update main header row..."));
+
+                                ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags
+                                        .Select(h => h.Tag)
+                                        .Union(SettingsProvider.CurrentSettings.HeaderSearchTags.Split(new char[] { ',' }))
+                                        .Select(i => i.Trim())
+                                        .Where(i => !string.IsNullOrEmpty(i))
+                                        .Distinct()
+                                        .ToArray());
+
+                                ds.UpdateHeaders(mappingRule.SheetHeadersSearchTags
+                                        .Select(h => h.Tag.Trim())
+                                        .Where(i => !string.IsNullOrEmpty(i))
+                                        .Distinct()
+                                        .ToArray());
+                            }
+
+                            var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds, 
+                                progressAction: (i) => 
+                                {
+                                    ((BackgroundWorker)s).ReportProgress(i);
+                                },
+                                isCanceled: () => { return ((BackgroundWorker)s).CancellationPending; },
+                                additionalErrorAction: (e, r) =>
+                                {
+                                    addErr.Add(new Error() { Description = e.GetExceptionText(includeStackTrace: false, clearText: true).Trim(), RowNumber = r });
+                                }));
+                            Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
+                            rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
+                            Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
+                        }
+                    }
+
+                    ExelConvertionRule.RemoveRepeatingId(rowsToExport.ToList());
+
+                    var UrlsPhoto = new UrlCollection();
+                    var UrlsSchema = new UrlCollection();
+                    var UrlsAll = new UrlCollection();
+
+                    var photos = rowsToExport.Select(r => r.Photo_img).Where(r => Helper.IsWellFormedUriString(r, UriKind.Absolute)).Distinct();
+                    var schemas = rowsToExport.Select(r => r.Location_img).Where(r => Helper.IsWellFormedUriString(r, UriKind.Absolute)).Distinct();
+                    var all = photos.Union(schemas).Distinct();
+
+                    foreach (var p in photos)
+                        UrlsPhoto.Add(new StringUrlWithResultWrapper(p));
+                    foreach (var p in schemas)
+                        UrlsSchema.Add(new StringUrlWithResultWrapper(p));
+                    foreach (var p in all)
+                        UrlsAll.Add(new StringUrlWithResultWrapper(p));
+
+                    if (!((BackgroundWorker)s).CancellationPending && s == loadWorker)
+                        Disp.Invoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+                        {
+                            if (UrlsPhoto.Count > 0)
+                                UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(0), Collection = UrlsPhoto });
+                            if (UrlsSchema.Count > 0)
+                                UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(1), Collection = UrlsSchema });
+                            if (UrlsPhoto.Count > 0 && UrlsSchema.Count > 0 && UrlsAll.Count > 0)
+                                UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
+
+                            RowsToExport = rowsToExport;
+                            UpdateErrors(addErr, addGErr);
                         }));
-                        Log.Add(string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
-                        rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
-                        Log.Add(string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
+                    else
+                        prm.Cancel = true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Add(logSession, ex.GetExceptionText());
+                    throw ex;
+                }
+                finally
+                {
+                    Log.Add(string.Format("total row count to export: '{0}'", rowsToExport.Count));
+                    Log.SessionEnd(logSession);
+                }
+            };
+
+            loadWorker.ProgressChanged += (s, e) =>
+            {
+                if (s == loadWorker)
+                    LoadProgress = e.ProgressPercentage;
+            };
+
+            loadWorker.RunWorkerCompleted += (s, e) => 
+            {
+                if (s == loadWorker)
+                try
+                { 
+                    if (e.Cancelled)
+                        throw new Exception("Загрузка отменена пользователем");
+                    if (e.Error != null)
+                        throw e.Error;
+                }
+                catch (Exception ex)
+                {
+                    InitializeError = ex.GetExceptionText();
+                }
+                finally
+                {
+                    if (s == loadWorker)
+                    { 
+                        IsLoading = false;
+                        loadWorker = null;
                     }
                 }
+                ((BackgroundWorker)s).Dispose();
+            };
 
-                ExelConvertionRule.RemoveRepeatingId(rowsToExport.ToList());
-
-                UrlCollection.Clear();
-                var UrlsPhoto = new UrlCollection();
-                var UrlsSchema = new UrlCollection();
-                var UrlsAll = new UrlCollection();
-
-                var photos = rowsToExport.Select(r => r.Photo_img).Where(r => Helper.IsWellFormedUriString(r, UriKind.Absolute)).Distinct();
-                var schemas = rowsToExport.Select(r => r.Location_img).Where(r => Helper.IsWellFormedUriString(r, UriKind.Absolute)).Distinct();
-                var all = photos.Union(schemas).Distinct();
-
-                foreach (var p in photos)
-                    UrlsPhoto.Add(new StringUrlWithResultWrapper(p));
-                foreach (var p in schemas)
-                    UrlsSchema.Add(new StringUrlWithResultWrapper(p));
-                foreach (var p in all)
-                    UrlsAll.Add(new StringUrlWithResultWrapper(p));
-
-                if (UrlsPhoto.Count > 0)
-                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(0), Collection = UrlsPhoto });
-                if (UrlsSchema.Count > 0)
-                    UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(1), Collection = UrlsSchema });
-                if (UrlsPhoto.Count > 0 && UrlsSchema.Count > 0 && UrlsAll.Count > 0)
-                    UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
-
-                RowsToExport = rowsToExport;
-                UpdateErrors(addErr, addGErr);
-            }
-            catch(Exception ex)
-            {
-                Log.Add(logSession, ex.GetExceptionText());
-                throw ex;
-            }
-            finally
-            {
-                Log.Add(string.Format("total row count to export: '{0}'", rowsToExport.Count));
-                Log.SessionEnd(logSession);
-            }
+            LoadProgress = 0;
+            IsLoading = true;
+            CancelCommand.RaiseCanExecuteChanged();
+            loadWorker.RunWorkerAsync(System.Windows.Threading.Dispatcher.CurrentDispatcher);
         }
 
         private ObservableCollection<UrlCollectionAdditional> urlCollection = null;
@@ -756,6 +859,11 @@ namespace ExelConverterLite.ViewModel
         internal void Closing()
         {
             Parsers.Save();
+            if (loadWorker != null)
+            { 
+                loadWorker.CancelAsync();
+                loadWorker = null;
+            }
         }
     }
 }

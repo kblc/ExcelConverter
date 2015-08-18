@@ -330,9 +330,9 @@ namespace ExelConverter.Core.Converter.CommonTypes
                         var header = sheet.Rows[sheet.Rows.IndexOf(sheet.MainHeader)].HeaderCells.Select(c => c.Value).ToList();
                         var columnNumber = header.IndexOf(header.Where(s => s.Trim().ToLower() == (function.Function.ColumnName ?? string.Empty).Trim().ToLower()).FirstOrDefault());
                         if (columnNumber >= 0 && sheet.Rows.ElementAt(rowNumber).Cells.Count > columnNumber)
-                        {
                             parameters.Add("value", sheet.Rows.ElementAt(rowNumber).Cells.ElementAt(columnNumber));
-                        }
+                        else
+                            throw new Exception(string.Format("В сетке не найдена колонка '{0}'", function.Function.ColumnName));
                     }
                 }
                 else if (function.Function.SelectedParameter == FunctionParameters.CellNumber)
@@ -341,6 +341,8 @@ namespace ExelConverter.Core.Converter.CommonTypes
                     {
                         parameters.Add("value", sheet.Rows.ElementAt(rowNumber).Cells.ElementAt(function.Function.ColumnNumber));
                     }
+                    else
+                        throw new Exception(string.Format("В сетке не найдена колонка с номером '{0}'", function.Function.ColumnNumber));
                 }
                 else
                 {

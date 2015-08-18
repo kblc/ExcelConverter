@@ -335,7 +335,10 @@ namespace ExelConverter.Core.Converter
 
         #region Some methods
 
-        public List<OutputRow> Convert(ExelSheet sheet, string[] conversionDataLimiter = null, Action<Exception, int> additionalErrorAction = null)
+        public List<OutputRow> Convert(ExelSheet sheet, string[] conversionDataLimiter = null, 
+            Action<int> progressAction = null,
+            Action<Exception, int> additionalErrorAction = null,
+            Func<bool> isCanceled = null)
         {
             Guid logSession = Log.SessionStart("ExelConvertionRule.Convert()");
             var result = new List<OutputRow>();
@@ -351,17 +354,23 @@ namespace ExelConverter.Core.Converter
 
                     int logPart = 0;
                     for (var i = initialRow; i < sheet.Rows.Count; i++)
+                        if (isCanceled == null || !isCanceled())
                         try
                         {
+                            if (progressAction != null)
+                                progressAction((int)(((decimal)i / (decimal)sheet.Rows.Count) * 100m));
+
                             logPart = 1;
                             if (headers.Any(h => h.RowNumber == i) || subheaders.Any(h => h.RowNumber == i))
-                            {
                                 continue;
-                            }
+                            
                             logPart++;
-                            var outputRow = new OutputRow();
-                            outputRow.OriginalIndex = sheet.Rows[i].Index;
-                            outputRow.OriginalSheet = sheet.Name;
+                            var outputRow = new OutputRow()
+                            {
+                                OriginalIndex = sheet.Rows[i].Index,
+                                OriginalSheet = sheet.Name,
+                            };
+
                             logPart++;
                             foreach (var convertionData in (conversionDataLimiter == null ? ConvertionData : ConvertionData.Where(i2 => conversionDataLimiter.Contains(i2.PropertyId))))
                             {
@@ -428,7 +437,7 @@ namespace ExelConverter.Core.Converter
                                     if (additionalErrorAction != null)
                                     {
                                         Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
-                                        additionalErrorAction(ex, i - initialRow - 1);
+                                        additionalErrorAction(ex, i - initialRow);
                                     } else
                                         throw new Exception(string.Format("exception on update field '{0}' at sub step '{1}';", convertionData.PropertyId, subLogPart), ex);
                                 }
@@ -446,7 +455,7 @@ namespace ExelConverter.Core.Converter
                                 outputRow.Size = outputRow.Size.Substring(0, outputRow.Size.LastIndexOf("(") - 1).Trim();
                             }
                             logPart++;
-                            if (!string.IsNullOrWhiteSpace(outputRow.Code) && !string.IsNullOrEmpty(outputRow.Code.Trim()) || !string.IsNullOrWhiteSpace(outputRow.Code.Trim()))
+                            //if (!string.IsNullOrWhiteSpace(outputRow?.Code?.Trim()))
                             {
                                 result.Add(outputRow);
                             }
@@ -456,7 +465,7 @@ namespace ExelConverter.Core.Converter
                             if (additionalErrorAction != null)
                             {
                                 Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
-                                additionalErrorAction(ex, i - initialRow - 1);
+                                additionalErrorAction(ex, i - initialRow);
                             }
                             else
                                 throw new Exception(string.Format("exception at row line: '{0}', log part: '{1}';", i, logPart), ex);

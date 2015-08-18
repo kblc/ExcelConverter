@@ -11,6 +11,8 @@
         DataContext="{Binding Export, Source={StaticResource Locator}}">
     <Window.Resources>
         <helpers:ApplyConverter x:Key="ApplyConverter"/>
+        <!--<helpers:ReverseBooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter"/>-->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
     <Grid>
         <TabControl SelectedIndex="0">
@@ -198,5 +200,23 @@
                     />
             </TabItem>
         </TabControl>
+        <Grid Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Background="Black" Opacity="0.8"/>
+            <Border Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="30,30">
+                <TextBlock Text="{Binding InitializeError, StringFormat=Ошибка инициализации: {0}}"/>
+            </Border>
+        </Grid>
+        <Grid Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Background="Black" Opacity="0.8"/>
+            <Border Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,30,0,0">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal" Margin="30,0">
+                        <TextBlock Text="{Binding LoadProgress, StringFormat=Идёт загрузка... {0}%}"/>
+                        <Button Content="Отмена" Command="{Binding CancelCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" Width="80" Margin="10,0,0,0"/>
+                    </StackPanel>
+                    <ProgressBar Maximum="100" Minimum="0" Height="3" Value="{Binding LoadProgress, Mode=OneWay}" MinWidth="150" Margin="0,27,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
