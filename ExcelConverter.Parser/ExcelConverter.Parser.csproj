@@ -41,8 +41,9 @@
     <AssemblyOriginatorKeyFile>ExcelConverter.sln.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aspose.Cells">
-      <HintPath>..\ExelConverter.Core\bin\Aspose.Cells.dll</HintPath>
+    <Reference Include="Aspose.Cells, Version=7.5.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Aspose.Cells\Aspose.Cells.dll</HintPath>
     </Reference>
     <Reference Include="Helpers, Version=1.0.5.10, Culture=neutral, PublicKeyToken=fdd3186503d11cf0, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
