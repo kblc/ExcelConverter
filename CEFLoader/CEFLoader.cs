@@ -60,9 +60,9 @@ namespace CEFLoader
 
                 CefSharp.CefSettings settings = new CefSharp.CefSettings()
                 {
-                    CachePath = resources.Replace(Directory.GetCurrentDirectory() + "\\",""),
-                    LogFile = logFile.Replace(Directory.GetCurrentDirectory() + "\\", ""),
-                    BrowserSubprocessPath = subprocessPath.Replace(Directory.GetCurrentDirectory() + "\\", ""),
+                    CachePath = resources.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
+                    LogFile = logFile.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
+                    BrowserSubprocessPath = subprocessPath.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
                     RemoteDebuggingPort = 8088,
                     LogSeverity = Debugger.IsAttached ? LogSeverity.Verbose : LogSeverity.Warning
                 };
