@@ -28,6 +28,7 @@ namespace ExelConverter.Core.DataAccess
         public string city { get; set; }
         public string region { get; set; }
         public long country_id { get; set; }
+        public string notes { get; set; }
         private string zip { get; set; }
         private string phone { get; set; }
         private string phone2 { get; set; }

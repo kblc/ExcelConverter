@@ -70,7 +70,8 @@ namespace ExelConverter.Core.DataAccess
                                 new Operator()
                                     {
                                         Id = c.id,
-                                        Name = c.name
+                                        Name = c.name,
+                                        Notes = c.notes
                                     }
                             )
                         .ToArray();

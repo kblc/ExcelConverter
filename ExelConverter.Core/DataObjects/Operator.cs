@@ -113,6 +113,14 @@ namespace ExelConverter.Core.DataObjects
                 RaisePropertyChanged("MappingRules");
             }
         }
+
+        [NonSerialized]
+        private string notes = string.Empty;
+        [field: NonSerialized]
+        public string Notes { get { return notes; } set { if (notes == value) return; notes = value; RaisePropertyChanged(nameof(Notes)); RaisePropertyChanged(nameof(HasNotes)); } }
+
+        [field: NonSerialized]
+        public bool HasNotes { get { return !string.IsNullOrWhiteSpace(notes); } }
         
         [NonSerialized]
         private Dictionary<int, byte[]> mappingRuleSavedData = null;

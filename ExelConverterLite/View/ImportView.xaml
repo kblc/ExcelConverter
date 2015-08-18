@@ -840,13 +840,18 @@
                                     </Style.Triggers>
                                 </Style>
                             </Grid.Resources>
-                            
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="{Binding Name}"/>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                <TextBlock Grid.Row="0" Text="{Binding Name}"/>
+                                <TextBlock Margin="4,0,0,0" Text="(i)" FontWeight="Bold"
+                                           ToolTipService.IsEnabled="True" 
+                                           ToolTip="{Binding Notes}" 
+                                           Visibility="{Binding HasNotes, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </StackPanel>
                             <WrapPanel Grid.Row="1" Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock Text="Блокировано: " FontSize="9"/>
                                 <TextBlock Text="{Binding LockedBy}" FontSize="9"/>

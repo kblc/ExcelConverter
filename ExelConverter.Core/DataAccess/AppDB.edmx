@@ -22,11 +22,12 @@
           <EntitySet Name="mockup_set" EntityType="alphaModel.Store.mockup_set" store:Type="Tables" Schema="alpha" />
           <EntitySet Name="news" EntityType="alphaModel.Store.news" store:Type="Tables" Schema="alpha" />
           <EntitySet Name="operator_orders" EntityType="alphaModel.Store.operator_orders" store:Type="Tables" store:Schema="alpha" store:Name="operator_orders">
-            <DefiningQuery>SELECT
-      `operator_orders`.`operator_id`, 
-      `operator_orders`.`order_id`, 
-      `operator_orders`.`status`
-      FROM `operator_orders` AS `operator_orders`</DefiningQuery>
+            <DefiningQuery>
+              SELECT
+              `operator_orders`.`operator_id`,
+              `operator_orders`.`order_id`,
+              `operator_orders`.`status`
+              FROM `operator_orders` AS `operator_orders`</DefiningQuery>
           </EntitySet>
           <EntitySet Name="orders" EntityType="alphaModel.Store.orders" store:Type="Tables" Schema="alpha" />
           <EntitySet Name="orders_confirms" EntityType="alphaModel.Store.orders_confirms" store:Type="Tables" Schema="alpha" />
@@ -223,6 +224,7 @@
           <Property Name="ownMediaUrl" Type="char" Nullable="false" MaxLength="200" />
           <Property Name="requisites" Type="text" Nullable="false" />
           <Property Name="syncCheckLimit" Type="bool" Nullable="false" />
+		  <Property Name="notes" Type="varchar" />
         </EntityType>
         <EntityType Name="countries">
           <Key>
@@ -1240,6 +1242,7 @@
           <Property Name="ownMediaUrl" Type="String" Nullable="false" MaxLength="200" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
           <Property Name="requisites" Type="String" Nullable="false" MaxLength="65535" Unicode="false" FixedLength="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
           <Property Name="syncCheckLimit" Type="Boolean" Nullable="false" a:GetterAccess="Private" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" a:SetterAccess="Private" />
+          <Property Name="notes" Type="String" MaxLength="65535" Unicode="false" FixedLength="false" />
           <NavigationProperty Name="import_rectangle" Relationship="alphaModel.import_rectangle_ibfk_1" FromRole="companies" ToRole="import_rectangle" />
           <NavigationProperty Name="mockup_set" Relationship="alphaModel.mockup_set_ibfk_2" FromRole="companies" ToRole="mockup_set" />
         </EntityType>
@@ -2122,6 +2125,7 @@
                 <ScalarProperty Name="city" ColumnName="city" />
                 <ScalarProperty Name="region" ColumnName="region" />
                 <ScalarProperty Name="country_id" ColumnName="country_id" />
+                <ScalarProperty Name="notes" ColumnName="notes" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
