@@ -47,7 +47,8 @@ namespace ExelConverter.Core.Converter.Functions
                 foreach(var prm in textPrm
                     .StringValue
                     .Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(i => Tag.ClearStringFromDoubleChars("*" + i.Replace(" ", "*") + "*", '*')))
+                    .Select(i => new { Strong = i.StartsWith("="), Value = i.StartsWith("=") ? i.Substring(1) : i })
+                    .Select(i => i.Strong ? i.Value : Tag.ClearStringFromDoubleChars("*" + i.Value.Replace(" ", "*") + "*", '*')))
                         res |= str.Like(prm);
             return res ? "+" : "-";
         }

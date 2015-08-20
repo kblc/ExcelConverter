@@ -309,9 +309,9 @@ namespace ExelConverter.Core.DataAccess
             }
         }
 
-        public void UploadFileToQueue(HttpDataAccessQueueParameters param)
+        public string UploadFileToQueue(HttpDataAccessQueueParameters param)
         {
-            UploadFileToQueue(
+            return UploadFileToQueue(
                 param.OperatorID,
                 param.FilePath,
                 param.Activate,
@@ -321,16 +321,19 @@ namespace ExelConverter.Core.DataAccess
                 );
         }
 
-        public void UploadFileToQueue(long operatorId, string filePath, bool activate, bool coordinatesApproved, bool useQueue, int curlTimeout)
+        public string UploadFileToQueue(long operatorId, string filePath, bool activate, bool coordinatesApproved, bool useQueue, int curlTimeout)
         {
             bool wasException = false;
             var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.UploadFileToQueue(operatorId:'{0}',activate:'{1}',coordinatesApproved:'{2}',useQueue:'{3}',curlTimeout:'{4}')", operatorId, activate, coordinatesApproved, useQueue, curlTimeout), true);
             try
             {
-                if (!IsWebLogined)
-                    WebLogin();
+                //if (!IsWebLogined)
+                //    WebLogin();
 
                 NameValueCollection nvc = new NameValueCollection() {
+                    { "converter", "1"}, //Отправляем через конвертер
+                    { "login", UserLogin },
+                    { "password", UserPassword },
                     { "companyId", operatorId.ToString() },  //Оператор
                     { "params[activate]", activate ? "1" : "0" }, //автоматически активировать плоскости после импорта
                     { "params[coordinatesApproved]", coordinatesApproved ? "1" : "0" }, //загружать координаты как оператор (если нет - как РА)
@@ -339,15 +342,7 @@ namespace ExelConverter.Core.DataAccess
                     { "addToQueue", "Добавить в очередь" }
                 };
 
-                //nvc.Add("login", UserLogin); //Имя пользователя
-                //nvc.Add("password", UserPassword); //Пароль
-                //nvc.Add("companyId", operatorId.ToString()); //Оператор
-                //nvc.Add("params[activate]", activate ? "1" : "0"); //автоматически активировать плоскости после импорта
-                //nvc.Add("params[coordinatesApproved]", coordinatesApproved ? "1" : "0"); //загружать координаты как оператор (если нет - как РА)
-                //nvc.Add("params[useQueue]", useQueue ? "1" : "0"); //Грузить в очереди
-                //nvc.Add("params[curlTimeout]", curlTimeout.ToString()); //Таймаут
-                //nvc.Add("addToQueue", "Добавить в очередь");
-                HttpUploadFile(
+                return HttpUploadFile(
                     GetUrl(PathUploadToQueue),
                     filePath,
                     "csv",
@@ -523,7 +518,27 @@ namespace ExelConverter.Core.DataAccess
             return Out;
         }
 
-        private static void HttpUploadFile(string url, string file, string paramName, string contentType, NameValueCollection nvc, CookieContainer cookies, WebProxy proxy)
+        protected static string GetHtml(WebResponse response)
+        {
+            if (response == null)
+                throw new ArgumentNullException("response");
+
+            string chr = "charset=";
+            var enc = Encoding.Default;
+            if (response.ContentType.ToLowerInvariant().Contains(chr))
+            {
+                var part = response.ContentType.Substring(response.ContentType.IndexOf(chr) + chr.Length);
+                if (part.IndexOf(";") > 0)
+                    part = part.Remove(part.IndexOf(";"));
+                enc = Encoding.GetEncoding(part);
+            }
+
+            using (Stream resStream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(resStream, enc))
+                return reader.ReadToEnd();
+        }
+
+        private string HttpUploadFile(string url, string file, string paramName, string contentType, NameValueCollection nvc, CookieContainer cookies, WebProxy proxy)
         {
             bool wasException = false;
 
@@ -581,34 +596,54 @@ namespace ExelConverter.Core.DataAccess
                         #region Response
                         try
                         {
-                            using (HttpWebResponse wresp = (HttpWebResponse)wr.GetResponse())
+                            using (var wresp = (HttpWebResponse)wr.GetResponse())
                             {
                                 if (wresp.StatusCode == HttpStatusCode.OK)
-                                    using (Stream stream2 = wresp.GetResponseStream())
-                                    {
-                                        HtmlDocument doc = new HtmlDocument();
-                                        doc.Load(stream2, true);
-                                        var nodes = doc.DocumentNode.SelectNodes("//p[@id='pErrors']");
-                                        if (nodes != null && nodes.Count > 0)
-                                        {
-                                            throw new ApplicationException(nodes[0].InnerText.Trim());
-                                        }
+                                {
+                                    var result = GetHtml(wresp);
+                                    var serializer = new JavaScriptSerializer();
+                                    serializer.RegisterConverters(new[] { new DynamicJsonConverter() });
+                                    dynamic data = serializer.Deserialize(result, typeof(object));
 
-                                        string addedText = "Задание поставлено в очередь";
+                                    if (!string.IsNullOrWhiteSpace(data["id"]))
+                                        return data["id"].ToString();
 
-                                        nodes = doc.DocumentNode.SelectNodes("//div[@class='stat-padd']");
-                                        if (nodes != null && nodes.Count > 0 && nodes[0].InnerText.Trim().Contains(addedText))
-                                        {
-                                            string txt = nodes[0].InnerText.Trim();
-                                            txt = txt.Substring(txt.IndexOf(addedText) + addedText.Length + 2);
-                                            txt = txt.Substring(0, txt.IndexOf("\n") - 1);
-                                            Log.Add(logSession, string.Format("file added '{0}'", txt));
-                                        }
-                                        else
-                                            throw new ApplicationException("По неизвестным причинам файл не был добавлен в очередь");
+                                    if (!string.IsNullOrWhiteSpace(data["error"]))
+                                        throw new InvalidDataException(data["error"]);
 
-                                        //Log.Add(string.Format("HttpDataAccess.HttpUploadFile() :: file uploaded, server response is: {0}", doc.DocumentNode.InnerHtml));
-                                    }
+                                    throw new InvalidDataException("Неизвестная ошибка");
+                                }
+                                    //using (Stream stream2 = wresp.GetResponseStream())
+                                    //{
+                                        
+
+
+
+
+                                    //    HtmlDocument doc = new HtmlDocument();
+                                    //    doc.Load(stream2, true);
+                                    //    var nodes = doc.DocumentNode.SelectNodes("//p[@id='pErrors']");
+                                    //    if (nodes != null && nodes.Count > 0)
+                                    //    {
+                                    //        throw new ApplicationException(nodes[0].InnerText.Trim());
+                                    //    }
+
+                                    //    string addedText = "Задание поставлено в очередь";
+
+                                    //    nodes = doc.DocumentNode.SelectNodes("//div[@class='stat-padd']");
+                                    //    if (nodes != null && nodes.Count > 0 && nodes[0].InnerText.Trim().Contains(addedText))
+                                    //    {
+                                    //        string txt = nodes[0].InnerText.Trim();
+                                    //        txt = txt.Substring(txt.IndexOf(addedText) + addedText.Length + 2);
+                                    //        txt = txt.Substring(0, txt.IndexOf("\n") - 1);
+                                    //        Log.Add(logSession, string.Format("file added '{0}'", txt));
+                                    //        return txt;
+                                    //    }
+                                    //    else
+                                    //        throw new ApplicationException("По неизвестным причинам файл не был добавлен в очередь");
+
+                                    //    //Log.Add(string.Format("HttpDataAccess.HttpUploadFile() :: file uploaded, server response is: {0}", doc.DocumentNode.InnerHtml));
+                                    //}
                                 else
                                     throw new ApplicationException(string.Format("Ответ от сервера: {0}", wresp.StatusCode.ToString()));
                             }

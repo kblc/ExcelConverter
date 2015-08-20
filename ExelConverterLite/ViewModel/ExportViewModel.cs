@@ -178,18 +178,26 @@ namespace ExelConverterLite.ViewModel
                     var addErr = new List<Error>();
                     var addGErr = new List<GlobalError>();
 
-                    foreach (var item in App.Locator.Import.ExportRules.Where(r => r.Rule != App.Locator.Import.NullRule))
+                    var progress = new PercentageProgress();
+
+                    foreach (var item in App.Locator.Import
+                        .ExportRules
+                        .Where(r => r.Rule != App.Locator.Import.NullRule)
+                        .Select(r => new { Rule = r, Progress = progress.GetChild() })
+                        .ToArray()
+                        )
                     {
                         if (((BackgroundWorker)s).CancellationPending || s != loadWorker)
                             break;
 
-                        var mappingRule = item.Rule;
-                        var ds = item.Sheet;
+                        var mappingRule = item.Rule.Rule;
+                        var ds = item.Rule.Sheet;
 
                         if (mappingRule == null || ds == null)
                         {
-                            if (!string.IsNullOrWhiteSpace(item.Status))
-                                addGErr.Add(new GlobalError() { Description = item.Status });
+                            if (!string.IsNullOrWhiteSpace(item.Rule.Status))
+                                addGErr.Add(new GlobalError() { Description = item.Rule.Status });
+                            item.Progress.Value = 100;
                             continue;
                         }
                         else
@@ -216,7 +224,8 @@ namespace ExelConverterLite.ViewModel
                             var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds, 
                                 progressAction: (i) => 
                                 {
-                                    ((BackgroundWorker)s).ReportProgress(i);
+                                    item.Progress.Value = i;
+                                    ((BackgroundWorker)s).ReportProgress((int)progress.Value);
                                 },
                                 isCanceled: () => { return ((BackgroundWorker)s).CancellationPending; },
                                 additionalErrorAction: (e, r) =>
@@ -452,8 +461,8 @@ namespace ExelConverterLite.ViewModel
                 Export2Csv();
                 try
                 {
-                    ExelConverter.Core.DataAccess.HttpDataClient.Default.UploadFileToQueue(prm);
-                    MessageBox.Show("Файл добавлен в очередь", "Очередь", MessageBoxButton.OK, MessageBoxImage.Information);
+                    string res = ExelConverter.Core.DataAccess.HttpDataClient.Default.UploadFileToQueue(prm);
+                    MessageBox.Show(string.Format("Файл добавлен в очередь. Его ID в очереди: '{0}'", res), "Очередь", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch(Exception ex)
                 {

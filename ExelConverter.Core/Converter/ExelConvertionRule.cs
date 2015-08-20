@@ -351,25 +351,33 @@ namespace ExelConverter.Core.Converter
                     var subheaders = sheet.SheetHeaders.Subheaders;
 
                     initialRow = sheet.Rows.IndexOf(sheet.MainHeader) + sheet.MainHeaderRowCount;
+                    int excludeRow = 0;
+                    bool hasError = false;
 
                     int logPart = 0;
+
+                    var exceptions = new List<Exception>();
+
                     for (var i = initialRow; i < sheet.Rows.Count; i++)
-                        if (isCanceled == null || !isCanceled())
+                    {
+                        if (isCanceled != null && isCanceled())
+                            break;
+
+                        var outputRow = new OutputRow();
                         try
                         {
+                            exceptions.Clear();
+                            hasError = false;
+
                             if (progressAction != null)
                                 progressAction((int)(((decimal)i / (decimal)sheet.Rows.Count) * 100m));
 
                             logPart = 1;
                             if (headers.Any(h => h.RowNumber == i) || subheaders.Any(h => h.RowNumber == i))
                                 continue;
-                            
-                            logPart++;
-                            var outputRow = new OutputRow()
-                            {
-                                OriginalIndex = sheet.Rows[i].Index,
-                                OriginalSheet = sheet.Name,
-                            };
+
+                            outputRow.OriginalIndex = sheet.Rows[i].Index;
+                            outputRow.OriginalSheet = sheet.Name;
 
                             logPart++;
                             foreach (var convertionData in (conversionDataLimiter == null ? ConvertionData : ConvertionData.Where(i2 => conversionDataLimiter.Contains(i2.PropertyId))))
@@ -423,22 +431,24 @@ namespace ExelConverter.Core.Converter
                                             cellResultContent = cellResultContent.Trim();
                                         }
                                     }
-                                    catch(Exception ex)
+                                    catch (Exception ex)
                                     {
-                                        throw new Exception(string.Format("Ошибка для правил столбца '{0}' ('{1}')", convertionData.FieldName, convertionData.PropertyId), ex);
+                                        throw new Exception(string.Format("Сетка '{0}'. Ошибка для правил столбца '{1}' ('{2}')", sheet.Name, convertionData.FieldName, convertionData.PropertyId), ex);
                                     }
 
                                     var property = typeof(OutputRow).GetProperty(convertionData.PropertyId);
                                     if (property != null)
                                         property.SetValue(outputRow, cellResultContent, null);
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
+                                    hasError = true;
                                     if (additionalErrorAction != null)
                                     {
                                         Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
-                                        additionalErrorAction(ex, i - initialRow);
-                                    } else
+                                        exceptions.Add(ex);
+                                    }
+                                    else
                                         throw new Exception(string.Format("exception on update field '{0}' at sub step '{1}';", convertionData.PropertyId, subLogPart), ex);
                                 }
                             }
@@ -455,21 +465,32 @@ namespace ExelConverter.Core.Converter
                                 outputRow.Size = outputRow.Size.Substring(0, outputRow.Size.LastIndexOf("(") - 1).Trim();
                             }
                             logPart++;
-                            //if (!string.IsNullOrWhiteSpace(outputRow?.Code?.Trim()))
+                            if (!string.IsNullOrWhiteSpace(outputRow?.Code?.Trim()) || (hasError && additionalErrorAction != null))
                             {
+                                if (additionalErrorAction != null)
+                                {
+                                    foreach (var ex in exceptions)
+                                        additionalErrorAction(ex, i - initialRow - excludeRow);
+                                    exceptions.Clear();
+                                }
                                 result.Add(outputRow);
                             }
+                            else
+                                excludeRow++;
                         }
                         catch (Exception ex)
                         {
                             if (additionalErrorAction != null)
                             {
                                 Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
-                                additionalErrorAction(ex, i - initialRow);
+                                if (!result.Contains(outputRow))
+                                    result.Add(outputRow);
+                                additionalErrorAction(ex, i - initialRow - excludeRow);
                             }
                             else
                                 throw new Exception(string.Format("exception at row line: '{0}', log part: '{1}';", i, logPart), ex);
                         }
+                    }
                 }
                 else
                     Log.Add(string.Format("sheet '{0}' has not header!", sheet.Name));
@@ -489,16 +510,15 @@ namespace ExelConverter.Core.Converter
 
         public static void RemoveRepeatingId(List<OutputRow> list)
         {
-            foreach (var row in list)
-            {
-                var sameIds = list
+            var sameCodes = list
                     .AsParallel()
-                    .Where(r => r.Code == row.Code)
-                    .ToArray();
-                if (sameIds.Length > 1)
-                    for (var i = 0; i < sameIds.Length; i++)
-                        sameIds[i].Code = string.Format("{0}_{1}", sameIds[i].Code, i + 1);
-            }
+                    .GroupBy(r => r.Code)
+                    .Select(g => new { Code = g.First().Code, Count = g.Count(), Items = g.ToArray() })
+                    .Where(r => r.Count > 1 && !string.IsNullOrWhiteSpace(r.Code));
+
+            foreach (var code in sameCodes)
+                for (var i = 0; i < code.Count; i++)
+                    code.Items.ElementAt(i).Code = string.Format("{0}_{1}", code.Code, i + 1);
         }
 
         private void UpdateMappingTablesValues()
