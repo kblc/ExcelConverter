@@ -601,17 +601,26 @@ namespace ExelConverter.Core.DataAccess
                                 if (wresp.StatusCode == HttpStatusCode.OK)
                                 {
                                     var result = GetHtml(wresp);
-                                    var serializer = new JavaScriptSerializer();
-                                    serializer.RegisterConverters(new[] { new DynamicJsonConverter() });
-                                    dynamic data = serializer.Deserialize(result, typeof(object));
+                                    try
+                                    { 
+                                        var serializer = new JavaScriptSerializer();
+                                        serializer.RegisterConverters(new[] { new DynamicJsonConverter() });
+                                        dynamic data = serializer.Deserialize(result, typeof(object));
 
-                                    if (!string.IsNullOrWhiteSpace(data["id"]))
-                                        return data["id"].ToString();
+                                        if (!string.IsNullOrWhiteSpace(data["id"]))
+                                            return data["id"].ToString();
 
-                                    if (!string.IsNullOrWhiteSpace(data["error"]))
-                                        throw new InvalidDataException(data["error"]);
+                                        if (!string.IsNullOrWhiteSpace(data["error"]))
+                                            throw new InvalidDataException(data["error"]);
 
-                                    throw new InvalidDataException("Неизвестная ошибка");
+                                        throw new InvalidDataException("Неизвестная ошибка");
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        var ex2 = new Exception("Error inside server response", ex);
+                                        ex.Data.Add("Server text response", result);
+                                        throw ex2;
+                                    }
                                 }
                                     //using (Stream stream2 = wresp.GetResponseStream())
                                     //{
