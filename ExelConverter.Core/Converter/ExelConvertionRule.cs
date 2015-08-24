@@ -426,10 +426,10 @@ namespace ExelConverter.Core.Converter
                                     try
                                     {
                                         cellResultContent = convertionData.Blocks.Run(sheet, i, convertionData);
-                                        if (cellResultContent != null)
-                                        {
-                                            cellResultContent = cellResultContent.Trim();
-                                        }
+                                        //if (cellResultContent != null)
+                                        //{
+                                        //    cellResultContent = cellResultContent.Trim();
+                                        //}
                                     }
                                     catch (Exception ex)
                                     {

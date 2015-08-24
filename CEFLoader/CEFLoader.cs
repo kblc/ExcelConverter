@@ -19,16 +19,76 @@ namespace CEFLoader
             var session = Log.SessionStart("CEFLoader()", true);
             try
             {
+                Log.Add(session, "Start dependency checker...");
+                Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
+
+                string cache = Path.Combine(Helpers.Log.CurrentPath, "cache");
+                Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", cache, Directory.Exists(cache)));
+                if (Directory.Exists(cache))
+                    try
+                    {
+                        Directory.Delete(cache, true);
+                        Directory.CreateDirectory(cache);
+                        Log.Add(session, "Cache directory cleared");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Add(session, "Can't clear cache directory");
+                        Log.Add(session, ex);
+                    }
+
+                string logFile = Path.Combine(Helpers.Log.CurrentPath, "chromelog.txt");
+                Log.Add(session, string.Format("Log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
+                if (File.Exists(logFile))
+                    try
+                    {
+                        File.Delete(logFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Add(session, "Can't remove log file");
+                        Log.Add(session, ex);
+                        logFile = Path.Combine(Helpers.Log.CurrentPath, DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_chromelog.txt");
+                        Log.Add(session, string.Format("New log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
+                    }
+
+                string subprocessPath = Path.Combine(Helpers.Log.CurrentPath, "CefSharp.BrowserSubprocess.exe");
+                Log.Add(session, string.Format("Subprocess path is '{0}'. Sub process file exists: '{1}'", subprocessPath, File.Exists(subprocessPath)));
+
+                if (!File.Exists(subprocessPath))
+                    throw new Exception("Subprocess file not exists!");
+
+                CefSharp.DependencyChecker.AssertAllDependenciesPresent("ru", "locales", "", false, subprocessPath);
+
+                Log.Add(session, "Check done");
+            }
+            catch (Exception ex)
+            {
+                Log.Add(session, ex);
+                throw;
+            }
+            finally
+            {
+                Log.SessionEnd(session);
+            }
+        }
+
+        private static bool CEFInited = false;
+        private static bool CEFLoaderInit()
+        {
+            var session = Log.SessionStart("CEFLoaderInit()", true);
+            try
+            {
                 Log.Add(session, "Start initialization...");
                 Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
 
-                string resources = Path.Combine(Helpers.Log.CurrentPath, "cache");
-                Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", resources, Directory.Exists(resources)));
-                if (Directory.Exists(resources))
+                string cache = Path.Combine(Helpers.Log.CurrentPath, "cache");
+                Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", cache, Directory.Exists(cache)));
+                if (Directory.Exists(cache))
                     try
                     {
-                        Directory.Delete(resources, true);
-                        Directory.CreateDirectory(resources);
+                        Directory.Delete(cache, true);
+                        Directory.CreateDirectory(cache);
                         Log.Add(session, "Cache directory cleared");
                     }
                     catch(Exception ex)
@@ -60,7 +120,7 @@ namespace CEFLoader
 
                 CefSharp.CefSettings settings = new CefSharp.CefSettings()
                 {
-                    CachePath = resources.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
+                    CachePath = cache.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
                     LogFile = logFile.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
                     BrowserSubprocessPath = subprocessPath.Replace(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar, string.Empty),
                     RemoteDebuggingPort = 8088,
@@ -71,8 +131,9 @@ namespace CEFLoader
                     Cef.GetGlobalCookieManager().SetStoragePath("cookies", true);
                 };
                 Log.Add(session, "Start Cef.Initialize()");
-                Cef.Initialize(settings, shutdownOnProcessExit: true, performDependencyCheck: !Debugger.IsAttached);
+                var res = Cef.Initialize(settings, shutdownOnProcessExit: true, performDependencyCheck: !Debugger.IsAttached);
                 Log.Add(session, "Cef.Initialize() done");
+                return res;
             }
             catch(Exception ex)
             {
@@ -87,13 +148,16 @@ namespace CEFLoader
 
         public static void Shutdown(bool killCurrentProcess = false)
         {
-            Cef.Shutdown();
+            if (CEFInited)
+                Cef.Shutdown();
             if (killCurrentProcess)
                 Process.GetCurrentProcess().Kill();
         }
 
         public static string GetHTML(ref string url, TimeSpan timeout)
         {
+            if (!CEFInited)
+                CEFInited = CEFLoaderInit();
             return MainAsync(ref url, timeout);
         }
 
