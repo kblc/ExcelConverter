@@ -12,6 +12,8 @@ using HtmlAgilityPack;
 using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ExelConverter.Core.DataAccess
 {
@@ -261,41 +263,43 @@ namespace ExelConverter.Core.DataAccess
                 var result = Post(GetUrl(PathGetResourceList), strRequest, Cookies, Proxy);
                 Helpers.Log.Add(logSession, "Server answer: " + result);
 
-                var serializer = new JavaScriptSerializer();
-                serializer.RegisterConverters(new[] { new DynamicJsonConverter() });
-                dynamic data = serializer.Deserialize(result, typeof(object));
+                var jo = JObject.Parse(result);
+                if (jo.Property("error") != null)
+                    throw new InvalidDataException(jo.GetValue("error", StringComparison.InvariantCultureIgnoreCase).Value<string>());
 
-                if (!string.IsNullOrWhiteSpace(data["error"]))
-                {
-                    throw new InvalidDataException(data["error"]);
-                }
-
-                if (data["resources"] != null)
-                {
-                    foreach (KeyValuePair<string,object> res in data["resources"].Dictionary)
+                if (jo.Property("resources") != null)
+                    foreach(var res in jo.GetValue("resources").Children<JProperty>())
                     {
-                        dynamic dynItem = res.Value;
-                        foreach(var item in idsToGet.Where(i => i.Code.ToLower() == res.Key.ToLower()))
+                        var props = res.Value.Children<JProperty>().ToArray();
+
+                        foreach (var item in idsToGet.Where(i => i.Code.ToLower() == res.Name.ToLower()))
                         {
-                            item.LinkPhoto = dynItem["photo"];
-                            item.LinkLocation = dynItem["location"];
-                            item.LinkMap = dynItem["map"];
+                            item.LinkPhoto = props.FirstOrDefault(p => string.Compare(p.Name,"photo", true) == 0 )?.Value?.Value<string>() ?? string.Empty;
+                            item.LinkLocation = props.FirstOrDefault(p => string.Compare(p.Name, "location", true) == 0)?.Value?.Value<string>() ?? string.Empty;
+                            item.LinkMap = props.FirstOrDefault(p => string.Compare(p.Name, "map", true) == 0)?.Value?.Value<string>() ?? string.Empty;
                         }
                     }
 
-                    //foreach (var item in idsToGet)
-                    //{
-                    //    dynamic dynItem = data["resources"][item.Code];
-                    //    if (dynItem != null)
-                    //    {
-                    //        item.LinkPhoto = dynItem["photo"];
-                    //        item.LinkLocation = dynItem["location"];
-                    //        item.LinkMap = dynItem["map"];
-                    //    }
-                    //}
-                }
-                map = data["map"];
-                pdf = data["pdf"];
+                map = jo.GetValue("map", StringComparison.InvariantCultureIgnoreCase)?.Value<string>() ?? string.Empty;
+                pdf = jo.GetValue("pdf", StringComparison.InvariantCultureIgnoreCase)?.Value<string>() ?? string.Empty;
+
+                //jo.GetValue("resources").
+
+                //if (data["resources"] != null)
+                //{
+                //    foreach (KeyValuePair<string,object> res in data["resources"].Dictionary)
+                //    {
+                //        dynamic dynItem = res.Value;
+                //        foreach(var item in idsToGet.Where(i => i.Code.ToLower() == res.Key.ToLower()))
+                //        {
+                //            item.LinkPhoto = dynItem["photo"];
+                //            item.LinkLocation = dynItem["location"];
+                //            item.LinkMap = dynItem["map"];
+                //        }
+                //    }
+                //}
+                //map = data["map"];
+                //pdf = data["pdf"];
             }
             catch (Exception ex)
             {
@@ -602,57 +606,21 @@ namespace ExelConverter.Core.DataAccess
                                 {
                                     var result = GetHtml(wresp);
                                     try
-                                    { 
-                                        var serializer = new JavaScriptSerializer();
-                                        serializer.RegisterConverters(new[] { new DynamicJsonConverter() });
-                                        dynamic data = serializer.Deserialize(result, typeof(object));
-
-                                        if (!string.IsNullOrWhiteSpace(data["id"]))
-                                            return data["id"].ToString();
-
-                                        if (!string.IsNullOrWhiteSpace(data["error"]))
-                                            throw new InvalidDataException(data["error"]);
-
+                                    {
+                                        var jo = JObject.Parse(result);
+                                        if (jo.Property("id") != null)
+                                            return jo.GetValue("id", StringComparison.InvariantCultureIgnoreCase).Value<string>();
+                                        if (jo.Property("error") != null)
+                                            throw new InvalidDataException(jo.GetValue("error", StringComparison.InvariantCultureIgnoreCase).Value<string>());
                                         throw new InvalidDataException("Неизвестная ошибка");
                                     }
                                     catch(Exception ex)
                                     {
-                                        var ex2 = new Exception("Error inside server response", ex);
-                                        ex.Data.Add("Server text response", result);
+                                        var ex2 = new Exception("Обнаружена ошибка в ответе сервера. Более детальную информацию вы можете найти в логе", ex);
+                                        ex2.Data.Add("Server text response", result);
                                         throw ex2;
                                     }
                                 }
-                                    //using (Stream stream2 = wresp.GetResponseStream())
-                                    //{
-                                        
-
-
-
-
-                                    //    HtmlDocument doc = new HtmlDocument();
-                                    //    doc.Load(stream2, true);
-                                    //    var nodes = doc.DocumentNode.SelectNodes("//p[@id='pErrors']");
-                                    //    if (nodes != null && nodes.Count > 0)
-                                    //    {
-                                    //        throw new ApplicationException(nodes[0].InnerText.Trim());
-                                    //    }
-
-                                    //    string addedText = "Задание поставлено в очередь";
-
-                                    //    nodes = doc.DocumentNode.SelectNodes("//div[@class='stat-padd']");
-                                    //    if (nodes != null && nodes.Count > 0 && nodes[0].InnerText.Trim().Contains(addedText))
-                                    //    {
-                                    //        string txt = nodes[0].InnerText.Trim();
-                                    //        txt = txt.Substring(txt.IndexOf(addedText) + addedText.Length + 2);
-                                    //        txt = txt.Substring(0, txt.IndexOf("\n") - 1);
-                                    //        Log.Add(logSession, string.Format("file added '{0}'", txt));
-                                    //        return txt;
-                                    //    }
-                                    //    else
-                                    //        throw new ApplicationException("По неизвестным причинам файл не был добавлен в очередь");
-
-                                    //    //Log.Add(string.Format("HttpDataAccess.HttpUploadFile() :: file uploaded, server response is: {0}", doc.DocumentNode.InnerHtml));
-                                    //}
                                 else
                                     throw new ApplicationException(string.Format("Ответ от сервера: {0}", wresp.StatusCode.ToString()));
                             }

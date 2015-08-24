@@ -154,7 +154,7 @@ namespace ExelConverterLite.ViewModel
         {
             InitializeError = string.Empty;
             if (Export2CsvCommand == null)
-                Export2CsvCommand = new RelayCommand(Export2Csv);
+                Export2CsvCommand = new RelayCommand(() => Export2Csv());
             if (Export2DbCommand == null)
                 Export2DbCommand = new RelayCommand(Export2Db);
             if (UpdateErrorsCommand == null)
@@ -458,7 +458,7 @@ namespace ExelConverterLite.ViewModel
             {
                 prm.OperatorID = App.Locator.Import.SelectedOperator.Id;
                 prm.FilePath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.Document.Name + ".csv";
-                Export2Csv();
+                if (Export2Csv())
                 try
                 {
                     string res = ExelConverter.Core.DataAccess.HttpDataClient.Default.UploadFileToQueue(prm);
@@ -467,7 +467,7 @@ namespace ExelConverterLite.ViewModel
                 catch(Exception ex)
                 {
                     Log.Add(ex, "ExportViewModel.ExportToQueue()");
-                    MessageBox.Show(string.Format("Произошла ошибка при отправке файла для постановки в очередь:{0}{1}", Environment.NewLine, ex.Message), "Ошибка при отправке файла", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(string.Format("Произошла ошибка при отправке файла для постановки в очередь:{0}{1}", Environment.NewLine, ex.GetExceptionText(includeData: false)), "Ошибка при отправке файла", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -513,7 +513,7 @@ namespace ExelConverterLite.ViewModel
         }
 
         public RelayCommand Export2CsvCommand { get; private set; }
-        private void Export2Csv()
+        private bool Export2Csv()
         {
             try
             {
@@ -524,7 +524,7 @@ namespace ExelConverterLite.ViewModel
                 using (var writer = new StreamWriter(new FileStream(fullPath, FileMode.Truncate), Encoding.Default))
                 {
                     var allowedFields = App.Locator.Import.ExportRules
-                        .Where(r => r.Rule != App.Locator.Import.NullRule)
+                        .Where(r => r.Rule != App.Locator.Import.NullRule && r.Sheet != null)
                         .Select(er => er.Rule)
                         .SelectMany(r => r.ConvertionData)
                         .Where(cd => cd.Blocks != null && cd.Blocks.Blocks.Count > 0)
@@ -554,7 +554,7 @@ namespace ExelConverterLite.ViewModel
                     Id = Guid.NewGuid()
                 };
                 App.Locator.ExportLog.AddExportedCsv(exportedCsv);
-
+                return true;
             }
             catch
             {
@@ -563,6 +563,7 @@ namespace ExelConverterLite.ViewModel
 папке с файлами и попробуйте снова...", "Ошибка",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
+            return false;
         }
 
         public RelayCommand Export2DbCommand { get; private set; }

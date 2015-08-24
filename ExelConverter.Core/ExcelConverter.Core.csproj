@@ -67,6 +67,10 @@
     </Reference>
     <Reference Include="MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="MySql.Data.Entity, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -180,7 +184,6 @@
     <Compile Include="DataAccess\discounts_qty.cs">
       <DependentUpon>AppDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="DataAccess\DynamicJsonConverter.cs" />
     <Compile Include="DataAccess\help_chapters.cs">
       <DependentUpon>AppDB.tt</DependentUpon>
     </Compile>

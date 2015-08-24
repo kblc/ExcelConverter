@@ -67,7 +67,7 @@ namespace ExelConverter.Core.DataWriter
                         {
                             var mappingRule = item.Rule;
                             var ds = item.Sheet;
-                            if (mappingRule != null)
+                            if (mappingRule != null && ds != null)
                             {
                                 if (ds.MainHeader == null)
                                 {
@@ -132,7 +132,7 @@ namespace ExelConverter.Core.DataWriter
                         #region Write Excel File
 
                         Workbook wb = new Workbook(fileName);
-                        foreach (var r in ruleToSheets)
+                        foreach (var r in ruleToSheets.Where(r => r.Sheet != null))
                         {
                             var sheet = wb.Worksheets.Cast<Worksheet>().FirstOrDefault(sht => sht.Name.ToLower().Trim() == r.Sheet.Name.ToLower().Trim());
                             if (sheet != null)
