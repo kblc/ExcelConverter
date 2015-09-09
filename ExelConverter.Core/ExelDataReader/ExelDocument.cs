@@ -142,6 +142,8 @@ namespace ExelConverter.Core.ExelDataReader
                 pp1.Weight = 3;
                 var pp2 = pp.GetChild();
                 pp2.Weight = 6;
+                //var pp3 = pp.GetChild();
+                //pp3.Weight = 3;
 
                 bw.ReportProgress((int)pp.Value, "Открытие документа...");
 
@@ -156,6 +158,12 @@ namespace ExelConverter.Core.ExelDataReader
                 bw.ReportProgress((int)pp.Value, "Чтение всех записей на страницах...");
 
                 res.WorkSheets = AsyncDocumentLoader.LoadSheets(res.WorkBook, 0, (i) => { pp2.Value = i; }, prms.DeleteEmptyRows).ToArray();
+
+                //foreach (var ws in res.WorkSheets.Select(w => new { WorkSheet = w, Progress = pp3.GetChild() }).ToArray())
+                //{ 
+                //    ws.WorkSheet.UpdateHeaders();
+
+                //}
 
                 bw.ReportProgress((int)pp.Value, "Применение результата...");
 
@@ -194,6 +202,7 @@ namespace ExelConverter.Core.ExelDataReader
                         {
                             if (res.WorkSheets.Count() == 0)
                                 Error = "В документе не найдено ни одного листа";
+                            Status = "Применение результатов (подсчёт заголовков и прочее)...";
                             applyRes(res.WorkBook, res.WorkSheets);
                         }
                         else

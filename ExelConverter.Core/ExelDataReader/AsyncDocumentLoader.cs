@@ -192,6 +192,15 @@ namespace ExelConverter.Core.ExelDataReader
             var totalRowsCount = 0;
             var loaded = 0;
 
+            var pp = new Helpers.PercentageProgress();
+            if (progressReport != null)
+                pp.Change += (s, e) => { progressReport((int)e.Value); };
+
+            var pp0 = pp.GetChild();
+            var pp1 = pp.GetChild();
+            pp0.Weight = 9;
+            pp1.Weight = 1;
+
             try
             {
                 totalRowsCount = Math.Max(sheet.Cells.MaxRow + 1, sheet.Cells.Rows.Count);
@@ -321,8 +330,7 @@ namespace ExelConverter.Core.ExelDataReader
                                 lock (lockObj)
                                 {
                                     loaded++;
-                                    if (progressReport != null)
-                                        progressReport((int)((double)loaded * 100 / (double)count));
+                                    pp0.Value = (decimal)loaded * 100m / (decimal)count;
                                 }
 
                                 return r;
@@ -341,20 +349,28 @@ namespace ExelConverter.Core.ExelDataReader
 
                 //#### Try to delete bottom info ####
                 //get last empty index
-                int lastEmptyRowsInDataIndex =
-                    result
-                    .Where(row => row.IsEmpty)
-                    .Select(row => result.IndexOf(row))
-                    .OrderByDescending(i => i)
-                    .FirstOrDefault();
+
+                var lastEmptyRow = result.LastOrDefault(row => row.IsEmpty);
+                int lastEmptyRowsInDataIndex = lastEmptyRow == null ? 0 : result.IndexOf(lastEmptyRow);
+
+                //int lastEmptyRowsInDataIndex =
+                //    result
+                //    .Where(row => row.IsEmpty)
+                //    .Select(row => result.IndexOf(row))
+                //    .OrderByDescending(i => i)
+                //    .FirstOrDefault();
+
                 //get last non empty index before last empty to check similarity
-                int lastNotEmptyRowsInDataIndexBeforeEmpty =
-                    result
-                    .Where(row => !row.IsEmpty)
-                    .Select(row => result.IndexOf(row))
-                    .Where(i => i < lastEmptyRowsInDataIndex)
-                    .OrderByDescending(i => i)
-                    .FirstOrDefault();
+                var lastNotEmptyRow = result.Take(lastEmptyRowsInDataIndex == 0 ? result.Count : lastEmptyRowsInDataIndex).LastOrDefault(row => !row.IsEmpty);
+                int lastNotEmptyRowsInDataIndexBeforeEmpty = lastNotEmptyRow == null ? 0 : result.IndexOf(lastNotEmptyRow);
+
+                //int lastNotEmptyRowsInDataIndexBeforeEmpty =
+                //    result
+                //    .Where(row => !row.IsEmpty)
+                //    .Select(row => result.IndexOf(row))
+                //    .Where(i => i < lastEmptyRowsInDataIndex)
+                //    .OrderByDescending(i => i)
+                //    .FirstOrDefault();
 
                 if (lastEmptyRowsInDataIndex > 4 && result.Count - lastEmptyRowsInDataIndex < 15)
                 {
@@ -371,6 +387,25 @@ namespace ExelConverter.Core.ExelDataReader
                     }
                 }
 
+                pp1.Value = 25;
+
+                var isRowsSimilar = new Func<ExelRow, ExelRow, bool>((r1, r2) => 
+                {
+                    var cnt = Math.Min(r1.Cells.Count, r2.Cells.Count);
+                    for (int i = 0; i < cnt; i++)
+                        if (string.Compare(r1.Cells[i].Value.Trim(), r2.Cells[i].Value.Trim(), true) != 0)
+                            return false;
+                    return true;
+                });
+
+                for (int i=result.Count-1; i>=4; i--)
+                {
+                    if (result[i].Similarity(result[i - 1]) >= 0.8 && isRowsSimilar(result[i],result[i-1]))
+                        result.RemoveAt(i);
+                }
+
+                pp1.Value = 50;
+
                 #endregion
 
                 //Delete all empty rows from data
@@ -381,6 +416,8 @@ namespace ExelConverter.Core.ExelDataReader
                         if (r1.IsEmpty)
                             result.RemoveAt(z);
                     }
+
+                pp1.Value = 100;
             }
 
             return result.ToArray();
