@@ -80,6 +80,13 @@ namespace CEFLoader
             try
             {
                 Log.Add(session, "Start initialization...");
+
+                if (Cef.IsInitialized)
+                {
+                    Log.Add(session, "CEF already initialized. Exit.");
+                    return true;
+                }
+
                 Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
 
                 string cache = Path.Combine(Helpers.Log.CurrentPath, "cache");
@@ -154,10 +161,12 @@ namespace CEFLoader
                 Process.GetCurrentProcess().Kill();
         }
 
+        private static object initLock = new object();
         public static string GetHTML(ref string url, TimeSpan timeout)
         {
-            if (!CEFInited)
-                CEFInited = CEFLoaderInit();
+            lock(initLock)
+                if (!CEFInited)
+                    CEFInited = CEFLoaderInit();
             return MainAsync(ref url, timeout);
         }
 

@@ -163,7 +163,6 @@ namespace ExelConverterLite.ViewModel
                 UpdateSelectedErrorCommand = new RelayCommand(UpdateSelectedError);
             if (UpdateSelectedWarningCommand == null)
                 UpdateSelectedWarningCommand = new RelayCommand(UpdateSelectedWarning);
-            UrlCollection.Clear();
 
             loadWorker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
             loadWorker.DoWork += (s, prm) => 
@@ -258,13 +257,14 @@ namespace ExelConverterLite.ViewModel
                     if (!((BackgroundWorker)s).CancellationPending && s == loadWorker)
                         Disp.Invoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
                         {
+                            UrlCollection.Clear();
                             if (UrlsPhoto.Count > 0)
                                 UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(0), Collection = UrlsPhoto });
                             if (UrlsSchema.Count > 0)
                                 UrlCollection.Add(new UrlCollectionAdditional() { Name = DBParsers.Labels.ElementAt(1), Collection = UrlsSchema });
                             if (UrlsPhoto.Count > 0 && UrlsSchema.Count > 0 && UrlsAll.Count > 0)
                                 UrlCollection.Add(new UrlCollectionAdditional() { Name = "Все", Collection = UrlsAll });
-
+                            UrlCollectionSelectedIndex = UrlCollection.Count - 1;
                             RowsToExport = rowsToExport;
                             UpdateErrors(addErr, addGErr);
                         }));
@@ -326,6 +326,22 @@ namespace ExelConverterLite.ViewModel
             get
             {
                 return urlCollection ?? (urlCollection = new ObservableCollection<UrlCollectionAdditional>());
+            }
+        }
+
+        private int urlCollectionSelectedIndex = -1;
+        public int UrlCollectionSelectedIndex
+        {
+            get
+            {
+                return urlCollectionSelectedIndex < 0 ? (urlCollectionSelectedIndex = Math.Max(urlCollection.Count - 1, 0)) : urlCollectionSelectedIndex;
+            }
+            set
+            {
+                if (urlCollectionSelectedIndex == value)
+                    return;
+                urlCollectionSelectedIndex = value;
+                RaisePropertyChanged(nameof(UrlCollectionSelectedIndex));
             }
         }
 

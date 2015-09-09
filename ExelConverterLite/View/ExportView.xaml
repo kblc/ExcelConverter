@@ -159,7 +159,7 @@
                                   SelectedValuePath="Collection"
                                   Width="100"
                                   Margin="4,2"
-                                  SelectedIndex="{Binding Path=UrlCollection.Count, Mode=OneTime, Converter={StaticResource ApplyConverter}, ConverterParameter=-1;0}"/>
+                                  SelectedIndex="{Binding Path=UrlCollectionSelectedIndex}"/>
                     </DockPanel>
                     <Controls:ParsersControl 
                         Grid.Row="1"
