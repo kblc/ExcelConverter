@@ -1309,7 +1309,7 @@ namespace ExelConverterLite.ViewModel
                 _repeatLocksUpdater.Stop();
 
                 bool wasException = false;
-                var logSession = Helpers.Log.SessionStart("ImportViewModel.SelectedOperator_set()", true);
+                var logSession = Helpers.Old.Log.SessionStart("ImportViewModel.SelectedOperator_set()", true);
                 try
                 {
                     if (_selectedOperator != null)
@@ -1340,11 +1340,11 @@ namespace ExelConverterLite.ViewModel
                 catch(Exception ex)
                 {
                     wasException = true;
-                    Log.Add(logSession, ex.GetExceptionText());
+                    Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 }
                 finally
                 {
-                    Log.SessionEnd(logSession, wasException);
+                    Helpers.Old.Log.SessionEnd(logSession, wasException);
                     RaisePropertyChanged("SelectedOperator");
                     _repeatLocksUpdater.Start();
                 }

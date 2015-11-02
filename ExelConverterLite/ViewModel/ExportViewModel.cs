@@ -170,7 +170,7 @@ namespace ExelConverterLite.ViewModel
                 var Disp = prm.Argument as System.Windows.Threading.Dispatcher;
 
                 ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
-                Guid logSession = Log.SessionStart("ExportViewModel.Initialize()");
+                Guid logSession = Helpers.Old.Log.SessionStart("ExportViewModel.Initialize()");
                 try
                 {
                     Log.Add(string.Format("total sheets count: '{0}'", App.Locator.Import.Document.DocumentSheets.Count));
@@ -273,13 +273,13 @@ namespace ExelConverterLite.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    Log.Add(logSession, ex.GetExceptionText());
+                    Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                     throw ex;
                 }
                 finally
                 {
                     Log.Add(string.Format("total row count to export: '{0}'", rowsToExport.Count));
-                    Log.SessionEnd(logSession);
+                    Helpers.Old.Log.SessionEnd(logSession);
                 }
             };
 

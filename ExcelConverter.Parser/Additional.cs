@@ -423,7 +423,7 @@ namespace ExcelConverter.Parser
                         }
                         catch (Exception ex)
                         {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerIE.Navigate().GetHTML()"));
+                            Helpers.Old.Log.Add(ex, "SiteManagerIE.Navigate().GetHTML()");
                         }
                         finally
                         {
@@ -536,7 +536,7 @@ namespace ExcelConverter.Parser
                 }
                 catch (Exception ex)
                 {
-                    Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "SiteManagerCHR.Navigate().GetHTML()"));
+                    Helpers.Old.Log.Add(ex, "SiteManagerCHR.Navigate().GetHTML()");
                 }
                 return result;
                 
@@ -862,7 +862,7 @@ namespace ExcelConverter.Parser
             return str1.Substring(0, maxlen);
         }
 
-        public static Uri GetFullSourceLink(string sourceLink, HtmlDocument doc, string stdBase)
+        public static Uri GetFullSourceLink(string sourceLink, HtmlDocument doc, string responseUrl)
         {
             Uri result = null;
             if (Helper.IsWellFormedUriString(sourceLink, UriKind.Relative))
@@ -873,7 +873,7 @@ namespace ExcelConverter.Parser
                         .Descendants("base")
                         .Where(n => n.HasAttributes && n.Attributes.Contains("href"))
                         .Select(n => n.Attributes["href"].Value)
-                        .FirstOrDefault() ?? stdBase, UriKind.Absolute);
+                        .FirstOrDefault() ?? responseUrl, UriKind.Absolute);
 
                 var li = baseUri.AbsoluteUri.LastIndexOf(sourceLink);
                 if (li == baseUri.AbsoluteUri.Length - sourceLink.Length && li != -1)
@@ -1042,7 +1042,7 @@ namespace ExcelConverter.Parser
             }
             catch (Exception ex)
             {
-                Log.Add(Log.GetExceptionText(ex, string.Format("Helper.GetImageSize('{0}',maxDownloadBytes:'{1}')", directSourceLink, maxDownloadBytes)));
+                Helpers.Old.Log.Add(ex, string.Format("Helper.GetImageSize('{0}',maxDownloadBytes:'{1}')", directSourceLink, maxDownloadBytes));
             }
             return result;
         }
@@ -1116,7 +1116,7 @@ namespace ExcelConverter.Parser
                 }
                 catch (Exception ex)
                 {
-                    Log.Add(Log.GetExceptionText(ex, string.Format("Helper.GetImageSize('{0}','{1}')",directSourceLink, tryToDownloadImage)));
+                    Helpers.Old.Log.Add(ex, string.Format("Helper.GetImageSize('{0}','{1}')",directSourceLink, tryToDownloadImage));
                 }
                 finally
                 {
@@ -1305,7 +1305,7 @@ namespace ExcelConverter.Parser
             }
             catch (Exception ex)
             {
-                Log.Add(Log.GetExceptionText(ex, string.Format("Helper.GetSomeUrlsForHost(host:'{0}',count:'{1}')", host, count)));
+                Helpers.Old.Log.Add(ex, string.Format("Helper.GetSomeUrlsForHost(host:'{0}',count:'{1}')", host, count));
             }
             return result.OrderBy(i => i).ToArray();
         }
@@ -1328,13 +1328,34 @@ namespace ExcelConverter.Parser
         {
             return GetAllImagesUrlsFromUrl(document, url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags);
         }
-        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, string url, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
+        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, string responseUrl, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
         {
             if (document == null)
                 throw new ArgumentNullException("В функции GetAllImagesUrlsFromUrl() не может отсутствовать обязательный параметр document");
 
+            var symbolsDict = new Dictionary<string, string>() {
+                    { "&amp;", "&" },
+                    { "&lt;", "<" },
+                    { "&gt;;", ">" },
+                    { "&sect;", "§" },
+                    { "&copy;", "©" },
+                    { "&reg;", "®" },
+                    { "&deg;", "°" },
+                    { "&laquo;", "«" },
+                    { "&raquo;", "»" },
+                    { "&middot;", "·" },
+                    { "&trade;", "™" },
+                    { "&plusmn;", "±" },
+                };
+            var fixFunc = new Func<string, string>((url) =>
+            {
+                foreach (var key in symbolsDict.Keys)
+                    url = url.Replace(key, symbolsDict[key]);
+                return url;
+            });
+
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()", true);
+            var logSession = Helpers.Old.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()", true);
             try
             {
                 var allIMGLinks = 
@@ -1345,7 +1366,7 @@ namespace ExcelConverter.Parser
                         .Where(n => 
                             n.Attributes.Contains("src") && 
                             Helper.IsWellFormedUriString(n.Attributes["src"].Value, UriKind.RelativeOrAbsolute))
-                        .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(n.Attributes["src"].Value, document, url) })
+                        .Select(n => new SomeNodeElement() { Node = n, Url = Helper.GetFullSourceLink(fixFunc(n.Attributes["src"].Value), document, responseUrl) })
                         .ToArray();
             
                 //add some links (<a href="img_source"/>)
@@ -1364,7 +1385,7 @@ namespace ExcelConverter.Parser
                         .Select(n => new SomeNodeElement()
                         { 
                             Node = n, 
-                            Url = Helper.GetFullSourceLink(n.Attributes["href"].Value, document, url)
+                            Url = Helper.GetFullSourceLink(fixFunc(n.Attributes["href"].Value), document, responseUrl)
                         })
                         .ToArray();
 
@@ -1393,7 +1414,7 @@ namespace ExcelConverter.Parser
                         if (Helper.IsWellFormedUriString(value, UriKind.RelativeOrAbsolute))
                             try
                             {
-                                Uri newUri = Helper.GetFullSourceLink(value, document, url);
+                                Uri newUri = Helper.GetFullSourceLink(fixFunc(value), document, responseUrl);
                                     allMETALinks = allMETALinks.Union(new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = newUri } }).ToArray();
                             }
                             catch(Exception)
@@ -1413,7 +1434,7 @@ namespace ExcelConverter.Parser
                         .ToArray();
 
                 if (allLinks.Length == 0 && string.IsNullOrWhiteSpace(document.DocumentNode.InnerText))
-                    allLinks = new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(url) } };
+                    allLinks = new SomeNodeElement[] { new SomeNodeElement() { Node = document.DocumentNode, Url = new Uri(responseUrl) } };
 
                 //List<SomeNodeElement> distinctedLinks = new List<SomeNodeElement>(allLinks);
                 //for (int i = distinctedLinks.Count - 1; i >= 0; i--)
@@ -1428,12 +1449,12 @@ namespace ExcelConverter.Parser
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex);
+                Helpers.Old.Log.Add(logSession, ex);
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
         }
         internal static SomeNodeElement[] GetAllImagesUrlsWithMinSize(SomeNodeElement[] items, System.Drawing.Size minSize)
@@ -1520,7 +1541,7 @@ namespace ExcelConverter.Parser
                         try
                         {
                             System.Drawing.Size imageSize;
-                            if (Helper.CheckImageSize(fileUrl.ToString(), minSize, out imageSize, true, !downloadImages))
+                            if (Helper.CheckImageSize(fileUrl.AbsoluteUri, minSize, out imageSize, true, !downloadImages))
                             {
                                 if (!imageSize.IsEmpty)
                                     SetImageSize(node.Node, imageSize);
@@ -1590,7 +1611,7 @@ namespace ExcelConverter.Parser
                         }
                         catch (Exception ex)
                         {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, string.Format("Helper.GetAllImagesFromUrl(url:'{0}',..,type:'{1}').ForAllThread(fileUrl:'{2}',..)", url, type, fileUrl.AbsoluteUri)));
+                            Helpers.Old.Log.Add(ex, string.Format("Helper.GetAllImagesFromUrl(url:'{0}',..,type:'{1}').ForAllThread(fileUrl:'{2}',..)", url, type, fileUrl.AbsoluteUri));
                         }
                         finally
                         {
@@ -1608,7 +1629,7 @@ namespace ExcelConverter.Parser
             }
             catch (Exception ex)
             {
-                Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, string.Format("Helper.GetAllImagesFromUrl(url:'{0}',..,type:'{1}')", url, type)));
+                Helpers.Old.Log.Add(ex, string.Format("Helper.GetAllImagesFromUrl(url:'{0}',..,type:'{1}')", url, type));
             }
 
             if (prgItem != null && prgItem.Value != 100)

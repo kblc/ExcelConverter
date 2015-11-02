@@ -16,29 +16,29 @@ namespace CEFLoader
     {
         static CEFLoader()
         {
-            var session = Log.SessionStart("CEFLoader()", true);
+            var session = Helpers.Old.Log.SessionStart("CEFLoader()", true);
             try
             {
-                Log.Add(session, "Start dependency checker...");
-                Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
+                Helpers.Old.Log.Add(session, "Start dependency checker...");
+                Helpers.Old.Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
 
                 string cache = Path.Combine(Helpers.Log.CurrentPath, "cache");
-                Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", cache, Directory.Exists(cache)));
+                Helpers.Old.Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", cache, Directory.Exists(cache)));
                 if (Directory.Exists(cache))
                     try
                     {
                         Directory.Delete(cache, true);
                         Directory.CreateDirectory(cache);
-                        Log.Add(session, "Cache directory cleared");
+                        Helpers.Old.Log.Add(session, "Cache directory cleared");
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(session, "Can't clear cache directory");
-                        Log.Add(session, ex);
+                        Helpers.Old.Log.Add(session, "Can't clear cache directory");
+                        Helpers.Old.Log.Add(session, ex);
                     }
 
                 string logFile = Path.Combine(Helpers.Log.CurrentPath, "chromelog.txt");
-                Log.Add(session, string.Format("Log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
+                Helpers.Old.Log.Add(session, string.Format("Log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
                 if (File.Exists(logFile))
                     try
                     {
@@ -46,66 +46,66 @@ namespace CEFLoader
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(session, "Can't remove log file");
-                        Log.Add(session, ex);
+                        Helpers.Old.Log.Add(session, "Can't remove log file");
+                        Helpers.Old.Log.Add(session, ex);
                         logFile = Path.Combine(Helpers.Log.CurrentPath, DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_chromelog.txt");
-                        Log.Add(session, string.Format("New log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
+                        Helpers.Old.Log.Add(session, string.Format("New log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
                     }
 
                 string subprocessPath = Path.Combine(Helpers.Log.CurrentPath, "CefSharp.BrowserSubprocess.exe");
-                Log.Add(session, string.Format("Subprocess path is '{0}'. Sub process file exists: '{1}'", subprocessPath, File.Exists(subprocessPath)));
+                Helpers.Old.Log.Add(session, string.Format("Subprocess path is '{0}'. Sub process file exists: '{1}'", subprocessPath, File.Exists(subprocessPath)));
 
                 if (!File.Exists(subprocessPath))
                     throw new Exception("Subprocess file not exists!");
 
                 CefSharp.DependencyChecker.AssertAllDependenciesPresent("ru", "locales", "", false, subprocessPath);
 
-                Log.Add(session, "Check done");
+                Helpers.Old.Log.Add(session, "Check done");
             }
             catch (Exception ex)
             {
-                Log.Add(session, ex);
+                Helpers.Old.Log.Add(session, ex);
                 throw;
             }
             finally
             {
-                Log.SessionEnd(session);
+                Helpers.Old.Log.SessionEnd(session);
             }
         }
 
         private static bool CEFInited = false;
         private static bool CEFLoaderInit()
         {
-            var session = Log.SessionStart("CEFLoaderInit()", true);
+            var session = Helpers.Old.Log.SessionStart("CEFLoaderInit()", true);
             try
             {
-                Log.Add(session, "Start initialization...");
+                Helpers.Old.Log.Add(session, "Start initialization...");
 
                 if (Cef.IsInitialized)
                 {
-                    Log.Add(session, "CEF already initialized. Exit.");
+                    Helpers.Old.Log.Add(session, "CEF already initialized. Exit.");
                     return true;
                 }
 
-                Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
+                Helpers.Old.Log.Add(session, string.Format("Current directory for initialization: '{0}'", Helpers.Log.CurrentPath));
 
                 string cache = Path.Combine(Helpers.Log.CurrentPath, "cache");
-                Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", cache, Directory.Exists(cache)));
+                Helpers.Old.Log.Add(session, string.Format("Cache directory is '{0}'. Directory exists: '{1}'", cache, Directory.Exists(cache)));
                 if (Directory.Exists(cache))
                     try
                     {
                         Directory.Delete(cache, true);
                         Directory.CreateDirectory(cache);
-                        Log.Add(session, "Cache directory cleared");
+                        Helpers.Old.Log.Add(session, "Cache directory cleared");
                     }
                     catch(Exception ex)
                     {
-                        Log.Add(session, "Can't clear cache directory");
-                        Log.Add(session, ex);
+                        Helpers.Old.Log.Add(session, "Can't clear cache directory");
+                        Helpers.Old.Log.Add(session, ex);
                     }
 
                 string logFile = Path.Combine(Helpers.Log.CurrentPath, "chromelog.txt");
-                Log.Add(session, string.Format("Log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
+                Helpers.Old.Log.Add(session, string.Format("Log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
                 if (File.Exists(logFile))
                     try
                     {
@@ -113,14 +113,14 @@ namespace CEFLoader
                     }
                     catch(Exception ex)
                     {
-                        Log.Add(session, "Can't remove log file");
-                        Log.Add(session, ex);
+                        Helpers.Old.Log.Add(session, "Can't remove log file");
+                        Helpers.Old.Log.Add(session, ex);
                         logFile = Path.Combine(Helpers.Log.CurrentPath, DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_chromelog.txt");
-                        Log.Add(session, string.Format("New log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
+                        Helpers.Old.Log.Add(session, string.Format("New log file is '{0}'. Log file exists: '{1}'", logFile, File.Exists(logFile)));
                     }
 
                 string subprocessPath = Path.Combine(Helpers.Log.CurrentPath, "CefSharp.BrowserSubprocess.exe");
-                Log.Add(session, string.Format("Subprocess path is '{0}'. Sub process file exists: '{1}'", subprocessPath, File.Exists(subprocessPath)));
+                Helpers.Old.Log.Add(session, string.Format("Subprocess path is '{0}'. Sub process file exists: '{1}'", subprocessPath, File.Exists(subprocessPath)));
 
                 if (!File.Exists(subprocessPath))
                     throw new Exception("Subprocess file not exists!");
@@ -137,19 +137,19 @@ namespace CEFLoader
                 {
                     Cef.GetGlobalCookieManager().SetStoragePath("cookies", true);
                 };
-                Log.Add(session, "Start Cef.Initialize()");
+                Helpers.Old.Log.Add(session, "Start Cef.Initialize()");
                 var res = Cef.Initialize(settings, shutdownOnProcessExit: true, performDependencyCheck: !Debugger.IsAttached);
-                Log.Add(session, "Cef.Initialize() done");
+                Helpers.Old.Log.Add(session, "Cef.Initialize() done");
                 return res;
             }
             catch(Exception ex)
             {
-                Log.Add(session, ex);
+                Helpers.Old.Log.Add(session, ex);
                 throw;
             }
             finally
             {
-                Log.SessionEnd(session);
+                Helpers.Old.Log.SessionEnd(session);
             }
         }
 

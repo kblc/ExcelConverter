@@ -129,7 +129,7 @@ namespace ExelConverter.Core.ExelDataReader
         {
             double result = 0.0;
             bool wasError = false;
-            var logSession = Helpers.Log.SessionStart("ExelRow.Similarity()", true);
+            var logSession = Helpers.Old.Log.SessionStart("ExelRow.Similarity()", true);
             try
             { 
                 if (maxColumnsCount == 0)
@@ -166,12 +166,12 @@ namespace ExelConverter.Core.ExelDataReader
             catch(Exception ex)
             {
                 wasError = true;
-                Helpers.Log.Add(logSession, ex);
+                Helpers.Old.Log.Add(logSession, ex);
                 throw ex;
             }
             finally
             {
-               Helpers.Log.SessionEnd(logSession, wasError);
+                Helpers.Old.Log.SessionEnd(logSession, wasError);
             }
             return result;
         }

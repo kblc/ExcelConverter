@@ -35,8 +35,8 @@ namespace ExcelConverter.Parser.Test
 
         private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            string errorMessage = "App.OnDispatcherUnhandledException() :: An unhandled " + Log.GetExceptionText(e.Exception);
-            Log.Add(errorMessage);
+            string errorMessage = "App.OnDispatcherUnhandledException() :: An unhandled " + e.Exception.GetExceptionText();
+            Helpers.Old.Log.Add(errorMessage);
             e.Handled = true;
 
             if (MessageBox.Show(errorMessage + string.Format("{0}{0}Do you want to continue?", Environment.NewLine), "Exception", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.No)

@@ -117,13 +117,13 @@ namespace ExelConverter.Core.DataAccess
         public void Login(string server, string userLogin, string userPassword, WebProxy proxy = null)
         {
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.Login(server:'{0}',userLogin:'{1}')", server, userLogin), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.Login(server:'{0}',userLogin:'{1}')", server, userLogin), true);
             try
             {
                 CookieContainer cookies = new CookieContainer();
                 var strRequest = GetLoginPasswordCouple(userLogin, userPassword);
 
-                Helpers.Log.Add(logSession, "Send request to server...");
+                Helpers.Old.Log.Add(logSession, "Send request to server...");
 
                 string result = Post(GetUrl(server, PathLogin), strRequest, cookies, proxy);
 
@@ -161,12 +161,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Helpers.Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw new Exception(string.Format("При подлючении к серверу '{0}' (логин: '{1}') произошла ошибка: '{2}';", server, userLogin, ex.Message), ex);
             }
             finally
             {
-                Helpers.Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 
@@ -188,7 +188,7 @@ namespace ExelConverter.Core.DataAccess
         public void AddFillRectangle(FillArea rect)
         {
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.AddFillRectangle(operator:'{0}')", rect.FKOperatorID), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.AddFillRectangle(operator:'{0}')", rect.FKOperatorID), true);
             try
             {
                 var strRequest = GetLoginPasswordCouple() +
@@ -200,9 +200,9 @@ namespace ExelConverter.Core.DataAccess
                                 "&data[0][x2]=" + rect.X2 +
                                 "&data[0][y1]=" + rect.Y1 +
                                 "&data[0][y2]=" + rect.Y2;
-                Helpers.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
+                Helpers.Old.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
                 var result = Post(GetUrl(PathAddFillRectangle), Uri.EscapeUriString(strRequest), Cookies, Proxy);
-                Helpers.Log.Add(logSession, "Server answer: " + result);
+                Helpers.Old.Log.Add(logSession, "Server answer: " + result);
                 if (result == "error")
                 {
                     throw new InvalidDataException("Сервер сообщает об ошибке");
@@ -211,25 +211,25 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 
         public void RemoveFillRectangle(int id)
         {
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.RemoveFillRectangle(operator:'{0}')", id), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.RemoveFillRectangle(operator:'{0}')", id), true);
             try
             {
                 var strRequest = GetLoginPasswordCouple() + "&id=" + id;
-                Helpers.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
+                Helpers.Old.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
                 var result = Post(GetUrl(PathRemoveFillRectangle), Uri.EscapeUriString(strRequest), Cookies, Proxy);
-                Helpers.Log.Add(logSession, "Server answer: " + result);
+                Helpers.Old.Log.Add(logSession, "Server answer: " + result);
                 if (result == "error")
                 {
                     throw new InvalidDataException("Сервер сообщает об ошибке");
@@ -238,19 +238,19 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 
         public void GetResourcesList(long companyId, IList<DataWriter.ReExportData> idsToGet, out string map, out string pdf)
         {
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.GetResourcesList(companyId:'{0}')", companyId), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.GetResourcesList(companyId:'{0}')", companyId), true);
             try
             {
                 string items = string.Empty;
@@ -258,10 +258,10 @@ namespace ExelConverter.Core.DataAccess
                     items += string.Format("&codes[]={0}", Uri.EscapeDataString(item));
 
                 var strRequest = string.Format("{0}&companyId={1}{2}", GetLoginPasswordCouple(), companyId, items);
-                Helpers.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
+                Helpers.Old.Log.Add(logSession, "Client query: " + strRequest.Replace(UserPassword, "*"));
                 //var result = Post(GetUrl(PathGetResourceList), strRequest, Cookies, Proxy);
                 var result = Post(GetUrl(PathGetResourceList), strRequest, Cookies, Proxy);
-                Helpers.Log.Add(logSession, "Server answer: " + result);
+                Helpers.Old.Log.Add(logSession, "Server answer: " + result);
 
                 var jo = JObject.Parse(result);
                 if (jo.Property("error") != null)
@@ -304,12 +304,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 
@@ -328,7 +328,7 @@ namespace ExelConverter.Core.DataAccess
         public string UploadFileToQueue(long operatorId, string filePath, bool activate, bool coordinatesApproved, bool useQueue, int curlTimeout)
         {
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.UploadFileToQueue(operatorId:'{0}',activate:'{1}',coordinatesApproved:'{2}',useQueue:'{3}',curlTimeout:'{4}')", operatorId, activate, coordinatesApproved, useQueue, curlTimeout), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.UploadFileToQueue(operatorId:'{0}',activate:'{1}',coordinatesApproved:'{2}',useQueue:'{3}',curlTimeout:'{4}')", operatorId, activate, coordinatesApproved, useQueue, curlTimeout), true);
             try
             {
                 //if (!IsWebLogined)
@@ -358,12 +358,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 
@@ -386,7 +386,7 @@ namespace ExelConverter.Core.DataAccess
         private static string GetConnectionString(XElement element)
         {
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.GetConnectionString(element:'{0}')", element.ToString()), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.GetConnectionString(element:'{0}')", element.ToString()), true);
             try
             {
                 return GetConnectionString(
@@ -399,12 +399,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
         }
 
@@ -459,7 +459,7 @@ namespace ExelConverter.Core.DataAccess
         {
             string Out = string.Empty;
             bool wasException = false;
-            var logSession = Helpers.Log.SessionStart(string.Format("HttpDataClient.Post(url:'{0}')", url), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.Post(url:'{0}')", url), true);
             try
             {
                 var oldServerCertificateValidationCallback = ServicePointManager.ServerCertificateValidationCallback;
@@ -511,12 +511,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
 
             return Out;
@@ -546,7 +546,7 @@ namespace ExelConverter.Core.DataAccess
         {
             bool wasException = false;
 
-            var logSession = Log.SessionStart(string.Format("HttpDataClient.HttpUploadFile('{0}' to '{1}')", file, url), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.HttpUploadFile('{0}' to '{1}')", file, url), true);
 
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
@@ -640,12 +640,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 
@@ -654,7 +654,7 @@ namespace ExelConverter.Core.DataAccess
             if (cookies != null)
             {
                 bool wasError = false;
-                var logSession = Log.SessionStart(string.Format("HttpDataClient.WebLogout(server:'{0}')", server), true);
+                var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.WebLogout(server:'{0}')", server), true);
                 try
                 {
                     var oldServerCertificateValidationCallback = ServicePointManager.ServerCertificateValidationCallback;
@@ -682,12 +682,12 @@ namespace ExelConverter.Core.DataAccess
                 catch (Exception ex)
                 {
                     wasError = true;
-                    Log.Add(logSession, ex.GetExceptionText());
+                    Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                     throw ex;
                 }
                 finally
                 {
-                    Log.SessionEnd(logSession, wasError || IsWebDebug);
+                    Helpers.Old.Log.SessionEnd(logSession, wasError || IsWebDebug);
                 }
             }
         }
@@ -695,7 +695,7 @@ namespace ExelConverter.Core.DataAccess
         private static void WebLogin(string server, string userName, string userPassword, CookieContainer cookies, WebProxy proxy)
         {
             bool wasException = false;
-            var logSession = Log.SessionStart(string.Format("HttpDataClient.WebLogin(server:'{0}',user:'{1}')", server, userName), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("HttpDataClient.WebLogin(server:'{0}',user:'{1}')", server, userName), true);
 
             string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
             byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
@@ -772,13 +772,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException || IsWebDebug);
-
+                Helpers.Old.Log.SessionEnd(logSession, wasException || IsWebDebug);
             }
         }
 

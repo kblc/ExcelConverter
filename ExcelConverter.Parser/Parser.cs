@@ -237,7 +237,7 @@ namespace ExcelConverter.Parser
 
         public ParseRule() { }
 
-        public string Parse(HtmlDocument doc, string baseUrl, string urlToParse)
+        public string Parse(HtmlDocument doc, string responseUrl, string urlToParse)
         {
             string result = string.Empty;
 
@@ -250,7 +250,7 @@ namespace ExcelConverter.Parser
                 }
                 else
                 {
-                    var links = Helper.GetAllImagesUrlsFromUrl(doc, baseUrl, collectIMGTags, collectLINKTags, collectMETATags)
+                    var links = Helper.GetAllImagesUrlsFromUrl(doc, responseUrl, collectIMGTags, collectLINKTags, collectMETATags)
                                        .Where(n => Helper.StringLikes(
                                            Condition == ParseFindRuleCondition.ByLink ? n.Url.AbsoluteUri : n.Node.XPath
                                            , mask))
@@ -279,7 +279,7 @@ namespace ExcelConverter.Parser
                         }
                         else
                         {
-                            var links = Helper.GetAllImagesUrlsFromUrl(doc, baseUrl, collectIMGTags, collectLINKTags, collectMETATags)
+                            var links = Helper.GetAllImagesUrlsFromUrl(doc, responseUrl, collectIMGTags, collectLINKTags, collectMETATags)
                                         .Where(n => Helper.StringLikes(
                                             Condition == ParseFindRuleCondition.ByLinkAndIndex ? n.Url.AbsoluteUri : n.Node.XPath
                                             , mask))
@@ -298,7 +298,7 @@ namespace ExcelConverter.Parser
             }
 
             if (!string.IsNullOrWhiteSpace(result))
-                result = Helper.GetFullSourceLink(result, doc, baseUrl).AbsoluteUri;
+                result = Helper.GetFullSourceLink(result, doc, responseUrl).AbsoluteUri;
 
             return result ?? string.Empty;
         }
@@ -598,7 +598,7 @@ namespace ExcelConverter.Parser
                     }
                     catch(Exception ex)
                     {
-                        Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, string.Format("DBParserCollection.Load(file: {0})", FullParsersPath)));
+                        Helpers.Old.Log.Add(ex, string.Format("DBParserCollection.Load(file: {0})", FullParsersPath));
                     }
                 else
                     DBParserLoad();
@@ -624,7 +624,7 @@ namespace ExcelConverter.Parser
                     }
                     catch (Exception ex)
                     {
-                        Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, string.Format("DBParserCollection.Save(file: {0})", FullParsersPath)));
+                        Helpers.Old.Log.Add(ex, string.Format("DBParserCollection.Save(file: {0})", FullParsersPath));
                     }
 
                 else
@@ -1020,7 +1020,7 @@ namespace ExcelConverter.Parser
                                         try
                                         {
                                             dic.Add(
-                                                new ParseResultDataItem() { Label = rule.Label, Link = rule.Parse(document, new Uri(urlResponse).GetLeftPart(UriPartial.Authority), urlResponse) });
+                                                new ParseResultDataItem() { Label = rule.Label, Link = rule.Parse(document, urlResponse, urlResponse) });
                                         }
                                         catch(Exception ex)
                                         {
@@ -1047,7 +1047,7 @@ namespace ExcelConverter.Parser
                         }
                         catch (Exception ex)
                         {
-                            Helpers.Log.Add(Helpers.Log.GetExceptionText(ex, "Parser.Parse()"));
+                            Helpers.Old.Log.Add(ex, "Parser.Parse()");
                             throw new Exception(string.Format("Ошибка при обработке ссылки{0}{1}.{0}Смотрите внутреннее исключение.", Environment.NewLine, url), ex);
                         }
                     }

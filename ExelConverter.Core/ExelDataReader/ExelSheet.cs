@@ -178,9 +178,9 @@ namespace ExelConverter.Core.ExelDataReader
             var result = new List<int>();
             var endHeaderRowIndex = Rows.IndexOf(MainHeader) + (MainHeaderRowCount - 1);
 
-            Guid logSession = Log.SessionStart("ExelSheet.GetAllHeadersData()", true);
-            Log.Add(logSession, string.Format("HeaderSearchAlgorithm = {0}", ExelConverter.Core.Properties.Settings.Default.HeaderSearchAlgorithm));
-            Log.Add(logSession, string.Format("rows count for import: '{0}' from '{1}' main row", Rows.Count, endHeaderRowIndex));
+            Guid logSession = Helpers.Old.Log.SessionStart("ExelSheet.GetAllHeadersData()", true);
+            Helpers.Old.Log.Add(logSession, string.Format("HeaderSearchAlgorithm = {0}", ExelConverter.Core.Properties.Settings.Default.HeaderSearchAlgorithm));
+            Helpers.Old.Log.Add(logSession, string.Format("rows count for import: '{0}' from '{1}' main row", Rows.Count, endHeaderRowIndex));
             try
             {
                 if (Rows.Count > endHeaderRowIndex)
@@ -204,12 +204,12 @@ namespace ExelConverter.Core.ExelDataReader
                     //var r2 = Rows[3];
                     //var b = IsIntersected(tags, Rows[3].UniqueNotEmptyCells.Select(c => c.Value).ToArray());
 
-                    Log.Add(logSession, string.Format("founded '{0}' TAGGED rows for sheets candidate.", rowIndexesForHeadersWithTags.Length));
+                    Helpers.Old.Log.Add(logSession, string.Format("founded '{0}' TAGGED rows for sheets candidate.", rowIndexesForHeadersWithTags.Length));
 
                     #endregion
                     #region By values
 
-                    Log.Add(logSession, string.Format("calculating by values..."));
+                    Helpers.Old.Log.Add(logSession, string.Format("calculating by values..."));
 
                     var rowIndexesForHeadersByValue =
                         Rows
@@ -236,11 +236,11 @@ namespace ExelConverter.Core.ExelDataReader
                             .Distinct()
                             .ToArray();
 
-                    Log.Add(logSession, string.Format("founded '{0}' rows for sheets candidate; Need check.", rowIndexesForHeadersByValue.Length));
+                    Helpers.Old.Log.Add(logSession, string.Format("founded '{0}' rows for sheets candidate; Need check.", rowIndexesForHeadersByValue.Length));
 
                     #endregion
                     #region By style
-                    Log.Add(logSession, string.Format("calculating by styles..."));
+                    Helpers.Old.Log.Add(logSession, string.Format("calculating by styles..."));
 
                     var rowIndexesForHeadersByWeight =
                         Rows
@@ -267,7 +267,7 @@ namespace ExelConverter.Core.ExelDataReader
                             .Distinct()
                             .ToArray();
 
-                    Log.Add(logSession, string.Format("founded '{0}' rows for sheets candidate; Need check.", rowIndexesForHeadersByWeight.Length));
+                    Helpers.Old.Log.Add(logSession, string.Format("founded '{0}' rows for sheets candidate; Need check.", rowIndexesForHeadersByWeight.Length));
 
                     #endregion
 
@@ -278,22 +278,22 @@ namespace ExelConverter.Core.ExelDataReader
                         .OrderBy(i => i)
                         .ToList();
 
-                    Log.Add(logSession, string.Format("Calculation for '{0}' rows starts...", res0.Count));
+                    Helpers.Old.Log.Add(logSession, string.Format("Calculation for '{0}' rows starts...", res0.Count));
                     SomeCalculations(res0, endHeaderRowIndex, tags, strongIndexes: rowIndexesForHeadersWithTags);
-                    Log.Add(logSession, string.Format("Calculation end with '{0}' rows.", res0.Count));
+                    Helpers.Old.Log.Add(logSession, string.Format("Calculation end with '{0}' rows.", res0.Count));
                     result.AddRange(res0);
                 }
             }
             finally
             {
-                Log.SessionEnd(logSession);
+                Helpers.Old.Log.SessionEnd(logSession);
             }
             return getAllHeadersData = result;
         }
 
         private void SomeCalculations(List<int> result, int endHeaderRowIndex, string[] tags, int[] strongIndexes)
         {
-            var logSessiong = Log.SessionStart("ExelSheet.SomeCalculations()", true);
+            var logSessiong = Helpers.Old.Log.SessionStart("ExelSheet.SomeCalculations()", true);
             bool wasException = false;
 
             try
@@ -310,8 +310,8 @@ namespace ExelConverter.Core.ExelDataReader
                     foreach (var tag in tags)
                         tags2 += tag + ";";
 
-                Log.Add(logSessiong, string.Format("Incoming indexes: '{0}'.", indexes));
-                Log.Add(logSessiong, string.Format("Incoming tags: '{0}'.", tags2));
+                Helpers.Old.Log.Add(logSessiong, string.Format("Incoming indexes: '{0}'.", indexes));
+                Helpers.Old.Log.Add(logSessiong, string.Format("Incoming tags: '{0}'.", tags2));
                 #endregion
 
                 if (result != null)
@@ -332,7 +332,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #region remove headers if step by step > 2
 
-                    Log.Add(logSessiong, string.Format("Remove headers if step by step > 2"));
+                    Helpers.Old.Log.Add(logSessiong, string.Format("Remove headers if step by step > 2"));
 
                     for (int i = result.Count - 1; i >= 0; i--)
                     {
@@ -356,11 +356,11 @@ namespace ExelConverter.Core.ExelDataReader
                             {
                                 if (!strongIndexes.Contains(index - z))
                                 {
-                                    Log.Add(logSessiong, string.Format("Remove header index '{0}'", index - z));
+                                    Helpers.Old.Log.Add(logSessiong, string.Format("Remove header index '{0}'", index - z));
                                     result.Remove(index - z);
                                 }
                                 else
-                                    Log.Add(logSessiong, string.Format("Can't remove protected (by tags) index '{0}'", index - z));
+                                    Helpers.Old.Log.Add(logSessiong, string.Format("Can't remove protected (by tags) index '{0}'", index - z));
                                 deleted++;
                             }
                             i -= deleted - 1;
@@ -370,7 +370,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #region remove bottom groups
 
-                    Log.Add(logSessiong, string.Format("Remove bottom groups"));
+                    Helpers.Old.Log.Add(logSessiong, string.Format("Remove bottom groups"));
 
                     if (result.Count > 0)
                     {
@@ -378,7 +378,7 @@ namespace ExelConverter.Core.ExelDataReader
                         {
                             if (result.Contains(i))
                             {
-                                Log.Add(logSessiong, string.Format("Remove index '{0}'", i));
+                                Helpers.Old.Log.Add(logSessiong, string.Format("Remove index '{0}'", i));
                                 result.Remove(i);
                             }
                             else
@@ -389,14 +389,14 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #region calc similarity with other (non headers) lines and remove header if similary like simple row
 
-                    Log.Add(logSessiong, string.Format("Calc similarity with other (non headers) lines and remove header if similary like simple row"));
+                    Helpers.Old.Log.Add(logSessiong, string.Format("Calc similarity with other (non headers) lines and remove header if similary like simple row"));
 
                     var oldResCnt = 0;
                     var calcCount = 0;
                     while (result.Count != oldResCnt)
                     {
                         calcCount++;
-                        Log.Add(logSessiong, string.Format("Calc similarity.. Step #{0}", calcCount));
+                        Helpers.Old.Log.Add(logSessiong, string.Format("Calc similarity.. Step #{0}", calcCount));
 
                         oldResCnt = result.Count;
                         foreach (var item in result
@@ -443,7 +443,7 @@ namespace ExelConverter.Core.ExelDataReader
                                                        ;
                                             }))
                             {
-                                Log.Add(logSessiong, string.Format("Remove header with index '{0}'", item.Index));
+                                Helpers.Old.Log.Add(logSessiong, string.Format("Remove header with index '{0}'", item.Index));
                                 result.Remove(item.Index);
                             }
                         }
@@ -451,23 +451,23 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #region add
 
-                    Log.Add(logSessiong, string.Format("Calc similarity with other (non headers) lines and remove header if similary like simple row (Additional)"));
+                    Helpers.Old.Log.Add(logSessiong, string.Format("Calc similarity with other (non headers) lines and remove header if similary like simple row (Additional)"));
 
                     if (result.Count > 0)
                     {
                         decimal averageWeight = result.Select(i => (decimal)Rows[i].UniqueWeight).Average();
-                        Log.Add(logSessiong, string.Format("Average unqiue weight: '{0}'", averageWeight));
+                        Helpers.Old.Log.Add(logSessiong, string.Format("Average unqiue weight: '{0}'", averageWeight));
 
                         decimal maxWeight = result.Select(i => (decimal)Rows[i].UniqueWeight).Max();
-                        Log.Add(logSessiong, string.Format("Max unqiue weight: '{0}'", maxWeight));
+                        Helpers.Old.Log.Add(logSessiong, string.Format("Max unqiue weight: '{0}'", maxWeight));
 
                         decimal minWeight = result.Select(i => (decimal)Rows[i].UniqueWeight).Min();
-                        Log.Add(logSessiong, string.Format("Min unqiue weight: '{0}'", minWeight));
+                        Helpers.Old.Log.Add(logSessiong, string.Format("Min unqiue weight: '{0}'", minWeight));
 
                         decimal moduleWeight = (maxWeight - minWeight) / 4m;
                         if (moduleWeight == 0.0m)
                             moduleWeight = 0.001m;
-                        Log.Add(logSessiong, string.Format("Module unqiue weight: '{0}'", moduleWeight));
+                        Helpers.Old.Log.Add(logSessiong, string.Format("Module unqiue weight: '{0}'", moduleWeight));
 
                         var subItemsToDelete = result
                             .Except(strongIndexes)
@@ -502,7 +502,7 @@ namespace ExelConverter.Core.ExelDataReader
                             .ToArray();
                         foreach (var index in itemsToDelete)
                         {
-                            Log.Add(logSessiong, string.Format("Remove index: '{0}'", index));
+                            Helpers.Old.Log.Add(logSessiong, string.Format("Remove index: '{0}'", index));
                             result.Remove(index);
                         }
 
@@ -543,7 +543,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                     #region remove excluded tags
 
-                    Log.Add(logSessiong, string.Format("Remove excluded tags"));
+                    Helpers.Old.Log.Add(logSessiong, string.Format("Remove excluded tags"));
 
                     var excludedTags = Tag.FromStrings(tags).Where(t => t.Direction == TagDirection.Exclude).ToArray();
                     if (result.Count > 0 && excludedTags.Length > 0)
@@ -556,7 +556,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                         foreach (int ex in excludeHeaderIndexes)
                         {
-                            Log.Add(logSessiong, string.Format("Remove index: '{0}'", ex));
+                            Helpers.Old.Log.Add(logSessiong, string.Format("Remove index: '{0}'", ex));
                             result.Remove(ex);
                         }
                     }
@@ -566,11 +566,11 @@ namespace ExelConverter.Core.ExelDataReader
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSessiong, ex);
+                Helpers.Old.Log.Add(logSessiong, ex);
             }
             finally
             {
-                Log.SessionEnd(logSessiong, wasException);
+                Helpers.Old.Log.SessionEnd(logSessiong, wasException);
             }
         }
 

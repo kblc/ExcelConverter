@@ -340,7 +340,7 @@ namespace ExelConverter.Core.Converter
             Action<Exception, int> additionalErrorAction = null,
             Func<bool> isCanceled = null)
         {
-            Guid logSession = Log.SessionStart("ExelConvertionRule.Convert()");
+            Guid logSession = Helpers.Old.Log.SessionStart("ExelConvertionRule.Convert()");
             var result = new List<OutputRow>();
             try
             {
@@ -445,7 +445,7 @@ namespace ExelConverter.Core.Converter
                                     hasError = true;
                                     if (additionalErrorAction != null)
                                     {
-                                        Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
+                                        Helpers.Old.Log.Add(logSession, ex);
                                         exceptions.Add(ex);
                                     }
                                     else
@@ -482,7 +482,7 @@ namespace ExelConverter.Core.Converter
                         {
                             if (additionalErrorAction != null)
                             {
-                                Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
+                                Helpers.Old.Log.Add(logSession, ex);
                                 if (!result.Contains(outputRow))
                                     result.Add(outputRow);
                                 additionalErrorAction(ex, i - initialRow - excludeRow);
@@ -497,12 +497,12 @@ namespace ExelConverter.Core.Converter
             }
             catch (Exception ex)
             {
-                Log.Add(logSession, Helpers.Log.GetExceptionText(ex));
+                Helpers.Old.Log.Add(logSession, ex);
             }
             finally
             {
                 RemoveRepeatingId(result);
-                Log.SessionEnd(logSession);
+                Helpers.Old.Log.SessionEnd(logSession);
             }
             
             return result;
@@ -524,7 +524,7 @@ namespace ExelConverter.Core.Converter
         private void UpdateMappingTablesValues()
         {
             bool wasException = false;
-            var logSession = Log.SessionStart("ExcelConvertionRule.UpdateMappingTablesValues()", true);
+            var logSession = Helpers.Old.Log.SessionStart("ExcelConvertionRule.UpdateMappingTablesValues()", true);
             try
             { 
                 if (!SettingsProvider.IsInitialized)
@@ -566,11 +566,11 @@ namespace ExelConverter.Core.Converter
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex);
+                Helpers.Old.Log.Add(logSession, ex);
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
         }
 

@@ -288,7 +288,11 @@ namespace ExcelConverter.Parser.Controls
                 object lockAdd = new Object();
                 UrlsToAddList.Clear();
 
+#if DEBUG
+                insideThreadCount = 1;
+#else
                 insideThreadCount = ThreadCount;
+#endif
 
                 ParseRuleConnectionType type = NewParseRule.Connection;
 
@@ -378,8 +382,8 @@ namespace ExcelConverter.Parser.Controls
                     Helper.DoEvents();
                 bw = null;
             }
-            #endregion
-            #region step 2
+#endregion
+#region step 2
             else if (step == 2 && action)
             {
                 HtmlNodeWithUrl[] nodes =
@@ -404,7 +408,7 @@ namespace ExcelConverter.Parser.Controls
 
                 ShowRuleModeCommand.Execute(null);
             }
-            #endregion
+#endregion
 
             if (step >= UrlsToAddTabControl.Items.Count)
                 for (int i = UrlsToAddTabControl.Items.Count - 1; i >= 0; i--)
@@ -447,7 +451,7 @@ namespace ExcelConverter.Parser.Controls
             }
         }
 
-        #region INotifyPropertyChanged
+#region INotifyPropertyChanged
 
         private void RaisePropertyChanged(string propertyName)
         {
@@ -457,7 +461,7 @@ namespace ExcelConverter.Parser.Controls
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        #endregion;
+#endregion;
 
         private int loadedPercent = 0;
         public int LoadedPercent 

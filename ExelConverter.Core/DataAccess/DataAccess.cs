@@ -55,7 +55,7 @@ namespace ExelConverter.Core.DataAccess
         public Operator[] GetOperators(int[] ids = null)
         {
             Operator[] result = new Operator[] {};
-            var logSession = Log.SessionStart("DataAccess.GetOperators()", true);
+            var logSession = Helpers.Old.Log.SessionStart("DataAccess.GetOperators()", true);
             bool wasException = false;
             try
             {
@@ -84,7 +84,7 @@ namespace ExelConverter.Core.DataAccess
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
             return result;
         }
@@ -301,7 +301,7 @@ namespace ExelConverter.Core.DataAccess
         {
             bool wasException = false;
             var result = new Parser[] { };
-            var logSession = Log.SessionStart("DataAccess.ParsersGet()", true);
+            var logSession = Helpers.Old.Log.SessionStart("DataAccess.ParsersGet()", true);
             try
             {
                 var pIds = ids == null ? new Guid[] { } : ids;
@@ -329,11 +329,11 @@ namespace ExelConverter.Core.DataAccess
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
             return result;
         }
@@ -426,7 +426,7 @@ namespace ExelConverter.Core.DataAccess
         {
             var result = new SheetRulePair[] { };
             bool wasException = false;
-            var logSesson = Log.SessionStart(string.Format("DataAccess.GetExportRulesIdByOperator(id:{0})", op == null ? "null" : op.Id.ToString()), true);
+            var logSesson = Helpers.Old.Log.SessionStart(string.Format("DataAccess.GetExportRulesIdByOperator(id:{0})", op == null ? "null" : op.Id.ToString()), true);
             try
             {
                 using (var dc = exelconverterEntities2.New())
@@ -460,12 +460,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSesson, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSesson, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSesson, wasException);
+                Helpers.Old.Log.SessionEnd(logSesson, wasException);
             }
 
             return result;
@@ -474,7 +474,7 @@ namespace ExelConverter.Core.DataAccess
         public void SetExportedRulesForOperator(Operator op, SheetRulePair[] exportRules)
         {
             bool wasException = false;
-            var logSesson = Log.SessionStart(string.Format("DataAccess.SetExportedRulesForOperator(id:{0})", op == null ? "null" : op.Id.ToString()), true);
+            var logSesson = Helpers.Old.Log.SessionStart(string.Format("DataAccess.SetExportedRulesForOperator(id:{0})", op == null ? "null" : op.Id.ToString()), true);
             try
             {
                 using (var dc = exelconverterEntities2.New())
@@ -512,12 +512,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSesson, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSesson, ex.GetExceptionText());
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSesson, wasException);
+                Helpers.Old.Log.SessionEnd(logSesson, wasException);
             }
         }
 
@@ -529,7 +529,7 @@ namespace ExelConverter.Core.DataAccess
         public ExelConvertionRule[] GetRulesByOperator(int[] ids)
         {
             bool wasException = false;
-            var logSesson = Log.SessionStart("DataAccess.GetRulesByOperator()", true);
+            var logSesson = Helpers.Old.Log.SessionStart("DataAccess.GetRulesByOperator()", true);
             try
             {
                 using (var dc = exelconverterEntities2.New())
@@ -551,12 +551,12 @@ namespace ExelConverter.Core.DataAccess
             catch (Exception ex)
             {
                 wasException = true;
-                Log.Add(logSesson, ex);
+                Helpers.Old.Log.Add(logSesson, ex);
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSesson, wasException);
+                Helpers.Old.Log.SessionEnd(logSesson, wasException);
             }
         }
 
@@ -565,7 +565,7 @@ namespace ExelConverter.Core.DataAccess
             ExelConvertionRule[] result = null;
             bool wasException = false;
 
-            var logSesson = Log.SessionStart("DataAccess.GetRules()", true);
+            var logSesson = Helpers.Old.Log.SessionStart("DataAccess.GetRules()", true);
             try
             { 
                 using (var dc = exelconverterEntities2.New())
@@ -585,12 +585,12 @@ namespace ExelConverter.Core.DataAccess
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSesson, ex);
+                Helpers.Old.Log.Add(logSesson, ex);
                 throw ex;
             }
             finally
             {
-                Log.SessionEnd(logSesson, wasException);
+                Helpers.Old.Log.SessionEnd(logSesson, wasException);
             }
             return result;
         }
@@ -741,7 +741,7 @@ namespace ExelConverter.Core.DataAccess
             if (IsNoLocking)
                 return result;
 
-            var logSession = Log.SessionStart(string.Format("DataAccess.GetOperatorLockers(operatorFilter:'{0}')", operatorFilter == null ? "null" : operatorFilter.Id.ToString()), true);
+            var logSession = Helpers.Old.Log.SessionStart(string.Format("DataAccess.GetOperatorLockers(operatorFilter:'{0}')", operatorFilter == null ? "null" : operatorFilter.Id.ToString()), true);
             bool wasException = false;
             try
             {
@@ -786,11 +786,11 @@ namespace ExelConverter.Core.DataAccess
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
             return result;
         }
@@ -833,7 +833,7 @@ namespace ExelConverter.Core.DataAccess
                 return true;
 
             bool wasException = false;
-            var logSession = Log.SessionStart("DataAccess.SetOperatorLocker()", true);
+            var logSession = Helpers.Old.Log.SessionStart("DataAccess.SetOperatorLocker()", true);
             bool result = false;
 
             try
@@ -875,11 +875,11 @@ namespace ExelConverter.Core.DataAccess
             catch(Exception ex)
             {
                 wasException = true;
-                Log.Add(logSession, ex.GetExceptionText());
+                Helpers.Old.Log.Add(logSession, ex.GetExceptionText());
             }
             finally
             {
-                Log.SessionEnd(logSession, wasException);
+                Helpers.Old.Log.SessionEnd(logSession, wasException);
             }
             return result;
         }

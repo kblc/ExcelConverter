@@ -54,12 +54,12 @@ namespace ExelConverter.Core.DataWriter
                     ObservableCollection<OutputRow> rowsToExport = new ObservableCollection<OutputRow>();
 
                     bool wasException = false;
-                    Guid logSession = Log.SessionStart("ReExport.ReExport()", true);
+                    var logSession = Helpers.Old.Log.SessionStart("ReExport.ReExport()", true);
                     try
                     {
                         #region Read Rules
 
-                        Log.Add(logSession, string.Format("total sheets count: '{0}'", ruleToSheets.Count()));
+                        Helpers.Old.Log.Add(logSession, string.Format("total sheets count: '{0}'", ruleToSheets.Count()));
                         int rulesToSheets = ruleToSheets.Count();
 
                         int ind = 0;
@@ -71,7 +71,7 @@ namespace ExelConverter.Core.DataWriter
                             {
                                 if (ds.MainHeader == null)
                                 {
-                                    Log.Add(logSession, string.Format("should update main header row..."));
+                                    Helpers.Old.Log.Add(logSession, string.Format("should update main header row..."));
 
                                     ds.UpdateMainHeaderRow(mappingRule.MainHeaderSearchTags
                                         .Select(h => h.Tag)
@@ -89,19 +89,19 @@ namespace ExelConverter.Core.DataWriter
                                 }
 
                                 var oc = new ObservableCollection<OutputRow>(mappingRule.Convert(ds, new string[] { "Code" }));
-                                Log.Add(logSession, string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
+                                Helpers.Old.Log.Add(logSession, string.Format("row count on sheet '{0}' : '{1}'", ds.Name, oc.Count));
                                 rowsToExport = new ObservableCollection<OutputRow>(rowsToExport.Union(oc));
-                                Log.Add(logSession, string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
+                                Helpers.Old.Log.Add(logSession, string.Format("subtotal row count on sheets: '{0}'", rowsToExport.Count));
                             }
 
                             ind++;
                             readRulesProgress.Value = ((decimal)ind / (decimal)rulesToSheets) * 100m;
                         }
-                        Log.Add(logSession, string.Format("total row count to export: '{0}'", rowsToExport.Count));
+                        Helpers.Old.Log.Add(logSession, string.Format("total row count to export: '{0}'", rowsToExport.Count));
 
                         #endregion
                         #region Get Links
-                        Log.Add(logSession, string.Format("Try to get links..."));
+                        Helpers.Old.Log.Add(logSession, string.Format("Try to get links..."));
                         
                         var idsToGet = 
                             rowsToExport
@@ -126,7 +126,7 @@ namespace ExelConverter.Core.DataWriter
                         //Log.Add(logSession, string.Format("Get CODES done"));
 
                         //HttpDataAccess.GetResourcesList(currentOperatorId, idsToGet, out outerMap, out outerPdf);
-                        Log.Add(logSession, string.Format("Links getted"));
+                        Helpers.Old.Log.Add(logSession, string.Format("Links getted"));
                         getLinksProgress.Value = 100;
                         #endregion
                         #region Write Excel File
@@ -299,13 +299,13 @@ namespace ExelConverter.Core.DataWriter
                     catch (Exception ex)
                     {
                         wasException = true;
-                        Log.Add(logSession, ex);
+                        Helpers.Old.Log.Add(logSession, ex);
                         throw ex;
                     }
                     finally
                     {
                         current.ReportProgress(100);
-                        Log.SessionEnd(logSession, wasException || showLogAnytime);
+                        Helpers.Old.Log.SessionEnd(logSession, wasException || showLogAnytime);
                     }
                 };
             result.WorkerReportsProgress = true;

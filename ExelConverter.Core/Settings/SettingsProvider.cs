@@ -123,7 +123,7 @@ namespace ExelConverter.Core.Settings
                         {
                             if (System.Windows.Application.Current != null)
                                 System.Windows.Application.Current.Shutdown();
-                            Log.AddWithCatcher("SettingsProvider.DataBasesEnabled", ex.GetExceptionText());
+                            Helpers.Old.Log.AddWithCatcher("SettingsProvider.DataBasesEnabled", ex.GetExceptionText());
                         }
                     return Login.IsLogined;
                 }
