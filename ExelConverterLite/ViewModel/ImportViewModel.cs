@@ -803,6 +803,7 @@ namespace ExelConverterLite.ViewModel
                 var filePath = ExelConverterFileDialog.Show();
                 if (filePath != null)
                     Document.Path = filePath;
+                ExportRules = null;
             }
             catch(Exception e)
             {

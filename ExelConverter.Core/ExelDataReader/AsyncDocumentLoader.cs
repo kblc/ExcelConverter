@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace ExelConverter.Core.ExelDataReader
 {
@@ -249,6 +250,9 @@ namespace ExelConverter.Core.ExelDataReader
                             .AsParallel()
                             .Select(row =>
                             {
+                                Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
+                                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+
                                 var r = new ExelRow() { Index = row.Index };
                                 var currMaxColumnsIndex = row.LastCell == null ? 0 : row.LastCell.Column;
 
@@ -419,7 +423,6 @@ namespace ExelConverter.Core.ExelDataReader
 
                 pp1.Value = 100;
             }
-
             return result.ToArray();
         }
 

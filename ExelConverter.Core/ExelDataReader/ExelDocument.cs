@@ -12,6 +12,8 @@ using Helpers;
 using Aspose.Cells;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
+using System.Globalization;
 
 namespace ExelConverter.Core.ExelDataReader
 {
@@ -129,6 +131,9 @@ namespace ExelConverter.Core.ExelDataReader
 
             loadWorker.DoWork += (s, e) =>
             {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
+                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+
                 var bw = (BackgroundWorker)s;
                 var prms = (AsyncLoadInit)e.Argument;
                 var res = new AsyncLoadResult() { StartSettings = prms };

@@ -1532,6 +1532,8 @@ namespace ExcelConverter.Parser
 
                 object currLoadedLock = new Object();
 
+                threadCount = 1;
+
                 allLinks
                     .AsParallel()
                     .WithDegreeOfParallelism(threadCount)

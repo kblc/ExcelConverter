@@ -260,28 +260,26 @@ namespace ExelConverter.Core.DataAccess
 
         }
 
-        public User[] GetUsers(string[] logins = null)
+        public User[] GetUsers(string[] logins)
         {
             using (var dc = alphaEntities.New())
             {
+                var users = logins == null
+                    ? dc.users
+                    : dc.users.Where(u => logins.Contains(u.login));
+
                 //var dc = alphaEntities.Default;
-                User[] result = 
-                    dc.users
-                    .AsEnumerable()
-                    .Where(c => logins == null || logins.Contains(c.login))
-                    .AsEnumerable()
-                    .Select(c => 
+                var result = users
+                    .Select(c => new User() 
                         {
-                            return new User()
-                                {
-                                    Id = c.id,
-                                    Login = c.login,
-                                    Password = c.password,
-                                    Name = c.name,
-                                    Surname = c.surname,
-                                    Patronymic = c.patronymic
-                                };
-                    }).ToArray();
+                            Id = c.id,
+                            Login = c.login,
+                            Password = c.password,
+                            Name = c.name,
+                            Surname = c.surname,
+                            Patronymic = c.patronymic
+                        }
+                    ).ToArray();
                 return result;
             }
         }

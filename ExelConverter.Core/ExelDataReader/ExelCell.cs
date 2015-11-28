@@ -35,7 +35,11 @@ namespace ExelConverter.Core.ExelDataReader
                 if (hyperLink == value)
                     return;
 
-                hyperLink = value == null ? string.Empty : ( value.IndexOf('%') >= 0 ? value : Uri.EscapeUriString(value));
+                var val = value ?? string.Empty;
+                while (val.Contains("%"))
+                    val = Uri.UnescapeDataString(val);
+
+                hyperLink = Uri.EscapeUriString(val);
             }
         }
 
