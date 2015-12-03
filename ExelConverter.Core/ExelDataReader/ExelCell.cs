@@ -36,7 +36,7 @@ namespace ExelConverter.Core.ExelDataReader
                     return;
 
                 var val = value ?? string.Empty;
-                while (val.Contains("%"))
+                if (val.Contains("%"))
                     val = Uri.UnescapeDataString(val);
 
                 hyperLink = Uri.EscapeUriString(val);

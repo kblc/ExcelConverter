@@ -4,6 +4,135 @@
     <name>Aspose.Cells</name>
   </assembly>
   <members>
+    <member name="T:Aspose.Cells.ExternalConnections.HtmlFormatHandlingType">
+      <summary>
+            Specifies how to handle formatting from the HTML source
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.ExternalConnections.HtmlFormatHandlingType.All">
+      <summary>
+            Transfer all HTML formatting into the worksheet along with data.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.ExternalConnections.HtmlFormatHandlingType.None">
+      <summary>
+            Bring data in as unformatted text (setting data types still occurs).
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.ExternalConnections.HtmlFormatHandlingType.Rtf">
+      <summary>
+            Translate HTML formatting to rich text formatting on the data brought into the worksheet.
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.Metadata.MetadataOptions">
+      <summary>
+            Represents the options of loading metadata of the file.
+            </summary>
+    </member>
+    <member name="M:Aspose.Cells.Metadata.MetadataOptions.#ctor">
+      <summary>
+            Creates an options of loading the metadata.
+            </summary>
+    </member>
+    <member name="M:Aspose.Cells.Metadata.MetadataOptions.#ctor(Aspose.Cells.Metadata.MetadataType)">
+      <summary>
+            Creates an options of loading the metadata.
+            </summary>
+      <param name="metadataType">The type of metadata.</param>
+    </member>
+    <member name="P:Aspose.Cells.Metadata.MetadataOptions.MetadataType">
+      <summary>
+            Gets and sets the type of the metadata which is loading.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Metadata.MetadataOptions.Password">
+      <summary>
+            Represents Workbook file encryption password.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Metadata.MetadataOptions.KeyLength">
+      <summary>
+            The key length.
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.Metadata.MetadataType">
+      <summary>
+            Represents the type of metadata.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Metadata.MetadataType.Encryption">
+      <summary>
+            Encrypts the file.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Metadata.MetadataType.Decryption">
+      <summary>
+            Decrypts the file.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Metadata.MetadataType.DocumentProperties">
+      <summary>
+            Load the properties of the file.
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.Metadata.WorkbookMetadata">
+      <summary>
+            Represents the meta data.
+            </summary>
+      <example>
+            The following example creates a Workbook, opens a file named designer.xls in it and makes the horizontal and vertical scroll bars invisible for the Workbook. It then replaces two string values with an Integer value and string value respectively within the spreadsheet and finally sends the updated file to the client browser. 
+            <code>
+            [C#]
+              MetadataOptions options = new MetadataOptions(MetadataType.DocumentProperties);
+              WorkbookMetadata meta = new WorkbookMetadata(path + "book1.xlsx", options);
+              meta.CustomDocumentProperties.Add("test", "test");
+              meta.Save(path + "book2.xlsx");
+            </code></example>
+    </member>
+    <member name="M:Aspose.Cells.Metadata.WorkbookMetadata.#ctor(System.String,Aspose.Cells.Metadata.MetadataOptions)">
+      <summary>
+            Create the meta data object.
+            </summary>
+      <param name="fileName">
+      </param>
+      <param name="options">
+      </param>
+    </member>
+    <member name="M:Aspose.Cells.Metadata.WorkbookMetadata.#ctor(System.IO.Stream,Aspose.Cells.Metadata.MetadataOptions)">
+      <summary>
+      </summary>
+      <param name="stream">
+      </param>
+      <param name="options">
+      </param>
+    </member>
+    <member name="M:Aspose.Cells.Metadata.WorkbookMetadata.Save(System.String)">
+      <summary>
+            Save the modified metadata to the file.
+            </summary>
+      <param name="fileName">The file name.</param>
+    </member>
+    <member name="M:Aspose.Cells.Metadata.WorkbookMetadata.Save(System.IO.Stream)">
+      <summary>
+            Save the modified metadata to the stream.
+            </summary>
+      <param name="stream">The stream.</param>
+    </member>
+    <member name="P:Aspose.Cells.Metadata.WorkbookMetadata.Options">
+      <summary>
+            Gets the options of the metadata.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Metadata.WorkbookMetadata.BuiltInDocumentProperties">
+      <summary>
+            Returns a DocumentProperties collection that represents all the  built-in document properties of the spreadsheet. 
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Metadata.WorkbookMetadata.CustomDocumentProperties">
+      <summary>
+            Returns a DocumentProperties collection that represents all the custom document properties of the spreadsheet. 
+            </summary>
+    </member>
     <member name="T:Aspose.Cells.MemorySetting">
       <summary>
             Memory usage options.
@@ -1267,23 +1396,28 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.ActiveXControls.ControlSpecialEffectType.Flat">
       <summary>
-      </summary>
+            Flat
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ActiveXControls.ControlSpecialEffectType.Raised">
       <summary>
-      </summary>
+            Raised
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ActiveXControls.ControlSpecialEffectType.Sunken">
       <summary>
-      </summary>
+            Sunken
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ActiveXControls.ControlSpecialEffectType.Etched">
       <summary>
-      </summary>
+            Etched
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ActiveXControls.ControlSpecialEffectType.Bump">
       <summary>
-      </summary>
+            Bump
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.ActiveXControls.TextBoxActiveXControl">
       <summary>
@@ -1477,7 +1611,7 @@
     </member>
     <member name="T:Aspose.Cells.CalculationOptions">
       <summary>
-            Options for calculation.
+            Represents options for calculation.
             </summary>
     </member>
     <member name="P:Aspose.Cells.CalculationOptions.IgnoreError">
@@ -1502,266 +1636,6 @@
       <summary>
             Specifies the strategy for processing precision of calcuation.
             </summary>
-    </member>
-    <member name="T:Aspose.Cells.CollectionBase`1">
-      <summary>
-             Provides the abstract base class for a strongly typed collection.
-            </summary>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.BinarySearch(`0)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.BinarySearch(`0,System.Collections.Generic.IComparer{`0})">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <param name="comparer">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.BinarySearch(System.Int32,System.Int32,`0,System.Collections.Generic.IComparer{`0})">
-      <summary>
-      </summary>
-      <param name="index">
-      </param>
-      <param name="count">
-      </param>
-      <param name="item">
-      </param>
-      <param name="comparer">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.Contains(`0)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.CopyTo(`0[])">
-      <summary>
-      </summary>
-      <param name="array">
-      </param>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.CopyTo(`0[],System.Int32)">
-      <summary>
-      </summary>
-      <param name="array">
-      </param>
-      <param name="arrayIndex">
-      </param>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.CopyTo(System.Int32,`0[],System.Int32,System.Int32)">
-      <summary>
-      </summary>
-      <param name="index">
-      </param>
-      <param name="array">
-      </param>
-      <param name="arrayIndex">
-      </param>
-      <param name="count">
-      </param>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.Exists(System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.Find(System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindAll(System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindIndex(System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindIndex(System.Int32,System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="startIndex">
-      </param>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindIndex(System.Int32,System.Int32,System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="startIndex">
-      </param>
-      <param name="count">
-      </param>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindLast(System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindLastIndex(System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindLastIndex(System.Int32,System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="startIndex">
-      </param>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.FindLastIndex(System.Int32,System.Int32,System.Predicate{`0})">
-      <summary>
-      </summary>
-      <param name="startIndex">
-      </param>
-      <param name="count">
-      </param>
-      <param name="match">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.IndexOf(`0)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.IndexOf(`0,System.Int32)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <param name="index">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.IndexOf(`0,System.Int32,System.Int32)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <param name="index">
-      </param>
-      <param name="count">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.LastIndexOf(`0)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.LastIndexOf(`0,System.Int32)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <param name="index">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.LastIndexOf(`0,System.Int32,System.Int32)">
-      <summary>
-      </summary>
-      <param name="item">
-      </param>
-      <param name="index">
-      </param>
-      <param name="count">
-      </param>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.GetEnumerator">
-      <summary>
-      </summary>
-      <returns>
-      </returns>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.Clear">
-      <summary>
-            Remove all elements.
-            </summary>
-    </member>
-    <member name="M:Aspose.Cells.CollectionBase`1.RemoveAt(System.Int32)">
-      <summary>
-             Removes the element at the specified index.
-            </summary>
-      <param name="index">
-      </param>
-    </member>
-    <member name="P:Aspose.Cells.CollectionBase`1.Capacity">
-      <summary>
-             Gets or sets the number of elements that the list can contain.
-            </summary>
-    </member>
-    <member name="P:Aspose.Cells.CollectionBase`1.Count">
-      <summary>
-            Gets the number of elements.
-            </summary>
-    </member>
-    <member name="P:Aspose.Cells.CollectionBase`1.Item(System.Int32)">
-      <summary>
-             Gets or sets the element at the specified index.        
-            </summary>
-      <param name="index">
-      </param>
-      <returns>
-      </returns>
     </member>
     <member name="T:Aspose.Cells.Drawing.AutomaticFill">
       <summary>
@@ -1791,7 +1665,6 @@
     <member name="P:Aspose.Cells.Drawing.SignatureLine.ProviderId">
       <summary>
             Gets and sets the id of singature provider.
-            
             </summary>
       <remarks>
             It's typically the CLSID of the provider com add-in.
@@ -1939,6 +1812,11 @@
             Recalculate the text area
             </summary>
       <returns>Text's Size in an array(width and height).</returns>
+    </member>
+    <member name="P:Aspose.Cells.Drawing.Shape.MacroName">
+      <summary>
+            Gets and sets the name of macro.
+            </summary>
     </member>
     <member name="P:Aspose.Cells.Drawing.Shape.ZOrderPosition">
       <summary>
@@ -2372,7 +2250,12 @@
     </member>
     <member name="P:Aspose.Cells.Drawing.Shape.Paths">
       <summary>
-            Gets and sets the paths of a custom geometric shape.
+            Gets the paths of a custom geometric shape.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Drawing.Shape.Geometry">
+      <summary>
+            Gets the geometry
             </summary>
     </member>
     <member name="P:Aspose.Cells.Drawing.Shape.ActualLowerRightRow">
@@ -2383,6 +2266,11 @@
     <member name="T:Aspose.Cells.Drawing.Geometry">
       <summary>
             Represents a geometric shape.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Drawing.Geometry.ShapeAdjustValues">
+      <summary>
+            Gets a collection of shape adjust value
             </summary>
     </member>
     <member name="T:Aspose.Cells.ExternalConnections.ExternalConnection">
@@ -2538,6 +2426,31 @@
             Gets path collection information when shape is a NotPrimitive autoshape
             </summary>
     </member>
+    <member name="T:Aspose.Cells.Drawing.ShapeGuide">
+      <summary>
+            Encapsulates a shape guide specifies the precense of a shape guide that will be used to 
+            govern the geometry of the specifiedshape
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Drawing.ShapeGuide.Value">
+      <summary>
+            Gets or sets value of this guide
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.Drawing.ShapeGuideCollection">
+      <summary>
+            Encapsulates a collection of shape guide
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Drawing.ShapeGuideCollection.Item(System.Int32)">
+      <summary>
+            Gets a shape guide by index
+            </summary>
+      <param name="index">
+      </param>
+      <returns>
+      </returns>
+    </member>
     <member name="T:Aspose.Cells.Drawing.ShapeLockType">
       <summary>
             Represents type of the property to be locked.
@@ -2545,55 +2458,68 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Group">
       <summary>
-      </summary>
+            Group
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.AdjustHandles">
       <summary>
-      </summary>
+            AdjustHandles
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Text">
       <summary>
-      </summary>
+            Text
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Points">
       <summary>
-      </summary>
+            Points
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Crop">
       <summary>
-      </summary>
+            Crop
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Selection">
       <summary>
-      </summary>
+            Selection
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Move">
       <summary>
-      </summary>
+            Move
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.AspectRatio">
       <summary>
-      </summary>
+            AspectRatio
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Rotation">
       <summary>
-      </summary>
+            Rotation
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Ungroup">
       <summary>
-      </summary>
+            Ungroup
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Resize">
       <summary>
-      </summary>
+            Resize
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.ShapeType">
       <summary>
-      </summary>
+            ShapeType
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapeLockType.Arrowhead">
       <summary>
-      </summary>
+            Arrowhead
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.ShapeSegmentPathCollection">
       <summary>
@@ -2636,10 +2562,19 @@
     </member>
     <member name="M:Aspose.Cells.Drawing.ShapePathPointCollection.Add(System.Int32,System.Int32)">
       <summary>
-            Add a path point.
+            Adds a path point.
             </summary>
       <param name="x">The x coordinate.</param>
       <param name="y">The y coordinate.</param>
+    </member>
+    <member name="M:Aspose.Cells.Drawing.ShapePathPointCollection.Add(Aspose.Cells.Drawing.ShapePathPoint)">
+      <summary>
+            Adds a path point.
+            </summary>
+      <param name="point">
+      </param>
+      <returns>
+      </returns>
     </member>
     <member name="P:Aspose.Cells.Drawing.ShapePathPointCollection.Item(System.Int32)">
       <summary>
@@ -2724,6 +2659,85 @@
       <summary>
             The string containing the database command to pass to the data provider API that will 
             interact with the external source in order to retrieve data
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.ExternalConnections.WebQueryConnection">
+      <summary>
+             Specifies the properties for a web query source. A web query will retrieve data from HTML tables, 
+             and can also supply HTTP "Get" parameters to be processed by the web server in generating the HTML by 
+             including the parameters and parameter elements.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsXml">
+      <summary>
+            true if the web query source is XML (versus HTML), otherwise false.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsXl97">
+      <summary>
+            This flag exists for backward compatibility with older existing spreadhseet files, and is set
+            to true if this web query was created in Microsoft Excel 97.
+            This is an optional attribute that can be ignored.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsXl2000">
+      <summary>
+            This flag exists for backward compatibility with older existing spreadsheet files, and is set
+            to true if this web query was refreshed in a spreadsheet application newer than or equal
+            to Microsoft Excel 2000.
+            This is an optional attribute that can be ignored.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.Url">
+      <summary>
+            URL to use to refresh external data.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsTextDates">
+      <summary>
+            Flag indicating whether dates should be imported into cells in the worksheet as text rather than dates.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsSourceData">
+      <summary>
+            Flag indicating that XML source data should be imported instead of the HTML table itself.        
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.Post">
+      <summary>
+            Returns or sets the string used with the post method of inputting data into a web server
+            to return data from a web query.
+            </summary>
+    </member>
+    <!-- Badly formed XML comment ignored for member "P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsParsePre" -->
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsHtmlTables">
+      <summary>
+            Flag indicating whether web queries should only work on HTML tables.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.HtmlFormat">
+      <summary>
+            How to handle formatting from the HTML source when bringing web query data into the
+            worksheet. Relevant when sourceData is True.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsFirstRow">
+      <summary>
+            Flag indicating whether to parse all tables inside a PRE block with the same width settings
+            as the first row.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.EditPage">
+      <summary>
+            The URL of the user-facing web page showing the web query data. This URL is persisted
+            in the case that sourceData="true" and url has been redirected to reference an XML file.
+            Then the user-facing page can be shown in the UI, and the XML data can be retrieved
+            behind the scenes.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.ExternalConnections.WebQueryConnection.IsConsecutive">
+      <summary>
+            Flag indicating whether consecutive delimiters should be treated as just one delimiter.
             </summary>
     </member>
     <member name="T:Aspose.Cells.ExternalConnections.ConnectionDataSourceType">
@@ -3890,6 +3904,27 @@
             Export all the data of html file.
             </summary>
     </member>
+    <!-- Badly formed XML comment ignored for member "T:Aspose.Cells.HtmlLinkTargetType" -->
+    <member name="F:Aspose.Cells.HtmlLinkTargetType.Blank">
+      <summary>
+            Opens the linked document in a new window or tab
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.HtmlLinkTargetType.Parent">
+      <summary>
+            Opens the linked document in the parent frame
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.HtmlLinkTargetType.Self">
+      <summary>
+            Opens the linked document in the same frame as it was clicked (this is default)
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.HtmlLinkTargetType.Top">
+      <summary>
+            Opens the linked document in the full body of the window
+            </summary>
+    </member>
     <member name="T:Aspose.Cells.TxtValueQuoteType">
       <summary>
             Specifies the type of using quotation marks for values in text format files.
@@ -4172,6 +4207,21 @@
       <param name="index">The specific index in the list</param>
       <returns>The <see cref="T:Aspose.Cells.ScenarioInputCell" /> object</returns>
     </member>
+    <member name="T:Aspose.Cells.ISmartMarkerCallBack">
+      <summary>
+            Represents callback interface of processing smartmarker.
+            </summary>
+    </member>
+    <member name="M:Aspose.Cells.ISmartMarkerCallBack.Process(System.Int32,System.Int32,System.Int32,System.String,System.String)">
+      <summary>
+            Callback for processing a smart marker.
+            </summary>
+      <param name="sheetIndex">The sheet index.</param>
+      <param name="rowIndex">The row index.</param>
+      <param name="colIndex">The column index.</param>
+      <param name="tableName">The table name of smartmarker.</param>
+      <param name="columnName">The table name of smartmarker.</param>
+    </member>
     <member name="T:Aspose.Cells.NumberCategoryType">
       <summary>
             Represents category type of cell's number formatting.
@@ -4313,6 +4363,21 @@
       <returns>
       </returns>
     </member>
+    <member name="M:Aspose.Cells.Vba.VbaModuleCollection.Remove(Aspose.Cells.Worksheet)">
+      <summary>
+            Removes module for a worksheet.
+            </summary>
+      <param name="sheet">The worksheet</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="M:Aspose.Cells.Vba.VbaModuleCollection.Remove(System.String)">
+      <summary>
+            Remove the module by the name
+            </summary>
+      <param name="name">
+      </param>
+    </member>
     <member name="P:Aspose.Cells.Vba.VbaModuleCollection.Item(System.Int32)">
       <summary>
             Gets <see cref="T:Aspose.Cells.Vba.VbaModule" /> in the list by the index.
@@ -4364,9 +4429,126 @@
             Gets and sets the name of the VBA project.
             </summary>
     </member>
+    <member name="P:Aspose.Cells.Vba.VbaProject.IsSigned">
+      <summary>
+            Indicates whether VBAcode is signed or not. 
+            </summary>
+    </member>
     <member name="P:Aspose.Cells.Vba.VbaProject.Modules">
       <summary>
             Gets all <see cref="T:Aspose.Cells.Vba.VbaModule" /> objects. 
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProject.References">
+      <summary>
+            Gets all references of VBA project.
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.Vba.VbaProjectReference">
+      <summary>
+            Represents the refernece of VBA project.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReference.Type">
+      <summary>
+            Gets the type of this reference.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReference.Name">
+      <summary>
+            Gets and sets the name of the reference.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReference.Libid">
+      <summary>
+            Gets and sets the Libid of the reference.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReference.Twiddledlibid">
+      <summary>
+            Gets and sets the twiddled Libid of the reference.
+            </summary>
+      <remarks>
+            Only for control refernce.
+            </remarks>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReference.ExtendedLibid">
+      <summary>
+            Gets and sets the extended Libid of the reference.
+            </summary>
+      <remarks>
+            Only for control refernce.
+            </remarks>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReference.RelativeLibid">
+      <summary>
+            Gets and sets the referenced VBA project’s identifier with an relative path.
+            </summary>
+      <remarks>
+            Only for project refernce.
+            </remarks>
+    </member>
+    <member name="T:Aspose.Cells.Vba.VbaProjectReferenceCollection">
+      <summary>
+            Represents all referneces of VBA project.
+            </summary>
+    </member>
+    <member name="M:Aspose.Cells.Vba.VbaProjectReferenceCollection.AddRegisteredReference(System.String,System.String)">
+      <summary>
+            Add a reference to an Automation type library.
+            </summary>
+      <param name="name">The name of reference.</param>
+      <param name="libid">The identifier of an Automation type library.</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="M:Aspose.Cells.Vba.VbaProjectReferenceCollection.AddControlRefrernce(System.String,System.String,System.String,System.String)">
+      <summary>
+             Add a reference to a twiddled type library and its extended type library.
+            </summary>
+      <param name="name">The name of reference.</param>
+      <param name="libid">The identifier of an Automation type library.</param>
+      <param name="twiddledlibid">The identifier of a twiddled type library</param>
+      <param name="extendedLibid">The identifier of an extended type library</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="M:Aspose.Cells.Vba.VbaProjectReferenceCollection.AddProjectRefrernce(System.String,System.String,System.String)">
+      <summary>
+            Add a reference to an external VBA project. 
+            </summary>
+      <param name="name">The name of reference.</param>
+      <param name="absoluteLibid">The referenced VBA project’s identifier with an absolute path.</param>
+      <param name="relativeLibid">The referenced VBA project’s identifier with an relative path.</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="P:Aspose.Cells.Vba.VbaProjectReferenceCollection.Item(System.Int32)">
+      <summary>
+            Get the reference in the list by the index.
+            </summary>
+      <param name="i">The index.</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="T:Aspose.Cells.Vba.VbaProjectReferenceType">
+      <summary>
+            Represents the type of VBA project reference.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Vba.VbaProjectReferenceType.Registered">
+      <summary>
+            Specifies a reference to an Automation type library.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Vba.VbaProjectReferenceType.Control">
+      <summary>
+            Specifies a reference to a twiddled type library and its extended type library.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Vba.VbaProjectReferenceType.Project">
+      <summary>
+            Specifies a reference to an external VBA project.
             </summary>
     </member>
     <member name="T:Aspose.Cells.WarningInfo">
@@ -4393,6 +4575,34 @@
       <summary>
             Font substitution warning type
             when a font has not been found, this warning type can be get.
+            </summary>
+    </member>
+    <member name="T:Aspose.Cells.WriteProtection">
+      <summary>
+            Specifies write protection settings for a workbook. 
+            </summary>
+    </member>
+    <member name="M:Aspose.Cells.WriteProtection.ValidatePassword(System.String)">
+      <summary>
+            Returns true if the specified password is the same as the write-protection password the file was protected with. 
+            </summary>
+      <param name="password">The specified password.</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="P:Aspose.Cells.WriteProtection.RecommendReadOnly">
+      <summary>
+            Indicates if the Read Only Recommended option is selected.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.WriteProtection.IsWriteProtected">
+      <summary>
+            Indicates whether this workbook is write protected.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.WriteProtection.Password">
+      <summary>
+            Sets the proected password to modify the file.
             </summary>
     </member>
     <member name="T:Aspose.Cells.ICustomParser">
@@ -4627,6 +4837,11 @@
             Default value for the value in the table is null.
             </summary>
     </member>
+    <member name="P:Aspose.Cells.ImportTableOptions.IsHtmlString">
+      <summary>
+            Indicates whether the value contains html tags.
+            </summary>
+    </member>
     <member name="T:Aspose.Cells.ICellsDataTable">
       <summary>
             Represents data table.
@@ -4678,19 +4893,23 @@
     </member>
     <member name="F:Aspose.Cells.Charts.ErrorBarDisplayType.Both">
       <summary>
-      </summary>
+            Both
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.ErrorBarDisplayType.Minus">
       <summary>
-      </summary>
+            Minus
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.ErrorBarDisplayType.None">
       <summary>
-      </summary>
+            None
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.ErrorBarDisplayType.Plus">
       <summary>
-      </summary>
+            Plus
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.FormatSetType">
       <summary>
@@ -4813,19 +5032,23 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.MirrorType.None">
       <summary>
-      </summary>
+            None
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MirrorType.Horizonal">
       <summary>
-      </summary>
+            Horizonal
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MirrorType.Vertical">
       <summary>
-      </summary>
+            Vertical
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MirrorType.Both">
       <summary>
-      </summary>
+            Both
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.PicFormatOption">
       <summary>
@@ -4983,7 +5206,8 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapePathType.Escape">
       <summary>
-      </summary>
+            Escape
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapePathType.ArcTo">
       <summary>
@@ -4992,7 +5216,8 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.ShapePathType.Unknown">
       <summary>
-      </summary>
+            Unknown
+            </summary>
     </member>
     <member name="T:Aspose.Cells.ErrorCheckOptionCollection">
       <summary>
@@ -5674,6 +5899,12 @@
             </summary>
       <returns>All Characters objects </returns>
     </member>
+    <member name="M:Aspose.Cells.Cell.SetCharacters(Aspose.Cells.FontSetting[])">
+      <summary>
+            Sets rich text format of the cell.
+            </summary>
+      <param name="characters">All Characters objects.</param>
+    </member>
     <member name="M:Aspose.Cells.Cell.GetMergedRange">
       <summary>
             Returns a <see cref="T:Aspose.Cells.Range" /> object which represents a merged range.
@@ -6263,6 +6494,11 @@
       <summary>
             The directory that the attached files will be saved to.
             </summary>
+      <remarks>
+            NOTE: This member is now obsolete. Instead, 
+            please use HTMLLoadOptions.StreamProvider property.
+            This property will be removed 12 months later since December 2014. 
+            Aspose apologizes for any inconvenience you may have experienced.</remarks>
     </member>
     <member name="P:Aspose.Cells.HTMLLoadOptions.LoadFormulas">
       <summary>
@@ -6282,6 +6518,11 @@
     <member name="P:Aspose.Cells.HTMLLoadOptions.ConvertFormulasData">
       <summary>
             if true, convert string to formula when string value starts with character '=',the default value is false.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.HTMLLoadOptions.StreamProvider">
+      <summary>
+            Gets or sets the StreamProviderImportHtmlFile for importing objects.
             </summary>
     </member>
     <member name="P:Aspose.Cells.HTMLLoadOptions.ConvertDateTimeData">
@@ -6971,7 +7212,15 @@
     </member>
     <member name="P:Aspose.Cells.SaveOptions.ValidateMergedAreas">
       <summary>
-            Indicates whether validate merged areas before saving the file.
+            Indicates whether validate merged cells before saving the file.
+            </summary>
+      <remarks>
+            The default value is false.
+            </remarks>
+    </member>
+    <member name="P:Aspose.Cells.SaveOptions.MergeAreas">
+      <summary>
+            Indicates whether merge the areas of conditional formatting and validation before saving the file.
             </summary>
       <remarks>
             The default value is false.
@@ -7000,6 +7249,12 @@
             The physical folder where images will be saved when exporting a workbook to Aspose.Pdf XML format.
             Default is an empty string. 
             </summary>
+    </member>
+    <member name="P:Aspose.Cells.SaveOptions.EnableHTTPCompression">
+      <summary>
+            Indicates if http compression is to be used in user's IIS.
+            </summary>
+      <remarks>Please specify this property to true if http compression is used.</remarks>
     </member>
     <member name="P:Aspose.Cells.SaveOptions.WarningCallback">
       <summary>
@@ -7243,6 +7498,11 @@
     <member name="P:Aspose.Cells.WorkbookDesigner.CalculateFormula">
       <summary>
             Indicates whether formulas should be calculated.
+            </summary>
+    </member>
+    <member name="P:Aspose.Cells.WorkbookDesigner.CallBack">
+      <summary>
+            Gets and sets callback interface of processing smartmarker.
             </summary>
     </member>
     <member name="T:Aspose.Cells.ConditionalFormattingValueCollection">
@@ -7528,6 +7788,19 @@
             Otherwise it must between 0 and 1000.
             Default value is 10.
             </summary>
+    </member>
+    <member name="T:Aspose.Cells.ContentDisposition">
+      <summary>
+            The content dispostion type.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.ContentDisposition.Inline">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:Aspose.Cells.ContentDisposition.Attachment">
+      <summary>
+      </summary>
     </member>
     <member name="T:Aspose.Cells.DigitalSignatures.DigitalSignature">
       <summary>
@@ -11233,6 +11506,7 @@
             Two point
             </summary>
     </member>
+    <!-- Badly formed XML comment ignored for member "F:Aspose.Cells.PresetShapeType.Can" -->
     <member name="T:Aspose.Cells.ExportTableOptions">
       <summary>
             Represents all export table options.
@@ -11388,6 +11662,11 @@
       <summary>
             Gets or sets the ExportObjectListener for exporting objects.
             </summary>
+      <remarks>
+            NOTE: This property is now obsolete. Instead, 
+            please use HtmlSaveOptions.IStreamProvider property.
+            This property will be removed 12 months later since August 2015. 
+            Aspose apologizes for any inconvenience you may have experienced.</remarks>
     </member>
     <member name="P:Aspose.Cells.HtmlSaveOptions.StreamProvider">
       <summary>
@@ -11427,11 +11706,18 @@
             to excel, please keep the default value.
             </summary>
     </member>
+    <member name="P:Aspose.Cells.HtmlSaveOptions.ExportFrameScriptsAndProperties">
+      <summary>
+            Indicating whether exporting frame scripts and document properties. The default value is true.If you want to import the html or mht file
+            to excel, please keep the default value.
+            </summary>
+    </member>
     <member name="P:Aspose.Cells.HtmlSaveOptions.ExportDataOptions">
       <summary>
             Indicating the rule of exporting html file data.The default value is All.
             </summary>
     </member>
+    <!-- Badly formed XML comment ignored for member "P:Aspose.Cells.HtmlSaveOptions.LinkTargetType" -->
     <member name="T:Aspose.Cells.Markup.SmartTag">
       <summary>
             Represents a smart tag.
@@ -12200,39 +12486,48 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.Bottom">
       <summary>
-      </summary>
+            Bottom
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.BottomLeft">
       <summary>
-      </summary>
+            BottomLeft
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.BottomRight">
       <summary>
-      </summary>
+            BottomRight
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.Center">
       <summary>
-      </summary>
+            Center
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.Left">
       <summary>
-      </summary>
+            Left
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.Right">
       <summary>
-      </summary>
+            Right
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.Top">
       <summary>
-      </summary>
+            Top
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.TopLeft">
       <summary>
-      </summary>
+            TopLeft
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.RectangleAlignmentType.TopRight">
       <summary>
-      </summary>
+            TopRight
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.ShapePropertyCollection">
       <summary>
@@ -12480,6 +12775,13 @@
             Encapsulates a collection of <see cref="T:Aspose.Cells.Charts.Sparkline" /> objects.
             </summary>
     </member>
+    <member name="M:Aspose.Cells.Charts.SparklineCollection.Add(Aspose.Cells.Charts.Sparkline)">
+      <summary>
+            Adds a sparkline only for read from file
+            </summary>
+      <param name="s">
+      </param>
+    </member>
     <member name="M:Aspose.Cells.Charts.SparklineCollection.Add(System.String,System.Int32,System.Int32)">
       <summary>
             Add a sparkline.
@@ -12490,7 +12792,8 @@
     </member>
     <member name="M:Aspose.Cells.Charts.SparklineCollection.Remove(System.Object)">
       <summary>
-      </summary>
+            Removes the sparkline
+            </summary>
       <param name="o">
       </param>
     </member>
@@ -12667,6 +12970,15 @@
       <param name="locationRange">Specifies where the sparklines to be placed.</param>
       <returns>
         <see cref="T:Aspose.Cells.Charts.SparklineGroup" /> object index.</returns>
+    </member>
+    <member name="M:Aspose.Cells.Charts.SparklineGroupCollection.Add(Aspose.Cells.Charts.SparklineGroup)">
+      <summary>
+            Adds a group only for read from file
+            </summary>
+      <param name="group">
+      </param>
+      <returns>
+      </returns>
     </member>
     <member name="M:Aspose.Cells.Charts.SparklineGroupCollection.ClearSparklines(Aspose.Cells.CellArea)">
       <summary>
@@ -13199,15 +13511,18 @@
     </member>
     <member name="F:Aspose.Cells.Charts.AxisType.Category">
       <summary>
-      </summary>
+            Category axis 
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.AxisType.Value">
       <summary>
-      </summary>
+            Value axis
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.AxisType.Series">
       <summary>
-      </summary>
+            Series axis
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Charts.CategoryType">
       <summary>
@@ -13216,15 +13531,18 @@
     </member>
     <member name="F:Aspose.Cells.Charts.CategoryType.AutomaticScale">
       <summary>
-      </summary>
+            AutomaticScale
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.CategoryType.CategoryScale">
       <summary>
-      </summary>
+            CategoryScale
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.CategoryType.TimeScale">
       <summary>
-      </summary>
+            TimeScale
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Charts.CrossType">
       <summary>
@@ -13513,19 +13831,22 @@
     </member>
     <member name="F:Aspose.Cells.Charts.TimeUnit.Days">
       <summary>
-      </summary>
+            Days
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TimeUnit.Months">
       <summary>
-      </summary>
+            Months
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TimeUnit.Years">
       <summary>
-      </summary>
+            Years
+            </summary>
     </member>
     <member name="T:Aspose.Cells.ColorType">
       <summary>
-            Indicates all color type 
+            Represents all color type 
             </summary>
     </member>
     <member name="F:Aspose.Cells.ColorType.Automatic">
@@ -14646,8 +14967,8 @@
       <param name="g">The object where to render to.</param>
       <param name="x">The X coordinate (in pixels) of the top left corner of the rendered page.</param>
       <param name="y">The Y coordinate (in pixels) of the top left corner of the rendered page.</param>
-      <param name="width">the desired width in pixels</param>
-      <param name="height">the desired height in pixels</param>
+      <param name="width">The maximum width (in pixels) that can be occupied by the rendered page.</param>
+      <param name="height">The maximum height (in pixels) that can be occupied by the rendered page.</param>
     </member>
     <member name="M:Aspose.Cells.Rendering.SheetRender.ToImage(System.Int32,System.Drawing.Graphics,System.Single,System.Single)">
       <summary>
@@ -16323,6 +16644,11 @@
             Represents the unit label for the specified axis. 
             </summary>
     </member>
+    <member name="P:Aspose.Cells.Charts.Axis.CustUnit">
+      <summary>
+            Specifies a custom value for the display unit.
+            </summary>
+    </member>
     <member name="P:Aspose.Cells.Charts.Axis.DisplayUnitLabel">
       <summary>
             Represents a unit label on an axis in the specified chart. 
@@ -16431,15 +16757,18 @@
     </member>
     <member name="F:Aspose.Cells.Charts.BackgroundMode.Automatic">
       <summary>
-      </summary>
+            Automatic
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.BackgroundMode.Opaque">
       <summary>
-      </summary>
+            Opaque
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.BackgroundMode.Transparent">
       <summary>
-      </summary>
+            Transparent
+            </summary>
     </member>
     <member name="T:Aspose.Cells.BackgroundType">
       <summary>
@@ -16548,27 +16877,33 @@
     </member>
     <member name="F:Aspose.Cells.Charts.Bar3DShapeType.Box">
       <summary>
-      </summary>
+            Box
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.Bar3DShapeType.PyramidToPoint">
       <summary>
-      </summary>
+            PyramidToPoint
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.Bar3DShapeType.PyramidToMax">
       <summary>
-      </summary>
+            PyramidToMax
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.Bar3DShapeType.Cylinder">
       <summary>
-      </summary>
+            Cylinder
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.Bar3DShapeType.ConeToPoint">
       <summary>
-      </summary>
+            ConeToPoint
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.Bar3DShapeType.ConeToMax">
       <summary>
-      </summary>
+            ConeToMax
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Border">
       <summary>
@@ -16888,7 +17223,7 @@
     </member>
     <member name="T:Aspose.Cells.CalcModeType">
       <summary>
-            Calculate formula mode type.
+            Represents the mode type fo calculating formulas.
             </summary>
     </member>
     <member name="F:Aspose.Cells.CalcModeType.Automatic">
@@ -18742,6 +19077,63 @@
       <param name="insertRows">Indicates whether extra rows are added to fit data.</param>
       <returns>Total number of rows imported</returns>
     </member>
+    <member name="M:Aspose.Cells.Cells.ImportDataGridAsString(System.Web.UI.WebControls.DataGrid,System.Int32,System.Int32,System.Boolean)">
+      <summary>
+            Imports a <see cref="T:System.Web.UI.WebControls.DataGrid" /> into a worksheet. This method doesn't try to convert text into numeric values.
+            </summary>
+      <param name="dataGrid">The <see cref="T:System.Web.UI.WebControls.DataGrid" /> object to be imported.</param>
+      <param name="firstRow">The row number of the first cell to import in.</param>
+      <param name="firstColumn">The column number of the first cell to import in.</param>
+      <param name="insertRows">Indicates whether extra rows are added to fit data.</param>
+      <returns>Total number of rows imported</returns>
+    </member>
+    <member name="M:Aspose.Cells.Cells.ImportGridView(System.Web.UI.WebControls.GridView,System.Int32,System.Int32,System.Boolean,System.Boolean,System.Boolean)">
+      <summary>
+            Imports a grid view to this cells.
+            </summary>
+      <param name="gridView">The grid view object.</param>
+      <param name="firstRow">The row number of the first cell to import in.</param>
+      <param name="firstColumn">The column number of the first cell to import in.</param>
+      <param name="insertRows">Indicates whether extra rows are added to fit data.</param>
+      <param name="convertStringToNumber">Indicates whether convert string value to number.</param>
+      <param name="convertStyle">Indicates whether apply the style of the grid view to cells.</param>
+      <returns>The row number.</returns>
+    </member>
+    <member name="M:Aspose.Cells.Cells.ImportDataGrid(System.Web.UI.WebControls.DataGrid,System.Int32,System.Int32,System.Boolean)">
+      <summary>
+            Imports a <see cref="T:System.Web.UI.WebControls.DataGrid" /> into a worksheet.
+            </summary>
+      <param name="dataGrid">The <see cref="T:System.Web.UI.WebControls.DataGrid" /> object to be imported.</param>
+      <param name="firstRow">The row number of the first cell to import in.</param>
+      <param name="firstColumn">The column number of the first cell to import in.</param>
+      <param name="insertRows">Indicates whether extra rows are added to fit data.</param>
+      <returns>Total number of rows imported</returns>
+    </member>
+    <member name="M:Aspose.Cells.Cells.ImportDataGrid(System.Web.UI.WebControls.DataGrid,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean)">
+      <summary>
+            Imports a <see cref="T:System.Web.UI.WebControls.DataGrid" /> into a worksheet.
+            </summary>
+      <param name="dataGrid">The <see cref="T:System.Web.UI.WebControls.DataGrid" /> object to be imported.</param>
+      <param name="firstRow">The row number of the first cell to import in.</param>
+      <param name="firstColumn">The column number of the first cell to import in.</param>
+      <param name="totalRows">Number of rows to be imported.</param>
+      <param name="totalColumns">Number of columns to be imported.</param>
+      <param name="insertRows">Indicates whether extra rows are added to fit data.</param>
+      <returns>Total number of rows imported</returns>
+    </member>
+    <member name="M:Aspose.Cells.Cells.ImportDataGrid(System.Web.UI.WebControls.DataGrid,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+      <summary>
+            Imports a <see cref="T:System.Web.UI.WebControls.DataGrid" /> into a worksheet.
+            </summary>
+      <param name="dataGrid">The <see cref="T:System.Web.UI.WebControls.DataGrid" /> object to be imported.</param>
+      <param name="firstRow">The row number of the first cell to import in.</param>
+      <param name="firstColumn">The column number of the first cell to import in.</param>
+      <param name="totalRows">Number of rows to be imported.</param>
+      <param name="totalColumns">Number of columns to be imported.</param>
+      <param name="insertRows">Indicates whether extra rows are added to fit data.</param>
+      <param name="importStyle">Indicates whether importing the cell style.</param>
+      <returns>Total number of rows imported</returns>
+    </member>
     <member name="M:Aspose.Cells.Cells.FindFormula(System.String,Aspose.Cells.Cell)">
       <summary>
             Finds the cell with the input string.
@@ -19202,6 +19594,11 @@
             Gets or sets the memory usage option for this cells.
             </summary>
     </member>
+    <member name="P:Aspose.Cells.Cells.Style">
+      <summary>
+            Gets and sets the default style.
+            </summary>
+    </member>
     <member name="P:Aspose.Cells.Cells.StandardWidthInch">
       <summary>
              Gets or sets the default column width in the worksheet,in unit of inches.
@@ -19533,6 +19930,17 @@
              </code>
       </example>
     </member>
+    <member name="M:Aspose.Cells.Charts.Chart.IsChartDataChanged">
+      <summary>
+            Detects if a chart's data source has changed.
+            </summary>
+      <remarks>
+            The method detects the changes in the chart's data source before rendering the chart to image format.
+            At first Chart.toImage call, the chart source data (e.g. XValuesParseData, ValuesParseData) will be recorded.
+            Before calling the Chart.toImage method again, call IsChartDataChanged method to check if Chart needs re-rendering.
+            </remarks>
+      <returns>Returns true if the chart has changed otherwise returns false</returns>
+    </member>
     <member name="M:Aspose.Cells.Charts.Chart.RefreshPivotData">
       <summary>
             Refreshes pivot chart's data  from it's pivot data source.
@@ -19666,6 +20074,12 @@
             If the width or height is zero or the chart is not supported according to Supported Charts List, this method will do nothing.
             Please refer <a href="http://www.aspose.com/documentation/.net-components/aspose.cells-for-.net/converting-chart-to-image.html">Supported Charts List</a> for more details.
             </remarks>
+    </member>
+    <member name="M:Aspose.Cells.Charts.Chart.ToPdf(System.String)">
+      <summary>
+            Saves the chart to a pdf file.
+            </summary>
+      <param name="fileName">the pdf file name with full path</param>
     </member>
     <member name="M:Aspose.Cells.Charts.Chart.ToImage(System.String,Aspose.Cells.Rendering.ImageOrPrintOptions)">
       <summary>
@@ -20989,7 +21403,8 @@
     </member>
     <member name="M:Aspose.Cells.Charts.ChartCollection.Add(Aspose.Cells.Charts.Chart)">
       <summary>
-      </summary>
+            Adds one chart
+            </summary>
       <param name="chart">
       </param>
       <remarks>Only for reading</remarks>
@@ -21623,15 +22038,18 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.CheckValueType.UnChecked">
       <summary>
-      </summary>
+            UnChecked
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.CheckValueType.Checked">
       <summary>
-      </summary>
+            Checked
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.CheckValueType.Mixed">
       <summary>
-      </summary>
+            Mixed
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Column">
       <summary>
@@ -22424,6 +22842,14 @@
       <summary>
             Represents Varp function.
             </summary>
+    </member>
+    <member name="F:Aspose.Cells.ConsolidationFunction.DistinctCount">
+      <summary>
+            Represents Distinct Count function.
+            </summary>
+      <remarks>
+            Only valid for pivottable  with Data Module created since by 2013.
+            </remarks>
     </member>
     <member name="T:Aspose.Cells.Rendering.PdfCompressionCore">
       <summary>
@@ -23531,6 +23957,11 @@
     <member name="F:Aspose.Cells.Charts.DisplayUnitType.Trillions">
       <summary>
             Specifies the values on the chart shall be divided by 1,000,000,000,000.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.Charts.DisplayUnitType.Cust">
+      <summary>
+            specifies a custom value for the display unit.
             </summary>
     </member>
     <member name="T:Aspose.Cells.Properties.BuiltInDocumentPropertyCollection">
@@ -27309,6 +27740,13 @@
             The cached file is used to store some temporary data.
             </remarks>
     </member>
+    <member name="P:Aspose.Cells.CellsHelper.DPI">
+      <summary>
+            Gets the DPI of the machine.
+            </summary>
+      <remarks>
+      </remarks>
+    </member>
     <member name="P:Aspose.Cells.CellsHelper.FontDir">
       <summary>
             When generating PDF/XPS, specific font file directory can be set in the property.
@@ -28587,7 +29025,8 @@
     </member>
     <member name="F:Aspose.Cells.Charts.ChartLineFormattingType.Gradient">
       <summary>
-      </summary>
+            Gradient
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.GradientFill">
       <summary>
@@ -28665,19 +29104,23 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientFillType.Linear">
       <summary>
-      </summary>
+            Linear 
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientFillType.Radial">
       <summary>
-      </summary>
+            Radial
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientFillType.Rectangle">
       <summary>
-      </summary>
+            Rectangle
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientFillType.Path">
       <summary>
-      </summary>
+            Path
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.GradientStop">
       <summary>
@@ -28706,27 +29149,33 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientDirectionType.FromUpperLeftCorner">
       <summary>
-      </summary>
+            FromUpperLeftCorner
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientDirectionType.FromUpperRightCorner">
       <summary>
-      </summary>
+            FromUpperRightCorner
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientDirectionType.FromLowerLeftCorner">
       <summary>
-      </summary>
+            FromLowerLeftCorner
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientDirectionType.FromLowerRightCorner">
       <summary>
-      </summary>
+            FromLowerRightCorner
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientDirectionType.FromCenter">
       <summary>
-      </summary>
+            FromCenter
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.GradientDirectionType.Unknown">
       <summary>
-      </summary>
+            Unknown
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.LineCapType">
       <summary>
@@ -29007,15 +29456,18 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.FillPictureType.Stretch">
       <summary>
-      </summary>
+            Stretch
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.FillPictureType.Stack">
       <summary>
-      </summary>
+            Stack
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.FillPictureType.StackAndScale">
       <summary>
-      </summary>
+            StackAndScale
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.MsoDrawingType">
       <summary>
@@ -29024,87 +29476,108 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Group">
       <summary>
-      </summary>
+            Group
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Line">
       <summary>
-      </summary>
+            Line
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Rectangle">
       <summary>
-      </summary>
+            Rectangle
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Oval">
       <summary>
-      </summary>
+            Oval
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Arc">
       <summary>
-      </summary>
+            Arc
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Chart">
       <summary>
-      </summary>
+            Chart
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.TextBox">
       <summary>
-      </summary>
+            TextBox
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Button">
       <summary>
-      </summary>
+            Button
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Picture">
       <summary>
-      </summary>
+            Picture
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Polygon">
       <summary>
-      </summary>
+            Polygon
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.CheckBox">
       <summary>
-      </summary>
+            CheckBox
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.RadioButton">
       <summary>
-      </summary>
+            RadioButton
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Label">
       <summary>
-      </summary>
+            Label
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.DialogBox">
       <summary>
-      </summary>
+            DialogBox
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Spinner">
       <summary>
-      </summary>
+            Spinner
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.ScrollBar">
       <summary>
-      </summary>
+            ScrollBar
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.ListBox">
       <summary>
-      </summary>
+            ListBox
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.GroupBox">
       <summary>
-      </summary>
+            GroupBox
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.ComboBox">
       <summary>
-      </summary>
+            ComboBox
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Comment">
       <summary>
-      </summary>
+            Comment
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.OleObject">
       <summary>
-      </summary>
+            OleObject
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.CellsDrawing">
       <summary>
@@ -29118,7 +29591,8 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoDrawingType.Slicer">
       <summary>
-      </summary>
+            Slicer
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.MsoPresetTextEffect">
       <summary>
@@ -29127,123 +29601,153 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect1">
       <summary>
-      </summary>
+            TextEffect1
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect2">
       <summary>
-      </summary>
+            TextEffect2
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect3">
       <summary>
-      </summary>
+            TextEffect3
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect4">
       <summary>
-      </summary>
+            TextEffect4
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect5">
       <summary>
-      </summary>
+            TextEffect5
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect6">
       <summary>
-      </summary>
+            TextEffect6
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect7">
       <summary>
-      </summary>
+            TextEffect7
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect8">
       <summary>
-      </summary>
+            TextEffect8
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect9">
       <summary>
-      </summary>
+            TextEffect9
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect10">
       <summary>
-      </summary>
+            TextEffect10
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect11">
       <summary>
-      </summary>
+            TextEffect11
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect12">
       <summary>
-      </summary>
+            TextEffect12
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect13">
       <summary>
-      </summary>
+            TextEffect13
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect14">
       <summary>
-      </summary>
+            TextEffect14
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect15">
       <summary>
-      </summary>
+            TextEffect15
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect16">
       <summary>
-      </summary>
+            TextEffect16
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect17">
       <summary>
-      </summary>
+            TextEffect17
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect18">
       <summary>
-      </summary>
+            TextEffect18
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect19">
       <summary>
-      </summary>
+            TextEffect19
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect20">
       <summary>
-      </summary>
+            TextEffect20
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect21">
       <summary>
-      </summary>
+            TextEffect21
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect22">
       <summary>
-      </summary>
+            TextEffect22
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect23">
       <summary>
-      </summary>
+            TextEffect23
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect24">
       <summary>
-      </summary>
+            TextEffect24
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect25">
       <summary>
-      </summary>
+            TextEffect25
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect26">
       <summary>
-      </summary>
+            TextEffect26
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect27">
       <summary>
-      </summary>
+            TextEffect27
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect28">
       <summary>
-      </summary>
+            TextEffect28
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect29">
       <summary>
-      </summary>
+            TextEffect29
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffect.TextEffect30">
       <summary>
-      </summary>
+            TextEffect30
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.MsoPresetTextEffectShape">
       <summary>
@@ -29252,167 +29756,208 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.PlainText">
       <summary>
-      </summary>
+            PlainText
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.Stop">
       <summary>
-      </summary>
+            Stop
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.TriangleUp">
       <summary>
-      </summary>
+            TriangleUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.TriangleDown">
       <summary>
-      </summary>
+            TriangleDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ChevronUp">
       <summary>
-      </summary>
+            ChevronUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ChevronDown">
       <summary>
-      </summary>
+            ChevronDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.RingInside">
       <summary>
-      </summary>
+            RingInside
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.RingOutside">
       <summary>
-      </summary>
+            RingOutside
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ArchUpCurve">
       <summary>
-      </summary>
+            ArchUpCurve
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ArchDownCurve">
       <summary>
-      </summary>
+            ArchDownCurve
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CircleCurve">
       <summary>
-      </summary>
+            CircleCurve
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ButtonCurve">
       <summary>
-      </summary>
+            ButtonCurve
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ArchUpPour">
       <summary>
-      </summary>
+            ArchUpPour
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ArchDownPour">
       <summary>
-      </summary>
+            ArchDownPour
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CirclePour">
       <summary>
-      </summary>
+            CirclePour
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.ButtonPour">
       <summary>
-      </summary>
+            ButtonPour
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CurveUp">
       <summary>
-      </summary>
+            CurveUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CurveDown">
       <summary>
-      </summary>
+            CurveDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CanUp">
       <summary>
-      </summary>
+            CanUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CanDown">
       <summary>
-      </summary>
+            CanDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.Wave1">
       <summary>
-      </summary>
+            Wave1
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.Wave2">
       <summary>
-      </summary>
+            Wave2
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.DoubleWave1">
       <summary>
-      </summary>
+            DoubleWave1
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.DoubleWave2">
       <summary>
-      </summary>
+            DoubleWave2
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.Inflate">
       <summary>
-      </summary>
+            Inflate
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.Deflate">
       <summary>
-      </summary>
+            Deflate
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.InflateBottom">
       <summary>
-      </summary>
+            InflateBottom
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.DeflateBottom">
       <summary>
-      </summary>
+            DeflateBottom
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.InflateTop">
       <summary>
-      </summary>
+            InflateTop
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.DeflateTop">
       <summary>
-      </summary>
+            DeflateTop
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.DeflateInflate">
       <summary>
-      </summary>
+            DeflateInflate
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.DeflateInflateDeflate">
       <summary>
-      </summary>
+            DeflateInflateDeflate
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.FadeRight">
       <summary>
-      </summary>
+            FadeRight
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.FadeLeft">
       <summary>
-      </summary>
+            FadeLeft
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.FadeUp">
       <summary>
-      </summary>
+            FadeUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.FadeDown">
       <summary>
-      </summary>
+            FadeDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.SlantUp">
       <summary>
-      </summary>
+            SlantUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.SlantDown">
       <summary>
-      </summary>
+            SlantDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CascadeUp">
       <summary>
-      </summary>
+            CascadeUp
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.CascadeDown">
       <summary>
-      </summary>
+            CascadeDown
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.MsoPresetTextEffectShape.Mixed">
       <summary>
-      </summary>
+            Mixed
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Drawing.TextEffectFormat">
       <summary>
@@ -30084,7 +30629,7 @@
              </summary>
       <remarks>
              NOTE: This member is now obsolete. Instead, 
-             please use Series.SecondCategoryData property.
+             please use SeriesCollection.SecondCategoryData property.
              This property will be removed 12 months later since February 2014. 
              Aspose apologizes for any inconvenience you may have experienced.</remarks>
     </member>
@@ -30142,19 +30687,23 @@
     </member>
     <member name="F:Aspose.Cells.Drawing.OleFileType.Xlsx">
       <summary>
-      </summary>
+            Xlsx
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.OleFileType.Xlsb">
       <summary>
-      </summary>
+            Xlsb
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.OleFileType.Docx">
       <summary>
-      </summary>
+            Docx
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.OleFileType.Pptx">
       <summary>
-      </summary>
+            Pptx
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Drawing.OleFileType.Unknown">
       <summary>
@@ -31085,7 +31634,7 @@
     </member>
     <member name="F:Aspose.Cells.PaperSizeType.PaperExecutive">
       <summary>
-            Executive (7-1/2 in. x 10-1/2 in.)
+            Executive (7-1/4 in. x 10-1/2 in.)
             </summary>
     </member>
     <member name="F:Aspose.Cells.PaperSizeType.PaperA3">
@@ -31739,7 +32288,8 @@
     </member>
     <member name="P:Aspose.Cells.Drawing.Picture.IsDynamicDataExchange">
       <summary>
-      </summary>
+            Gets or sets whether dynamic data exchange
+            </summary>
     </member>
     <member name="P:Aspose.Cells.Drawing.Picture.DisplayAsIcon">
       <summary>
@@ -32542,6 +33092,14 @@
             Encapsulates a collection of <see cref="T:Aspose.Cells.Range" /> objects.
             </summary>
     </member>
+    <member name="M:Aspose.Cells.RangeCollection.Add(Aspose.Cells.Range)">
+      <summary>
+            Adds a <see cref="T:Aspose.Cells.Range" /> item to the collection.
+            </summary>
+      <param name="range">Range object</param>
+      <returns>
+      </returns>
+    </member>
     <member name="P:Aspose.Cells.RangeCollection.Item(System.Int32)">
       <summary>
              Gets the <see cref="T:Aspose.Cells.Range" /> element at the specified index.
@@ -32593,6 +33151,27 @@
             Gets a <seealso cref="T:Aspose.Cells.Row" /> object by given row index. The Row object of given row index will be instantiated if it does not exist before.
             </summary>
     </member>
+    <member name="T:Aspose.Cells.SaveType">
+      <summary>
+            Enumerates spreadsheet creation and saving types.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.SaveType.Default">
+      <summary>
+            Writes the spreadsheet directly to the hard disk. 
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.SaveType.OpenInExcel">
+      <summary>
+            Returns the spreadsheet as a stream of binary data and 
+            asks the user to either save or open it.
+            </summary>
+    </member>
+    <member name="F:Aspose.Cells.SaveType.OpenInBrowser">
+      <summary>
+            Sends the spreadsheet to browser and opens it in browser. 
+            </summary>
+    </member>
     <member name="T:Aspose.Cells.Drawing.ScrollBar">
       <summary>
             Represents a scroll bar object.
@@ -32621,7 +33200,8 @@
     </member>
     <member name="P:Aspose.Cells.Drawing.ScrollBar.PageChange">
       <summary>
-      </summary>
+            Gets or sets page change
+            </summary>
     </member>
     <member name="P:Aspose.Cells.Drawing.ScrollBar.Shadow">
       <summary>
@@ -35996,27 +36576,33 @@
     </member>
     <member name="F:Aspose.Cells.Charts.TrendlineType.Exponential">
       <summary>
-      </summary>
+            Exponential
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TrendlineType.Linear">
       <summary>
-      </summary>
+            Linear
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TrendlineType.Logarithmic">
       <summary>
-      </summary>
+            Logarithmic
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TrendlineType.MovingAverage">
       <summary>
-      </summary>
+            MovingAverage
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TrendlineType.Polynomial">
       <summary>
-      </summary>
+            Polynomial
+            </summary>
     </member>
     <member name="F:Aspose.Cells.Charts.TrendlineType.Power">
       <summary>
-      </summary>
+            Power
+            </summary>
     </member>
     <member name="T:Aspose.Cells.Validation">
       <summary>
@@ -36704,11 +37290,33 @@
       <param name="stream">The file stream.</param>
       <param name="saveOptions">The save options.</param>
     </member>
+    <member name="M:Aspose.Cells.Workbook.Save(System.Web.HttpResponse,System.String,Aspose.Cells.ContentDisposition,Aspose.Cells.SaveOptions)">
+      <summary>
+            Creates the result spreadsheet and transfer it to the client then open it in the browser or MS Workbook.
+            </summary>
+      <param name="response">Response object to return the spreadsheet to client.</param>
+      <param name="fileName">The name of created file.</param>
+      <param name="contentDisposition">The content dispostion type.</param>
+      <param name="saveOptions">The save options.</param>
+    </member>
+    <member name="M:Aspose.Cells.Workbook.RemoveUnusedStyles">
+      <summary>
+            Remove all unused styles.
+            </summary>
+    </member>
     <member name="M:Aspose.Cells.Workbook.CreateStyle">
       <summary>
             Creates a new style.
             </summary>
       <returns>Returns a style object.</returns>
+    </member>
+    <member name="M:Aspose.Cells.Workbook.CreateBuiltinStyle(Aspose.Cells.BuiltinStyleType)">
+      <summary>
+            Creates built-in style by given type.
+            </summary>
+      <param name="type">
+      </param>
+      <returns>style object</returns>
     </member>
     <member name="M:Aspose.Cells.Workbook.CreateCellsColor">
       <summary>
@@ -37094,6 +37702,11 @@
       <param name="password">The password.</param>
       <returns>
       </returns>
+      <remarks>
+            NOTE: This member is now obsolete. Instead, 
+            please use WorkbookSettings.WriteProtection.ValidatePassword method.
+            This property will be removed 12 months later since October 2015. 
+            Aspose apologizes for any inconvenience you may have experienced.</remarks>
     </member>
     <member name="M:Aspose.Cells.Workbook.GetThemeColor(Aspose.Cells.ThemeColorType)">
       <summary>
@@ -37534,24 +38147,49 @@
             Represents Workbook file encryption password.
             </summary>
     </member>
+    <member name="P:Aspose.Cells.WorkbookSettings.WriteProtection">
+      <summary>
+            Provides access to the workbook write protection options. 
+            </summary>
+    </member>
     <member name="P:Aspose.Cells.WorkbookSettings.RecommendReadOnly">
       <summary>
             Indicates if the Read Only Recommended option is selected.
             </summary>
+      <remarks>
+            NOTE: This member is now obsolete. Instead, 
+            please use WorkbookSettings.WriteProtection.RecommendReadOnly property.
+            This property will be removed 12 months later since October 2015. 
+            Aspose apologizes for any inconvenience you may have experienced.</remarks>
     </member>
     <member name="P:Aspose.Cells.WorkbookSettings.IsWriteProtected">
       <summary>
             Indicates whether this workbook is write protected.
             </summary>
+      <remarks>
+            NOTE: This member is now obsolete. Instead, 
+            please use WorkbookSettings.WriteProtection.IsWriteProtected property.
+            This property will be removed 12 months later since October 2015. 
+            Aspose apologizes for any inconvenience you may have experienced.</remarks>
     </member>
     <member name="P:Aspose.Cells.WorkbookSettings.WriteProtectedPassword">
       <summary>
             Sets the proected password to modify the file.
             </summary>
+      <remarks>
+            NOTE: This member is now obsolete. Instead, 
+            please use WorkbookSettings.WriteProtection.Password property.
+            This property will be removed 12 months later since October 2015. 
+            Aspose apologizes for any inconvenience you may have experienced.</remarks>
+    </member>
+    <member name="P:Aspose.Cells.WorkbookSettings.IsEncrypted">
+      <summary>
+            Gets a value that indicates whether a password is required to open this workbook.
+            </summary>
     </member>
     <member name="P:Aspose.Cells.WorkbookSettings.IsProtected">
       <summary>
-            Gets a value that indicates whether the Workbook is protected. 
+            Gets a value that indicates whether the structure or window of the Workbook is protected. 
             </summary>
     </member>
     <member name="P:Aspose.Cells.WorkbookSettings.IsDefaultEncrypted">
@@ -37826,7 +38464,7 @@
             Copies contents and formats from another worksheet.
             </summary>
       <param name="sourceSheet">Source worksheet.</param>
-      <param name="copyOption">
+      <param name="copyOptions">
       </param>
       <remarks>You can copy data from another worksheet in the same file or another file. However, this method does not support to copy drawing objects, such as comments, images and charts.</remarks>
     </member>
@@ -38798,9 +39436,19 @@
             The Data provider to provide cells data for saving workbook in light mode.
             </summary>
     </member>
+    <member name="P:Aspose.Cells.OoxmlSaveOptions.UpdateZoom">
+      <summary>
+            Indicates whether update scaling factor before saving the file 
+            if the PageSetup.FitToPagesWide and PageSetup.FitToPagesTall properties control how the worksheet is scaled.
+            </summary>
+      <remarks>
+            The default value is false for permance.
+            
+            </remarks>
+    </member>
     <member name="T:Aspose.Cells.XpsSaveOptions">
       <summary>
-            Can be used to specify additional options when saving the file into the Xps format. 
+            Represents the additional options when saving the file as the Xps. 
             </summary>
     </member>
     <member name="M:Aspose.Cells.XpsSaveOptions.#ctor">
