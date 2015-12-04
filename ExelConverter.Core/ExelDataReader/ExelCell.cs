@@ -23,6 +23,14 @@ namespace ExelConverter.Core.ExelDataReader
 
         public System.Drawing.Color Color { get; set; }
 
+        private static string DecodeUrlString(string url)
+        {
+            string newUrl;
+            while ((newUrl = Uri.UnescapeDataString(url)) != url)
+                url = newUrl;
+            return newUrl;
+        }
+
         private string hyperLink = string.Empty;
         public string HyperLink 
         {
@@ -35,11 +43,10 @@ namespace ExelConverter.Core.ExelDataReader
                 if (hyperLink == value)
                     return;
 
-                var val = value ?? string.Empty;
-                if (val.Contains("%"))
-                    val = Uri.UnescapeDataString(val);
+                hyperLink = System.Web.HttpUtility.UrlPathEncode(value ?? string.Empty);
 
-                hyperLink = Uri.EscapeUriString(val);
+                //var val = System.Web.HttpUtility.UrlEncode(value ?? string.Empty);// DecodeUrlString(value ?? string.Empty);
+                //hyperLink = System.Web.HttpUtility.UrlEncode(val); //Uri.EscapeUriString(val);
             }
         }
 
