@@ -14,5 +14,8 @@
     <Setting Name="HeaderSearchAlgorithm_2_BadSymbols" Type="System.String" Scope="User">
       <Value Profile="(Default)">|][':&lt;&gt;?*&amp;^%$#@!`~+=_</Value>
     </Setting>
+    <Setting Name="MaxRowsInGroupCountToDeleteSimilarityRows" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

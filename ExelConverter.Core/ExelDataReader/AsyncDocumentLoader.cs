@@ -197,10 +197,8 @@ namespace ExelConverter.Core.ExelDataReader
             if (progressReport != null)
                 pp.Change += (s, e) => { progressReport((int)e.Value); };
 
-            var pp0 = pp.GetChild();
-            var pp1 = pp.GetChild();
-            pp0.Weight = 9;
-            pp1.Weight = 1;
+            var pp0 = pp.GetChild(weight: 9);
+            var pp1 = pp.GetChild(weight: 1);
 
             try
             {
@@ -402,10 +400,31 @@ namespace ExelConverter.Core.ExelDataReader
                     return true;
                 });
 
-                for (int i=result.Count-1; i>=4; i--)
+                var defStart = 4;
+                var minCountForDeleteSimilarity = Properties.Settings.Default.MaxRowsInGroupCountToDeleteSimilarityRows;
+                for (int i=result.Count-1; i>= defStart; i--)
                 {
-                    if (result[i].Similarity(result[i - 1]) >= 0.8 && isRowsSimilar(result[i],result[i-1]))
-                        result.RemoveAt(i);
+                    var n = 1;
+                    if ((i - n >= defStart) && result[i].Similarity(result[i - n]) >= 0.8 && isRowsSimilar(result[i], result[i - n]))
+                    {
+                        var rowIndexes = new List<int>(new int[] { i - n });
+                        do
+                        {
+                            n++;
+                            rowIndexes.Add(i - n);
+                        } while ((i - n >= defStart) && result[i].Similarity(result[i - n]) >= 0.8 && isRowsSimilar(result[i], result[i - n]));
+
+                        if (n + 1 >= minCountForDeleteSimilarity)
+                        {
+                            rowIndexes
+                                .OrderByDescending(ind => ind)
+                                .ToList()
+                                .ForEach(ind => result.RemoveAt(ind));
+                            i -= n;
+                            continue;
+                            //result.RemoveAt(i);
+                        }
+                    }
                 }
 
                 pp1.Value = 50;
