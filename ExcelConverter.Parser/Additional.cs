@@ -1227,10 +1227,10 @@ namespace ExcelConverter.Parser
                                 if (additional)
                                 {
                                     int colCount = sheet.Cells.Columns.Count;
-                                    sheet.Cells.Rows.Cast<Row>().AsParallel().WithDegreeOfParallelism(1).ForAll(
+                                    sheet.Cells.Rows.Cast<Row>().ToList().ForEach(
                                         (row) =>
                                             {
-                                                for (int i = 0; i < colCount; i++)
+                                                for (int i = 0; i < Math.Max(colCount, row.LastCell?.Column ?? 0); i++)
                                                     {
                                                         Cell cell = row.GetCellOrNull(i);
                                                         if (cell != null)
@@ -1257,6 +1257,16 @@ namespace ExcelConverter.Parser
                                                                                     }
                                                                             }
                                                                         }
+                                                                    }
+                                                                }
+                                                            } else
+                                                            {
+                                                                var val = cell.DisplayStringValue;
+                                                                if (val != null && Helper.IsWellFormedUriString(val, UriKind.Absolute))
+                                                                {
+                                                                    lock (lockObject)
+                                                                    {
+                                                                        result.Add(val);
                                                                     }
                                                                 }
                                                             }
@@ -1316,7 +1326,11 @@ namespace ExcelConverter.Parser
                 return false;
 
             Uri uri;
-            return Uri.TryCreate(uriString, uriKind, out uri); // && uri.IsWellFormedOriginalString()
+            var res = Uri.TryCreate(uriString, uriKind, out uri);
+            if (res && uriKind == UriKind.Absolute)
+                res &= uri.IsAbsoluteUri;
+
+            return res; // && uri.IsWellFormedOriginalString()
         }
 
         internal class SomeNodeElement
@@ -1532,7 +1546,7 @@ namespace ExcelConverter.Parser
 
                 object currLoadedLock = new Object();
 
-                threadCount = 1;
+                //threadCount = 1;
 
                 allLinks
                     .AsParallel()

@@ -479,12 +479,12 @@ namespace ExelConverter.Core.DataAccess
                 {
                     string ruleString = string.Empty;
 
-                    foreach(var itemToSave in 
-                                    exportRules
-                                        .Where(i => !string.IsNullOrWhiteSpace(i.Sheet?.Name) || !string.IsNullOrWhiteSpace(i.Rule?.Name))
-                                        .Select(i => string.Format("{0}:{1}",i.Rule.Id,i.SheetName))
-                                        )
-                        ruleString += itemToSave + ";";
+                    var validRules = exportRules
+                                        .Where(i => i.Rule != null && !string.IsNullOrWhiteSpace(i.Sheet?.Name ?? i.SheetName))
+                                        .Select(i => string.Format("{0}:{1}", i.Rule.Id, i.Sheet?.Name ?? i.SheetName))
+                                        .ToArray();
+                    if (validRules.Length > 0)
+                        ruleString = validRules.Aggregate((s1, s2) => $"{s1};{s2}");
 
                     var export_rule =
                         dc
