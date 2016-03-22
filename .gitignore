@@ -154,3 +154,7 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/packages/Aspose.Cells.8.7.1
+/packages/EntityFramework.6.0.0
+/packages/MySql.Data.6.9.7
+/packages

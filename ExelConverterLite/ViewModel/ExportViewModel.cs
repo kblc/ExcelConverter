@@ -534,39 +534,40 @@ namespace ExelConverterLite.ViewModel
             try
             {
                 var fileName = App.Locator.Import.Document.Name + ".csv";
-                var fullPath = App.Locator.Settings.Settings.CsvFilesDirectory + Path.DirectorySeparatorChar + App.Locator.Import.Document.Name + ".csv";
+                var filePath = Path.Combine(App.Locator.Settings.Settings.CsvFilesDirectory, fileName);
 
-                using (var strm = new FileStream(fullPath, FileMode.OpenOrCreate)) { }
-                using (var writer = new StreamWriter(new FileStream(fullPath, FileMode.Truncate), Encoding.Default))
-                {
-                    var allowedFields = App.Locator.Import.ExportRules
-                        .Where(r => r.Rule != App.Locator.Import.NullRule && r.Sheet != null)
-                        .Select(er => er.Rule)
-                        .SelectMany(r => r.ConvertionData)
-                        .Where(cd => cd.Blocks != null && cd.Blocks.Blocks.Count > 0)
-                        .Select(cd => cd.PropertyId)
-                        .Distinct();
+                var allowedFields = App.Locator.Import.ExportRules
+                    .Where(r => r.Rule != null && r.Rule != App.Locator.Import.NullRule && r.Sheet != null)
+                    .Select(er => er.Rule)
+                    .SelectMany(r => r.ConvertionData)
+                    .Where(cd => cd.Blocks != null && cd.Blocks.Blocks.Count > 0)
+                    .Select(cd => cd.PropertyId)
+                    .Distinct()
+                    .ToArray();
 
-                    var props = OutputRow.ColumnOrder
-                            .Join(allowedFields, i => i.Value, a => a, (i, a) => i)
-                            .OrderBy(i => i.Key)
-                            .Select(i => i.Value)
-                            .ToArray();
+                var props = OutputRow.ColumnOrder
+                    .Join(allowedFields, i => i.Value, a => a, (i, a) => i)
+                    .OrderBy(i => i.Key)
+                    .Select(i => i.Value)
+                    .ToArray();
 
-                    string propLine = string.Empty;
-                    for (int i = 0; i < props.Length; i++)
-                            propLine += (propLine.Length > 0 ? ";" : string.Empty) + string.Format("\"{0}\"", props[i]);
+                string headerLine = (props.Length > 0) 
+                    ? props.Select(p => $"\"{p}\"").Aggregate((s0, s1) => $"{s0};{s1}")
+                    : string.Empty;
 
-                    writer.WriteLine(propLine);
-                    foreach (var entry in RowsToExport)
-                        writer.WriteLine(entry.ToCsvString(props.ToArray()));
-                }
+                var rows = RowsToExport.Select(r => r.ToCsvString(props)).ToArray();
+
+                var allLines = string.IsNullOrEmpty(headerLine)
+                    ? rows
+                    : new[] { headerLine }.Union(rows).ToArray();
+
+                File.WriteAllLines(filePath, allLines);
 
                 var exportedCsv = new ExportedCsv
                 {
                     ExportDate = DateTime.Now,
                     FileName = fileName,
-                    Path = fullPath,
+                    Path = filePath,
                     Id = Guid.NewGuid()
                 };
                 App.Locator.ExportLog.AddExportedCsv(exportedCsv);
