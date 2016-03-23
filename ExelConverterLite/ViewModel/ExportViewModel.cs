@@ -85,6 +85,8 @@ namespace ExelConverterLite.ViewModel
 
     public class ExportViewModel : ViewModelBase
     {
+        private static readonly Encoding defaultEncoding = Encoding.GetEncoding(1251);
+
         private static MyDBParserCollection _DBParsers = null;
         private static MyDBParserCollection DBParsers
         {
@@ -560,8 +562,8 @@ namespace ExelConverterLite.ViewModel
                 var allLines = string.IsNullOrEmpty(headerLine)
                     ? rows
                     : new[] { headerLine }.Union(rows).ToArray();
-
-                File.WriteAllLines(filePath, allLines);
+                
+                File.WriteAllLines(filePath, allLines, defaultEncoding);
 
                 var exportedCsv = new ExportedCsv
                 {
