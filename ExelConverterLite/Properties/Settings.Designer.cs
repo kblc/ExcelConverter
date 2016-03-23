@@ -71,5 +71,17 @@ namespace ExelConverterLite.Properties {
                 this["LastConnected"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("windows-1251")]
+        public string ExportCsvEncoding {
+            get {
+                return ((string)(this["ExportCsvEncoding"]));
+            }
+            set {
+                this["ExportCsvEncoding"] = value;
+            }
+        }
     }
 }

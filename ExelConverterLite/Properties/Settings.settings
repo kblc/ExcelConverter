@@ -14,5 +14,8 @@
     <Setting Name="LastConnected" Type="System.String" Scope="User">
       <Value Profile="(Default)">Альфа</Value>
     </Setting>
+    <Setting Name="ExportCsvEncoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">windows-1251</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

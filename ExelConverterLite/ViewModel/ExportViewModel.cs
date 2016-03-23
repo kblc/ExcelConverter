@@ -85,7 +85,7 @@ namespace ExelConverterLite.ViewModel
 
     public class ExportViewModel : ViewModelBase
     {
-        private static readonly Encoding defaultEncoding = Encoding.GetEncoding(1251);
+        private static readonly Encoding defaultEncoding = Encoding.GetEncoding(Properties.Settings.Default.ExportCsvEncoding);
 
         private static MyDBParserCollection _DBParsers = null;
         private static MyDBParserCollection DBParsers
