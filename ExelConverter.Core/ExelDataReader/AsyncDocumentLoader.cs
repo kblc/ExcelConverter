@@ -32,63 +32,41 @@ namespace ExelConverter.Core.ExelDataReader
                 && (y2 >= x1 && y2 <= x2)
                 ;
         }
-
-        private static Hyperlink[] GetHyperlinksForCell(Cell cell, Worksheet sheet)
-        {
-            var range = cell.GetMergedRange();
-            var hLinks = sheet.Hyperlinks.Cast<Hyperlink>();
-
-            var hLinksINCLD = hLinks
-                    .Where(l =>
-                        IsIncluded(
-                            l.Area.StartColumn,
-                            l.Area.EndColumn,
-                            range != null ? range.FirstColumn : cell.Column,
-                            range != null ? range.FirstColumn + range.ColumnCount - 1 : cell.Column)
-                        && IsIncluded(
-                            l.Area.StartRow,
-                            l.Area.EndRow,
-                            range != null ? range.FirstRow : cell.Row,
-                            range != null ? range.FirstRow + range.RowCount - 1 : cell.Row)
-                        )
-                    .ToArray();
-
-            var hLinksINSCT = hLinks
-                    .Where(l =>
-                        IsIntersected(
-                            l.Area.StartColumn,
-                            l.Area.EndColumn, 
-                            range != null ? range.FirstColumn : cell.Column,
-                            range != null ? range.FirstColumn + range.ColumnCount - 1 : cell.Column)
-                        && IsIntersected(
-                            l.Area.StartRow, 
-                            l.Area.EndRow, 
-                            range != null ? range.FirstRow : cell.Row, 
-                            range != null ? range.FirstRow + range.RowCount - 1 : cell.Row)
-                        )
-                    .ToArray();
-            return hLinksINCLD.Union(hLinksINSCT).ToArray();
-            //return hLinksINCLD.Length > 0 ? hLinksINCLD : hLinksINSCT;
-        }
-
+        
         private static Hyperlink GetHyperlinkForCell(Cell cell, Worksheet sheet)
         {
-            var range = cell.GetMergedRange();
-            var vLinks = GetHyperlinksForCell(cell, sheet);
-            var mgLinks = vLinks
-                .Select(i1 =>
+            var row = cell.Row;
+            var column = cell.Column;
+
+            ArrayList list = sheet.Cells.MergedCells;
+            {
+                foreach (CellArea ca in list)
+                {
+                    if (row >= ca.StartRow
+                          && row <= ca.EndRow
+                          && column >= ca.StartColumn
+                          && column <= ca.EndColumn)
                     {
-                        double res = 0.0;
-                        res += Math.Abs(i1.Area.StartColumn - (range != null ? range.FirstColumn : cell.Column));
-                        res += Math.Abs(i1.Area.EndColumn - (range != null ? (range.FirstColumn + range.ColumnCount - 1) : cell.Column));
-                        res += Math.Abs(i1.Area.StartRow - (range != null ? range.FirstRow : cell.Row));
-                        res += Math.Abs(i1.Area.EndRow - (range != null ? (range.FirstRow + range.RowCount - 1) : cell.Row));
-                        return new { Link = i1, Length = res / 4 };
+                        row = ca.StartRow;
+                        column = ca.EndColumn;
+                        break;
                     }
-                )
-                .OrderBy(i1 => i1.Length)
-                .ToArray();
-            return mgLinks.Select(i => i.Link).FirstOrDefault();
+                }
+            }
+            HyperlinkCollection links = sheet.Hyperlinks;
+            for (int i = links.Count - 1; i >= 0; i--)
+            {
+                CellArea ca = links[i].Area;
+                if (row >= ca.StartRow
+                      && row <= ca.EndRow
+                      && column >= ca.StartColumn
+                      && column <= ca.EndColumn)
+                {
+
+                    return links[i];
+                }
+            }
+            return null;
         }
 
         private static Color GetBrush(string color)
