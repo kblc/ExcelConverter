@@ -150,7 +150,7 @@ namespace ExelConverter.Core.DataWriter
                                         if (func != null)
                                         { 
                                             CodeColumnName = func.Function.ColumnName;
-                                            if (string.IsNullOrWhiteSpace(func.Function.ColumnName))
+                                            if (string.IsNullOrWhiteSpace(func.Function.ColumnName) || func.Function.SelectedParameter == Core.Converter.Functions.FunctionParameters.CellNumber)
                                                 CodeColumnIndex = func.Function.ColumnNumber;
                                         }
                                     }
@@ -158,25 +158,8 @@ namespace ExelConverter.Core.DataWriter
 
                                 if (!string.IsNullOrWhiteSpace(CodeColumnName) || (CodeColumnIndex != -1))
                                 {
-                                    var headerRow = sheet.Cells.Rows[r.Sheet.MainHeader.Index];
-
-                                    int fHeader = headerRow.FirstCell == null ? 0 : headerRow.FirstCell.Column;
-                                    int lHeader = headerRow.LastCell == null ? 0 : headerRow.LastCell.Column;
-
                                     if (CodeColumnIndex == -1)
-                                        for (int i = fHeader; i <= lHeader; i++)
-                                        {
-                                            var cell = headerRow.GetCellOrNull(i);
-                                            if (cell != null)
-                                            {
-                                                string cellValue = cell.StringValue;
-                                                if (!string.IsNullOrWhiteSpace(cellValue) && cellValue.ToLower().Trim() == CodeColumnName.ToLower().Trim())
-                                                {
-                                                    CodeColumnIndex = i;
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                        CodeColumnIndex = r.Sheet.MainHeader.Cells.FirstOrDefault(c => string.Compare(c.Value, CodeColumnName, true) == 0)?.OriginalIndex ?? -1;
 
                                     #region Add cells to rows
                                     if (CodeColumnIndex >= 0)
@@ -201,10 +184,10 @@ namespace ExelConverter.Core.DataWriter
                                         .Union(new int[] { 0 })
                                         .Max();
 
-                                        var h0 = sheet.Cells[headerRow.Index, lastIndex + 0];
-                                        var h1 = sheet.Cells[headerRow.Index, lastIndex + 1];
-                                        var h2 = sheet.Cells[headerRow.Index, lastIndex + 2];
-                                        var h3 = sheet.Cells[headerRow.Index, lastIndex + 3];
+                                        var h0 = sheet.Cells[r.Sheet.MainHeader.Index, lastIndex + 0];
+                                        var h1 = sheet.Cells[r.Sheet.MainHeader.Index, lastIndex + 1];
+                                        var h2 = sheet.Cells[r.Sheet.MainHeader.Index, lastIndex + 2];
+                                        var h3 = sheet.Cells[r.Sheet.MainHeader.Index, lastIndex + 3];
 
                                         sheet.Cells.Columns[h1.Column].IsHidden = false;
                                         sheet.Cells.Columns[h2.Column].IsHidden = false;

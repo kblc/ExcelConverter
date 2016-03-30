@@ -23,6 +23,8 @@ namespace ExelConverter.Core.ExelDataReader
 
         public System.Drawing.Color Color { get; set; }
 
+        public int OriginalIndex { get; set; }
+
         private static string DecodeUrlString(string url)
         {
             string newUrl;

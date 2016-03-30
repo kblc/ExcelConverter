@@ -238,7 +238,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                                 var cells = Enumerable.Range(0, lastFilledColumnIndex + 1)
                                     .Select(cellIndex => new { OriginalCell = row.GetCellOrNull(cellIndex), Index = cellIndex })
-                                    .Select(c => new { OriginalCell = c.OriginalCell, ResultCell = new ExelCell() { Value = string.Empty, FormatedValue = string.Empty, CellStyle = new Style() }, Index = c.Index })
+                                    .Select(c => new { OriginalCell = c.OriginalCell, ResultCell = new ExelCell() { Value = string.Empty, FormatedValue = string.Empty, CellStyle = new Style(), OriginalIndex = c.Index } })
                                     .Select(i =>
                                         {
                                             if (i.OriginalCell != null)
@@ -282,7 +282,7 @@ namespace ExelConverter.Core.ExelDataReader
 
                                                 try
                                                 {
-                                                    var comment = sheet.Comments[i.OriginalCell.Row, i.Index];
+                                                    var comment = sheet.Comments[i.OriginalCell.Row, i.ResultCell.OriginalIndex];
                                                     if (comment != null)
                                                         i.ResultCell.Comment = comment.Note;
                                                 }
@@ -293,7 +293,7 @@ namespace ExelConverter.Core.ExelDataReader
                                                 i.ResultCell.Color = (style != null) ? (DefColors.Any(clr => ColorsEqual(clr, style.BackgroundColor)) ? style.ForegroundColor : style.BackgroundColor) : System.Drawing.Color.White;
                                                 i.ResultCell.Color = System.Drawing.Color.FromArgb((i.ResultCell.Color.R > byte.MinValue || i.ResultCell.Color.G > byte.MinValue || i.ResultCell.Color.B > byte.MinValue) && i.ResultCell.Color.A == byte.MinValue ? byte.MaxValue : i.ResultCell.Color.A, i.ResultCell.Color.R, i.ResultCell.Color.G, i.ResultCell.Color.B);
                                             }
-                                            return new { ResultCell = i.ResultCell, Index = i.Index };
+                                            return new { ResultCell = i.ResultCell, Index = i.ResultCell.OriginalIndex };
                                         })
                                     .OrderBy(i => i.Index)
                                     .Select(i => i.ResultCell)
