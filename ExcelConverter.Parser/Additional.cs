@@ -1338,11 +1338,15 @@ namespace ExcelConverter.Parser
             public HtmlNode Node { get; set; }
             public Uri Url { get; set; }
         }
-        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, Uri url, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
+        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, Uri url, 
+            bool collectIMGTags, bool collectLINKTags, bool collectMETATags,
+            Func<string, bool> additionalAttributeAsLink)
         {
-            return GetAllImagesUrlsFromUrl(document, url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags);
+            return GetAllImagesUrlsFromUrl(document, url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags, additionalAttributeAsLink);
         }
-        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, string responseUrl, bool collectIMGTags, bool collectLINKTags, bool collectMETATags)
+        internal static SomeNodeElement[] GetAllImagesUrlsFromUrl(HtmlAgilityPack.HtmlDocument document, string responseUrl, 
+            bool collectIMGTags, bool collectLINKTags, bool collectMETATags,
+            Func<string,bool> additionalAttributeAsLink)
         {
             if (document == null)
                 throw new ArgumentNullException("В функции GetAllImagesUrlsFromUrl() не может отсутствовать обязательный параметр document");
@@ -1370,8 +1374,17 @@ namespace ExcelConverter.Parser
 
             bool wasException = false;
             var logSession = Helpers.Old.Log.SessionStart("Additional.GetAllImagesUrlsFromUrl()", true);
-            try
-            {
+            try {
+                var allAdditionalLinks = additionalAttributeAsLink == null
+                    ? new SomeNodeElement[] {}
+                    : document
+                        .DocumentNode
+                        .Descendants()
+                        .SelectMany(n => n.Attributes.Select(a => new { Node = n, AttributeValue = fixFunc(a.Value) }))
+                        .Where(i => additionalAttributeAsLink(i.AttributeValue))
+                        .Select(i => new SomeNodeElement() { Node = i.Node, Url = Helper.GetFullSourceLink(i.AttributeValue, document, responseUrl) })
+                        .ToArray();
+
                 var allIMGLinks = 
                         !collectIMGTags ? new SomeNodeElement[] {} :
                         document
@@ -1393,7 +1406,7 @@ namespace ExcelConverter.Parser
                         .Where(n =>
                         {
                             string href = n.Attributes["href"].Value;
-                            string[] likes = new string[] { "*.jpeg","*.jpg",  "*.bmp", "*.gif" };
+                            string[] likes = new string[] { "*.jpeg", "*.jpg",  "*.bmp", "*.gif", "*.png" };
                             return likes.Any(i => Helper.StringLikes(href, i)) && Helper.IsWellFormedUriString(href, UriKind.RelativeOrAbsolute);
                         })
                         .Select(n => new SomeNodeElement()
@@ -1442,6 +1455,7 @@ namespace ExcelConverter.Parser
                         allIMGLinks
                         .Union(allLINKLinks)
                         .Union(allMETALinks)
+                        .Union(allAdditionalLinks)
                         //.Distinct()
                         .GroupBy(ne => ne.Url)
                         .Select(neg => neg.First())
@@ -1540,7 +1554,7 @@ namespace ExcelConverter.Parser
 
                 object lockAdd = new Object();
 
-                var allLinks = GetAllImagesUrlsFromUrl(document, url, collectIMGTags, collectLINKTags, collectMETATags);
+                var allLinks = GetAllImagesUrlsFromUrl(document, url, collectIMGTags, collectLINKTags, collectMETATags, null);
                 int fullCnt = allLinks.Count();
                 int currLoaded = 0;
 
@@ -1942,7 +1956,7 @@ namespace ExcelConverter.Parser
                             .Select(nodeItem => 
                                 {
                                     var links = Helper
-                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
+                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags, url => collectMETATags && Helper.StringLikes(url, mask))
                                                 .Where(n => Helper.StringLikes(n.Url.AbsoluteUri, mask));
                                     var results =
                                         minSize == null
@@ -1973,7 +1987,7 @@ namespace ExcelConverter.Parser
                             .Select(n =>
                             {
                                 var links = Helper
-                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
+                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags, url => collectMETATags && Helper.StringLikes(url, mask))
                                             .Where(i => Helper.StringLikes(i.Url.AbsoluteUri, mask)).ToArray();
 
                                 string[] images =
@@ -2050,7 +2064,7 @@ namespace ExcelConverter.Parser
                             .Select(nodeItem =>
                                 {
                                     var links = Helper
-                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
+                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags, null)
                                                 .Where(n => Helper.StringLikes(n.Node.XPath, mask1));
                                     return
                                         minSize == null
@@ -2073,7 +2087,7 @@ namespace ExcelConverter.Parser
                             .Select(nodeItem =>
                                 {
                                     var links = Helper
-                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
+                                                .GetAllImagesUrlsFromUrl(nodeItem.Node.OwnerDocument, nodeItem.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags, null)
                                                 .Where(n => Helper.StringLikes(n.Node.XPath, mask2));
                                     return
                                         minSize == null
@@ -2101,7 +2115,7 @@ namespace ExcelConverter.Parser
                             .Select(n => 
                                 {
                                     var links = Helper
-                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags)
+                                            .GetAllImagesUrlsFromUrl(n.Node.OwnerDocument, n.Url.AbsoluteUri, collectIMGTags, collectLINKTags, collectMETATags, null)
                                             .Where(i => Helper.StringLikes(i.Node.XPath, betterMask));
 
                                     string[] images =

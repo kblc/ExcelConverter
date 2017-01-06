@@ -5,14 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Threading;
-
 using Helpers;
 using Helpers.WPF;
 using Helpers.Serialization;
@@ -64,14 +57,14 @@ namespace ExcelConverter.Parser
 
     public class ParseRuleEnumWrapper<T> : Helpers.WPF.PropertyChangedBase
     {
-        private T value = default(T);
+        private T _value;
 
         public T Value
         {
-            get { return value; }
+            get { return _value; }
             internal set
             {
-                this.value = value;
+                _value = value;
                 RaisePropertyChange("Value");
                 RaisePropertyChange("Description");
             }
@@ -81,13 +74,13 @@ namespace ExcelConverter.Parser
         {
             get
             {
-                return (value as Enum).GetAttributeValue<DescriptionAttribute, string>(i => i.Description);
+                return (_value as Enum).GetAttributeValue<DescriptionAttribute, string>(i => i.Description);
             }
         }
 
         public ParseRuleEnumWrapper(T value)
         {
-            this.value = value;
+            _value = value;
         }
     }
 
@@ -109,102 +102,102 @@ namespace ExcelConverter.Parser
     [Serializable]
     public class ParseRule : INotifyPropertyChanged
     {
-        private string label = "Фото";
+        private string _label = "Фото";
         public string Label
         {
             get
             {
-                return label;
+                return _label;
             }
             set
             {
-                label = value;
+                _label = value;
                 RaisePropertyChanged("Label");
             }
         }
 
-        private ParseFindRuleCondition condition = ParseFindRuleCondition.None;
+        private ParseFindRuleCondition _condition = ParseFindRuleCondition.None;
         public ParseFindRuleCondition Condition
         {
             get
             {
-                return condition;
+                return _condition;
             }
             set
             {
-                condition = value;
+                _condition = value;
                 RaisePropertyChanged("Condition");
             }
         }
 
-        private ParseRuleConnectionType connection = ParseRuleConnectionType.Direct;
+        private ParseRuleConnectionType _connection = ParseRuleConnectionType.Direct;
         public ParseRuleConnectionType Connection
         {
             get
             {
-                return connection;
+                return _connection;
             }
             set
             {
-                connection = value;
+                _connection = value;
                 RaisePropertyChanged("Connection");
             }
         }
 
-        private int minImageWidth = ExcelConverter.Parser.Properties.Settings.Default.MinImageWidth;
+        private int _minImageWidth = Properties.Settings.Default.MinImageWidth;
         public int MinImageWidth
         {
-            get { return minImageWidth; }
+            get { return _minImageWidth; }
             set 
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException("Значение должно быть больше 0");
-                minImageWidth = value; 
+                    throw new ArgumentOutOfRangeException($"Значение должно быть больше 0");
+                _minImageWidth = value; 
                 RaisePropertyChanged("MinImageWidth");
                 RaisePropertyChanged("MinImageSize");
             }
         }
 
-        private int minImageHeight = ExcelConverter.Parser.Properties.Settings.Default.MinImageHeight;
+        private int _minImageHeight = Properties.Settings.Default.MinImageHeight;
         public int MinImageHeight
         {
-            get { return minImageHeight; }
+            get { return _minImageHeight; }
             set 
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException("Значение должно быть больше 0");
-                minImageHeight = value;
+                    throw new ArgumentOutOfRangeException($"Значение должно быть больше 0");
+                _minImageHeight = value;
                 RaisePropertyChanged("MinImageHeight");
                 RaisePropertyChanged("MinImageSize");
             }
         }
 
-        private bool checkImageSize = false;
+        private bool _checkImageSize;
         public bool CheckImageSize
         {
-            get { return checkImageSize; }
-            set { checkImageSize = value; RaisePropertyChanged("CheckImageSize"); }
+            get { return _checkImageSize; }
+            set { _checkImageSize = value; RaisePropertyChanged("CheckImageSize"); }
         }
 
-        private bool collectIMGTags = true;
+        private bool _collectIMGTags = true;
         public bool CollectIMGTags
         {
-            get { return collectIMGTags; }
-            set { collectIMGTags = value; RaisePropertyChanged("CollectIMGTags"); }
+            get { return _collectIMGTags; }
+            set { _collectIMGTags = value; RaisePropertyChanged("CollectIMGTags"); }
         }
 
-        private bool collectLINKTags = true;
+        private bool _collectLINKTags = true;
         public bool CollectLINKTags
         {
-            get { return collectLINKTags; }
-            set { collectLINKTags = value; RaisePropertyChanged("CollectLINKTags"); }
+            get { return _collectLINKTags; }
+            set { _collectLINKTags = value; RaisePropertyChanged("CollectLINKTags"); }
         }
 
-        private bool collectMETATags = true;
+        private bool _collectMETATags = true;
         public bool CollectMETATags
         {
-            get { return collectMETATags; }
-            set { collectMETATags = value; RaisePropertyChanged("CollectMETATags"); }
+            get { return _collectMETATags; }
+            set { _collectMETATags = value; RaisePropertyChanged("CollectMETATags"); }
         }
 
         [System.Xml.Serialization.XmlIgnoreAttribute]
@@ -212,7 +205,7 @@ namespace ExcelConverter.Parser
         {
             get
             {
-                return new System.Drawing.Size() { Height = minImageHeight, Width = minImageWidth };
+                return new System.Drawing.Size { Height = _minImageHeight, Width = _minImageWidth };
             }
             set
             {
@@ -221,21 +214,19 @@ namespace ExcelConverter.Parser
             }
         }
 
-        private string parameter = string.Empty;
+        private string _parameter = string.Empty;
         public string Parameter
         {
             get
             {
-                return parameter;
+                return _parameter;
             }
             set
             {
-                parameter = value;
+                _parameter = value;
                 RaisePropertyChanged("Parameter");
             }
         }
-
-        public ParseRule() { }
 
         public string Parse(HtmlDocument doc, string responseUrl, string urlToParse)
         {
@@ -250,10 +241,8 @@ namespace ExcelConverter.Parser
                 }
                 else
                 {
-                    var links = Helper.GetAllImagesUrlsFromUrl(doc, responseUrl, collectIMGTags, collectLINKTags, collectMETATags)
-                                       .Where(n => Helper.StringLikes(
-                                           Condition == ParseFindRuleCondition.ByLink ? n.Url.AbsoluteUri : n.Node.XPath
-                                           , mask))
+                    var links = Helper.GetAllImagesUrlsFromUrl(doc, responseUrl, _collectIMGTags, _collectLINKTags, _collectMETATags, url => _collectMETATags && Condition == ParseFindRuleCondition.ByLink && Helper.StringLikes(url, mask))
+                                       .Where(n => Helper.StringLikes(Condition == ParseFindRuleCondition.ByLink ? n.Url.AbsoluteUri : n.Node.XPath, mask))
                                        .ToArray();
 
                     if (CheckImageSize)
@@ -266,20 +255,20 @@ namespace ExcelConverter.Parser
             }
             else if (Condition == ParseFindRuleCondition.ByLinkAndIndex || Condition == ParseFindRuleCondition.ByXPathAndIndex)
             {
-                var lInd = parameter.LastIndexOf(";");
-                if (lInd >= 0 && parameter.Length > lInd)
+                var lInd = _parameter.LastIndexOf(";");
+                if (lInd >= 0 && _parameter.Length > lInd)
                 {
                     int index;
-                    if (int.TryParse(parameter.Substring(lInd + 1), out index))
+                    if (int.TryParse(_parameter.Substring(lInd + 1), out index))
                     {
-                        string mask = parameter.Substring(0, lInd);
+                        string mask = _parameter.Substring(0, lInd);
                         if (string.IsNullOrWhiteSpace(doc.DocumentNode.InnerText))
                         {
                             result = urlToParse;
                         }
                         else
                         {
-                            var links = Helper.GetAllImagesUrlsFromUrl(doc, responseUrl, collectIMGTags, collectLINKTags, collectMETATags)
+                            var links = Helper.GetAllImagesUrlsFromUrl(doc, responseUrl, _collectIMGTags, _collectLINKTags, _collectMETATags, url => _collectMETATags && Condition == ParseFindRuleCondition.ByLinkAndIndex && Helper.StringLikes(url, mask))
                                         .Where(n => Helper.StringLikes(
                                             Condition == ParseFindRuleCondition.ByLinkAndIndex ? n.Url.AbsoluteUri : n.Node.XPath
                                             , mask))
